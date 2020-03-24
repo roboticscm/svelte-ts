@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <link rel="stylesheet" href="/bundle.css" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <title>SkyPlus System</title>
+
+    <style>
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+      }
+      .load-screen {
+        background: #000;
+        opacity: 0.8;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+      }
+
+      .loading {
+        color: #fff;
+        margin: 0 auto;
+      }
+    </style>
+
+    <script>
+      window.addEventListener('load', function() {
+        document.body.removeChild(document.getElementById('loadScreen'));
+        document.body.style.cursor = 'auto';
+      });
+    </script>
+  </head>
+
+  <body>
+    <script>
+      document.body.style.cursor = 'wait';
+    </script>
+    <div id="loadScreen" class="load-screen">
+      <div class="loading">Loading...</div>
+    </div>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css"
+    />
+    <script src="/bundle.js"></script>
+  </body>
+</html>
