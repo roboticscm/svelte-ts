@@ -21,7 +21,7 @@
       menuPath: 'system',
       controlId: 'mainNavBarId',
       keys: ['lastMenuPath'],
-      values: [menuPath.startsWith('/') ? menuPath.slice(1) : menuPath]
+      values: [menuPath.startsWith('/') ? menuPath.slice(1) : menuPath],
     });
   };
 </script>

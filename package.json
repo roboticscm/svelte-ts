@@ -29,7 +29,7 @@
     "build": "cross-env NODE_ENV=production webpack",
     "dev": "webpack-dev-server --open",
     "start": "sirv public --single",
-    "format": "npx prettier --write \"{,!(node_modules)/**/}*.{js,jsx}\"",
+    "format": "npx prettier --write 'src/**/*.{js,ts,svelte,css,scss}'",
     "eslint": "npx eslint  src/**/*.*"
   },
   "dependencies": {

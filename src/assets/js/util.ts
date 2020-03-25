@@ -64,7 +64,6 @@ export const markStringSearch = (source: string, search: string, removeAccent: b
   return source;
 };
 
-
-export const genUUID  = () => {
+export const genUUID = () => {
   return Date.now();
-}
+};

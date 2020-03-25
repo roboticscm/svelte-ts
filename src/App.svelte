@@ -1,6 +1,6 @@
 <script lang="ts">
   import { appStore } from '@/store/app';
-  import {menuStore} from '@/store/menu';
+  import { menuStore } from '@/store/menu';
   import { onMount, setContext } from 'svelte';
   import MainLayout from '@/components/layout/main-layout/index.svelte';
   import MainNavBar from '@/components/layout/main-nav-bar/index.svelte';
@@ -11,14 +11,14 @@
   import SearchBar from '@/components/ui/input/search-bar/index.svelte';
   import { T } from '@/assets/js/locale/locale';
   import RouterView from '@/components/ui/router-view/index.svelte';
-  import {skip, take} from 'rxjs/operators'
+  import { skip, take } from 'rxjs/operators';
   let routerView: any;
 
   onMount(() => {
     if (routerView) {
       menuStore.dataList$.pipe(skip(1), take(1)).subscribe((_) => {
         routerView.show(appStore.org.menuPath);
-      })
+      });
     }
   });
 
@@ -27,7 +27,7 @@
 </script>
 
 <MainLayout>
-  <nav slot="header" >
+  <nav slot="header">
     <div class="header-left">
       <BranchDropdown />
       <MainNavBar />
@@ -48,7 +48,7 @@
     </div>
   </nav>
 
-  <div slot="content" style="height: 100%;" >
+  <div slot="content" style="height: 100%;">
     <RouterView bind:this={routerView} hashbang={false} />
   </div>
 </MainLayout>

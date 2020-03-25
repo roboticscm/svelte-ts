@@ -3,8 +3,8 @@
   import Split from 'split-grid';
   import { applyLeftGutterState, leftCollapse } from './helper';
   import { GUTTER_WIDTH } from '@/assets/js/constants';
-  import {settingsStore} from '@/store/settings';
-  import {Settings} from "@/model/settings";
+  import { settingsStore } from '@/store/settings';
+  import { Settings } from '@/model/settings';
 
   export let showTitle: boolean = true;
   export let id: string = '';
@@ -13,19 +13,21 @@
       columnGutters: [
         {
           track: 1,
-          element: document.querySelector('.left-grid-vertical-gutter')
-        }
+          element: document.querySelector('.left-grid-vertical-gutter'),
+        },
       ],
       onDragEnd: (direction: any, track: number) => {
         const gridEle: any = document.querySelector('.view-container-2-col');
         const [leftWidth] = gridEle.style['grid-template-columns'].split(' ');
 
-        settingsStore.saveSettings(new Settings({
+        settingsStore.saveSettings(
+          new Settings({
             controlId: `left${id}`,
             keys: ['lastLeftWidth'],
-            values: [leftWidth]
-        }));
-      }
+            values: [leftWidth],
+          }),
+        );
+      },
     });
 
     const divElement = document.createElement('div');
@@ -40,7 +42,7 @@
     document.querySelector('.left-grid-vertical-gutter').appendChild(divElement);
 
     // loadSettings
-    settingsStore.getUserSettings(`left${id}`).then((res: any []) => {
+    settingsStore.getUserSettings(`left${id}`).then((res: any[]) => {
       const found = res.find((it) => it.key === 'lastLeftWidth');
       if (found) {
         const { value } = found;

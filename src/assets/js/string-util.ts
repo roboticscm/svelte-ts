@@ -34,26 +34,23 @@ export class StringUtil {
     return source.replace(new RegExp(find, 'g'), replace);
   }
 
-  public static replaceAlls(source: string, finds: string[] , replaces: string[]) {
+  public static replaceAlls(source: string, finds: string[], replaces: string[]) {
     if (finds.length === 0 || replaces.length === 0 || StringUtil.isEmpty(source) || finds.length !== replaces.length) {
       return source;
     }
-    let replaceStr =  StringUtil.replaceAll(source, finds[0], replaces[0]);
+    let replaceStr = StringUtil.replaceAll(source, finds[0], replaces[0]);
 
-    for(let i = 1; i < finds.length; i++) {
+    for (let i = 1; i < finds.length; i++) {
       replaceStr = StringUtil.replaceAll(replaceStr, finds[i], replaces[i]);
     }
 
     return replaceStr;
   }
 
-  public static toTitleCase (str) {
-    if(!str) return str;
-    return str.replace(
-        /\w\S*/g,
-        function(txt) {
-          return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-        }
-    );
+  public static toTitleCase(str) {
+    if (!str) return str;
+    return str.replace(/\w\S*/g, function(txt) {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
   }
 }

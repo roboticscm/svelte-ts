@@ -14,20 +14,20 @@ const onwarn = (warning, onwarn) => warning.code === 'css-unused-selector' || on
 
 module.exports = {
   entry: {
-    bundle: ['./src/main.ts']
+    bundle: ['./src/main.ts'],
   },
   resolve: {
     alias: {
       svelte: path.resolve('node_modules', 'svelte'),
-      '@': path.resolve(__dirname, 'src')
+      '@': path.resolve(__dirname, 'src'),
     },
     extensions: ['.mjs', '.js', '.ts', '.svelte', '.css', '.scss'],
-    mainFields: ['svelte', 'browser', 'module', 'main']
+    mainFields: ['svelte', 'browser', 'module', 'main'],
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name].js',
-    chunkFilename: '[name].[id].js'
+    chunkFilename: '[name].[id].js',
   },
   module: {
     rules: [
@@ -38,9 +38,9 @@ module.exports = {
             loader: 'ts-loader',
             options: {
               // transpileOnly: true
-            }
-          }
-        ]
+            },
+          },
+        ],
       },
       {
         test: /\.svelte$/,
@@ -51,12 +51,12 @@ module.exports = {
             onwarn: onwarn,
             preprocess: sveltePreprocess({
               scss: {
-                importer: [magicImporter()]
+                importer: [magicImporter()],
               },
               typescript: {
                 // skips type checking
-                transpileOnly: false
-              }
+                transpileOnly: false,
+              },
             }),
             hotReload: true,
             hotOptions: {
@@ -67,14 +67,14 @@ module.exports = {
               // during component init. This goes funky when your components are
               // not pure enough.
               optimistic: true,
-              noReload: true
+              noReload: true,
               // noPreserveStateKey: '__'
               // See docs of svelte-loader-hot for all available options:
               //
               // https://github.com/rixo/svelte-loader-hot#usage
-            }
-          }
-        }
+            },
+          },
+        },
       },
       // {
       //   test: /\.css$/,
@@ -89,7 +89,7 @@ module.exports = {
       // },
       {
         test: /\.(svg|ico|jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|cur|ani|pdf)(\?.*)?$/,
-        loader: 'file-loader'
+        loader: 'file-loader',
       },
       {
         test: /\.(scss|sass|css)$/,
@@ -100,35 +100,35 @@ module.exports = {
             loader: 'sass-loader',
             options: {
               sassOptions: {
-                importer: magicImporter()
-              }
-            }
-          }
+                importer: magicImporter(),
+              },
+            },
+          },
           // {
           //   loader: 'sass-resources-loader',
           //   options: {
           //     resources: '../sass/sass/index.scss'
           //   }
           // }
-        ]
-      }
-    ]
+        ],
+      },
+    ],
   },
   mode,
   plugins: [
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
-      filename: '[name].css'
+      filename: '[name].css',
     }),
     new webpack.ProvidePlugin({
       j: 'jquery',
-      jQuery: 'jquery'
+      jQuery: 'jquery',
     }),
 
     new CopyPlugin([
       { from: './public/index.html', to: './index.html' },
-      { from: './public/favicon.png', to: './favicon.png' }
-    ])
+      { from: './public/favicon.png', to: './favicon.png' },
+    ]),
   ],
   devtool: prod ? false : 'source-map',
   devServer: {
@@ -137,7 +137,7 @@ module.exports = {
     overlay: true,
     historyApiFallback: true,
     headers: {
-      'Access-Control-Allow-Origin': '*'
-    }
-  }
+      'Access-Control-Allow-Origin': '*',
+    },
+  },
 };

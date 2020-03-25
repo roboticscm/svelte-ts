@@ -6,13 +6,13 @@ import { Http } from '@/assets/js/http';
 const createTree = (id) => {
   const setting = {
     check: {
-      enable: true
+      enable: true,
     },
     data: {
       simpleData: {
-        enable: true
-      }
-    }
+        enable: true,
+      },
+    },
   };
   const data = [
     { id: 1, pId: 0, name: 'pNode 1', open: true },
@@ -29,7 +29,7 @@ const createTree = (id) => {
     { id: 13, pId: 1, name: 'pNode 13 - no child', isParent: true },
     { id: 2, pId: 0, name: 'pNode 2' },
     { id: 21, pId: 2, name: 'pNode 21', open: true },
-    { id: 211, pId: 21, name: 'leaf node 211' }
+    { id: 211, pId: 21, name: 'leaf node 211' },
   ];
 
   window['$'].fn.zTree.init(window['$'](id), setting, data);
@@ -42,7 +42,7 @@ onMount(() => {
     category: 'SYS',
     typeGroup: '',
     page: 1,
-    pageSize: 10
+    pageSize: 10,
   })
     .then((res) => {
       // @ts-ignore
@@ -52,19 +52,19 @@ onMount(() => {
           {
             type: 'text',
             title: 'id',
-            width: 90
+            width: 90,
           },
           {
             type: 'text',
             title: 'key',
-            width: 120
+            width: 120,
           },
           {
             type: 'text',
             title: 'value',
-            width: 120
-          }
-        ]
+            width: 120,
+          },
+        ],
       });
     })
     .catch(console.log);

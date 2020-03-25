@@ -1,3 +1,1 @@
-class LanguageStore {
-
-}
+class LanguageStore {}

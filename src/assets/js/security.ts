@@ -43,7 +43,7 @@ export const getLoginInfo = function() {
     username: username,
     lastName: lastName,
     firstName: firstName,
-    avatarUrl: avatarUrl
+    avatarUrl: avatarUrl,
   };
 };
 
@@ -69,7 +69,7 @@ export const setHeader = function(rawToken: string, userId: any) {
   axios.defaults.headers['Authorization'] = authHeader;
   axios.defaults.headers = {
     'Content-Type': 'application/json',
-    Authorization: authHeader
+    Authorization: authHeader,
   };
 };
 
@@ -79,13 +79,11 @@ export const updateHeader = function(screen: string, func: string) {
   if (lastFuncIndex < 0) {
     prevHeader = `${screen}!!!${func}!!!` + prevHeader;
   } else {
-    prevHeader =
-      `${screen}!!!${func}!!!` +
-      prevHeader.substring(lastFuncIndex + 3, prevHeader.length);
+    prevHeader = `${screen}!!!${func}!!!` + prevHeader.substring(lastFuncIndex + 3, prevHeader.length);
   }
   axios.defaults.headers = {
     'Content-Type': 'application/json',
-    Authorization: prevHeader
+    Authorization: prevHeader,
   };
   axios.defaults.headers['Authorization'] = prevHeader;
 };

@@ -15,7 +15,7 @@ import { Token, API } from '@/assets/js/constants';
 import { menuStore } from '@/store/menu';
 import { sysGetLocaleResourceListByCompanyIdAndLocale } from './assets/js/locale/locale';
 import { appStore } from '@/store/app';
-import {take} from "rxjs/operators";
+import { take } from 'rxjs/operators';
 
 const applyAlphaColor = (alpha: number) => {
   Color.applyApha(getThemeColors(), alpha);
@@ -49,7 +49,7 @@ const loadMenuAndUserSettings = (companyId) => {
     },
     (error) => {
       Debug.errorSection('Main App - menuStore.sysGetRoledMenuPathListByUserId', error);
-    }
+    },
   );
 };
 

@@ -13,7 +13,7 @@ export const leftCollapse = (
   split: any,
   leftGutterMore: boolean,
   lastLeftContentWidth: number,
-  delta: number
+  delta: number,
 ): boolean => {
   const oldSizes = split.getSizes();
   let newSizes: any[];

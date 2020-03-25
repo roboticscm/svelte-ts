@@ -4,7 +4,7 @@ export class Window {
     const top = (window.innerHeight - height) / 2;
     return {
       left: left,
-      top: top
+      top: top,
     };
   }
 }

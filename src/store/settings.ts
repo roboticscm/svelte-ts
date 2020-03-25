@@ -11,14 +11,14 @@ const BASE_URL = 'sys/user-settings/';
 class SettingsStore {
   sysGetUserSettings(companyId: string) {
     return RxHttp.get(`${BASE_URL}${getMethodNameInSnackCase()}`, {
-      companyId
+      companyId,
     });
   }
 
   getUserSettings(controlId: string, menuPath = appStore.org.menuPath) {
     return Http.get(`${BASE_URL}${getMethodNameInSnackCase()}`, {
       menuPath,
-      controlId
+      controlId,
     });
   }
 

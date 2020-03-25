@@ -4,7 +4,6 @@ export class Menu {
   path = '';
 }
 
-
 export class RoleMenu {
   menuId = '';
   menuName = '';
@@ -12,12 +11,11 @@ export class RoleMenu {
   fontIcon = '';
   useFontIcon = false;
   iconData = '';
-  departmentId ='';
-  departmentName='';
+  departmentId = '';
+  departmentName = '';
 }
 
 export class HistoryMenu {
   menuPath = '';
   departmentId = 0;
 }
-

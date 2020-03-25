@@ -8,7 +8,7 @@
   export let hashbang: boolean = true;
   let menuPath: string;
   Page.start({
-    hashbang
+    hashbang,
   });
 
   const loadComponent = (uri: string) => {
@@ -36,6 +36,4 @@
   }
 </script>
 
-<svelte:component this={Component} {menuPath}/>
-
-
+<svelte:component this={Component} {menuPath} />

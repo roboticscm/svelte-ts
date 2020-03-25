@@ -14,19 +14,12 @@
   export let fixedHeader = true;
   export let showHeader = true;
   export let columns: TableColumn[];
-  export let data$: BehaviorSubject<any[]>;
+  export let data: any[];
   export let height: string; // in pixel
 
   let startRow: any = null;
   let selectedRows: number[] = [];
 
-  let data: any [];
-
-  $: {
-    // @ts-ignore
-    data = $data$;
-    applyTable();
-  }
   onMount(() => {
     const tbodyEle: any = document.querySelector(`#${id} tbody`);
     // height must be in vh
@@ -37,13 +30,13 @@
 
   const onSelectedRow = () => {
     // @ts-ignore
-    let selectedRowsData = selectedRows.map((index) => $data$[index]);
+    let selectedRowsData = selectedRows.map((index) => data[index]);
 
     dispatch('selection', selectedRowsData);
   };
 
   const getTableId = () => {
-    const jId: any =  window['$']('#' + id);
+    const jId: any = window['$']('#' + id);
     return jId;
   };
 
@@ -53,10 +46,9 @@
 
     getTableId().SelectableTable(
       {
-        sort: true
+        sort: true,
       },
       function(obj: any) {
-        console.log('1111');
         selectedRows = obj.rows;
         onSelectedRow();
 
@@ -66,7 +58,7 @@
         document.onkeydown = (e) => {
           checkKey(e);
         };
-      }
+      },
     );
   };
 
@@ -92,8 +84,6 @@
   };
 
   const findRowById = (id: any) => {
-    // @ts-ignore
-    const data = $data$;
     for (let i = 0; i < data.length; i++) {
       if (id === data[i].id) {
         return i;
@@ -114,8 +104,7 @@
   };
 
   const getSelectedData = () => {
-    // @ts-ignore
-    return selectedRows.map((index) => $data$[index]);
+    return selectedRows.map((index) => data[index]);
   };
 
   function dotheneedful(sibling) {
@@ -186,6 +175,12 @@
       onSelectedRow();
     });
   };
+
+  // @ts-ignore
+  $: {
+    const _ = data;
+    applyTable();
+  }
 </script>
 
 <style lang="scss">

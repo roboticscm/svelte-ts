@@ -1,10 +1,10 @@
 <script lang="ts">
   import { routerLinkStore } from './store';
   import { createEventDispatcher } from 'svelte';
-  import {take, skip} from 'rxjs/operators';
+  import { take, skip } from 'rxjs/operators';
   import { T } from '@/assets/js/locale/locale';
   import Page from 'page';
-  import {menuStore} from '@/store/menu';
+  import { menuStore } from '@/store/menu';
 
   const { currentComponentUri$ } = routerLinkStore;
   const dispatch = createEventDispatcher();
@@ -26,9 +26,9 @@
     const comUri = `modules${path}/index.svelte`;
     dispatch('navigate', path);
 
-    menuStore.dataList$.pipe(skip(1), take(1)).subscribe((_)=>{
+    menuStore.dataList$.pipe(skip(1), take(1)).subscribe((_) => {
       currentComponentUri$.next(comUri);
-    })
+    });
   };
 
   Page(__path, navigate);

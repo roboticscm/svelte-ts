@@ -1,13 +1,13 @@
 export const createTree = (id) => {
   const setting = {
     check: {
-      enable: true
+      enable: true,
     },
     data: {
       simpleData: {
-        enable: true
-      }
-    }
+        enable: true,
+      },
+    },
   };
 
   const data = [
@@ -25,7 +25,7 @@ export const createTree = (id) => {
     { id: 13, pId: 1, name: 'pNode 13 - no child', isParent: true },
     { id: 2, pId: 0, name: 'pNode 2' },
     { id: 21, pId: 2, name: 'pNode 21', open: true },
-    { id: 211, pId: 21, name: 'leaf node 211' }
+    { id: 211, pId: 21, name: 'leaf node 211' },
   ];
 
   j$.fn.zTree.init(j$(id), setting, data);

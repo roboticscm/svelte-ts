@@ -7,5 +7,5 @@ export const Locale = {
   INV,
   EMR,
   SYS,
-  T
+  T,
 };

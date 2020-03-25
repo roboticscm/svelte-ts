@@ -7,12 +7,7 @@ import { Method } from 'axios';
 const JSONbig = require('json-bigint');
 
 export class RxHttp {
-  public static callApi(
-    method: Method,
-    url: string,
-    params: any,
-    jsonData: any
-  ) {
+  public static callApi(method: Method, url: string, params: any, jsonData: any) {
     let fullUrl: string | null = null;
     if (params) {
       fullUrl = `${API.BASE_URL}${url}${RxHttp.paramParser(params)}`;
@@ -29,7 +24,7 @@ export class RxHttp {
         } else {
           return res;
         }
-      }
+      },
     });
   }
 

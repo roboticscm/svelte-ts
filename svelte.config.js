@@ -6,8 +6,8 @@ module.exports = {
     scss: {
       importer: [
         //scssAliases(aliases),
-        magicImporter()
-      ]
-    }
-  })
+        magicImporter(),
+      ],
+    },
+  }),
 };

@@ -4,11 +4,11 @@ import { User } from '@/model/user';
 import { settingsStore } from '@/store/settings';
 import { getMethodNameInSnackCase } from '@/assets/js/util';
 import { NavBarConfig } from '@/model/nav-bar-config';
-import {menuStore} from "@/modules/sys/menu/store";
-import {Menu, RoleMenu} from "@/modules/sys/menu/model";
-import {take} from "rxjs/operators";
-import {T} from '@/assets/js/locale/locale';
-import {StringUtil} from "@/assets/js/string-util";
+import { menuStore } from '@/modules/sys/menu/store';
+import { Menu, RoleMenu } from '@/modules/sys/menu/model';
+import { take } from 'rxjs/operators';
+import { T } from '@/assets/js/locale/locale';
+import { StringUtil } from '@/assets/js/string-util';
 
 const BASE_URL = 'sys/human-or-org/';
 
@@ -31,7 +31,7 @@ class AppStore {
           this.user$.next(null);
         }
       },
-      (error) => this.user$.error(error)
+      (error) => this.user$.error(error),
     );
   }
 
@@ -44,19 +44,19 @@ class AppStore {
           companyId,
           departmentId,
           lang,
-          menuPath
+          menuPath,
         };
         this.org$.next({
           companyId,
           departmentId,
-          lang
+          lang,
         });
 
         // theme
         this.theme$.next({
           theme,
           alpha,
-          headerHeight
+          headerHeight,
         });
 
         // nav bar config
@@ -64,10 +64,10 @@ class AppStore {
           mainNavBarViewCount: 3,
           showSearchBar: true,
           showHistory: true,
-          historyNavBarViewCount: 2
+          historyNavBarViewCount: 2,
         });
       },
-      (error) => this.org$.error(error)
+      (error) => this.org$.error(error),
     );
   }
 }

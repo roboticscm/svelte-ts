@@ -1,5 +1,5 @@
-import {BehaviorSubject} from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 export const routerLinkStore = {
-    currentComponentUri$: new BehaviorSubject<string>(''),
-}
+  currentComponentUri$: new BehaviorSubject<string>(''),
+};

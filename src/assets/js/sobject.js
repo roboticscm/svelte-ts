@@ -29,8 +29,8 @@ export class SObject {
     }
   }
 
-  static getEqualRow (arr2, keyValues, keyFields) {
-    for(let item of arr2) {
+  static getEqualRow(arr2, keyValues, keyFields) {
+    for (let item of arr2) {
       const keyValues2 = [];
       for (let field of keyFields) {
         keyValues2.push(item[field]);
@@ -64,7 +64,7 @@ export class SObject {
       if (value2 === null) {
         removeArray.push(arr1[i]);
       } else {
-        const isEqual = SObject.simpleObjEqual(arr1[i], value2)
+        const isEqual = SObject.simpleObjEqual(arr1[i], value2);
 
         if (!isEqual) {
           editToArray.push(value2);
@@ -84,7 +84,7 @@ export class SObject {
       if (value1 === null) {
         addArray.push(arr2[i]);
       } else {
-        const isEqual = SObject.simpleObjEqual(arr2[i], value1)
+        const isEqual = SObject.simpleObjEqual(arr2[i], value1);
         if (!isEqual) {
           editFromArray.push(value1);
         }
@@ -95,7 +95,7 @@ export class SObject {
       addArray,
       editFromArray,
       editToArray,
-      removeArray
+      removeArray,
     };
   }
 
@@ -125,7 +125,6 @@ export class SObject {
   }
 
   static simpleArrayEqual(arr1, arr2) {
-
     if (arr1 && arr2 && arr1.length !== arr2.length) {
       return false;
     }

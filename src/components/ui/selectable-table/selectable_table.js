@@ -20,9 +20,9 @@
     var settings = $.extend(
       {
         sort: true,
-        status: 'single'
+        status: 'single',
       },
-      options
+      options,
     );
     return this.each(function() {
       var $row_nums = [];

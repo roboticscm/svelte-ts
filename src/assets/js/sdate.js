@@ -8,7 +8,7 @@ export class SDate {
     const date = new Date(milisecond);
     return date.toLocaleString('vi-VN', {
       dateStyle: 'short',
-      timeStyle: 'short'
+      timeStyle: 'short',
     });
   }
 }

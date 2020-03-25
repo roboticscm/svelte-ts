@@ -5,12 +5,7 @@ import { API } from './constants';
 const JSONbig = require('json-bigint');
 
 export class Http {
-  public static async callApi(
-    method: string,
-    url: string,
-    params: any,
-    jsonData: any
-  ) {
+  public static async callApi(method: string, url: string, params: any, jsonData: any) {
     let fullUrl: string | null = null;
     if (params) {
       fullUrl = `${API.BASE_URL}${url}${Http.paramParser(params)}`;
@@ -29,7 +24,7 @@ export class Http {
           } else {
             return res;
           }
-        }
+        },
       })
         .then((res: any) => {
           resolve(res.data);

@@ -17,7 +17,7 @@ const TYPE_GROUPS = [
   'TAB',
   'MENU',
   'MSG',
-  'COLOR'
+  'COLOR',
 ];
 
 export const IMG: any = {};
@@ -56,7 +56,7 @@ const CATEGORIES_MAP = new Map([
   ['INV', INV],
   ['ACC', ACC],
   ['SYS', SYS],
-  ['COMMON', COMMON]
+  ['COMMON', COMMON],
 ]);
 
 export const convertLocaleResource = function() {
@@ -87,7 +87,7 @@ export const sysGetLocaleResourceListByCompanyIdAndLocale = (companyId: any, loc
       companyId,
       locale,
       includeDeleted: false,
-      includeDisabled: false
+      includeDisabled: false,
     })
       .then((res) => {
         I18N = res;

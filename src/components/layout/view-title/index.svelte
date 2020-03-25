@@ -3,11 +3,11 @@
   import { App } from '@/assets/js/constants';
   import { appStore } from '@/store/app';
   import { RoleMenu } from '@/modules/sys/menu/model';
-  import {ViewStore} from '@/store/view';
+  import { ViewStore } from '@/store/view';
 
   export let view: ViewStore;
 
-  const viewTitle = view.getViewTitle()
+  const viewTitle = view.getViewTitle();
   const selectedMenu = view.getMenu();
 
   document.title = App.NAME + ' - ' + viewTitle;
