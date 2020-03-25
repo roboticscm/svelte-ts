@@ -6,19 +6,40 @@
   import ViewTitle from '@/components/layout/view-title/index.svelte';
   import {App} from '@/assets/js/constants';
   import {ViewStore} from '@/store/view';
+  import {onMount} from 'svelte';
+  import ProgressBar from '@/components/ui/progress-bar/index.svelte';
+  import {take} from 'rxjs/operators';
+  import {pipe} from 'rxjs';
+
 
   export let showTitle = true;
   export let menuPath: string;
 
   let transition = App.USE_ANIMATION ? scale : ()=>{};
   const view = new ViewStore(menuPath);
+  view.tableName='language';
+  view.columns = ['id', 'name', 'locale'];
 
-  console.log('aaaaaa')
+  const init = () => {
+    view.loading = true;
+  }
+
+  const subscribe = () => {
+    view.completeLoading$.pipe(take(1)).subscribe((_) => {
+      view.loading = false;
+    })
+  }
+
+  onMount(() => {
+    init();
+    subscribe();
+  });
 </script>
 
 <style lang="scss">
-  @import '../sass/sass/helpers/variables.scss';
 </style>
+
+<ProgressBar loading={view.loading}></ProgressBar>
 
 {#if showTitle}
   <ViewTitle view={view}/>

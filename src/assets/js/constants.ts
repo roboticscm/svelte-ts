@@ -33,4 +33,5 @@ export  class App {
   static NAME = 'SKy Plus'
   static DEFAULT_ICON = `<i class="fab fa-skyatlas"></i>`
   static USE_ANIMATION = true;
+  static DEFAULT_PAGE_SIZE = 20;
 }

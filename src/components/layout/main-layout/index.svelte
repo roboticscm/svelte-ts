@@ -44,7 +44,7 @@
 </script>
 
 <div class="layout-container">
-  <div class="layout-header-wrapper">
+  <div class="layout-header">
     <slot name="header">Header Section</slot>
   </div>
   <div class="layout-horizontal-gutter" />

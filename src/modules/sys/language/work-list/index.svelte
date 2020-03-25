@@ -1,39 +1,58 @@
 <script lang="ts">
 import SelectableTable from '@/components/ui/selectable-table/index.svelte';
-import {BehaviorSubject} from 'rxjs';
-import {TableColumn} from '@/model/base';
 import {ViewStore} from '@/store/view';
+import {onMount} from 'svelte';
+import {apolloClient} from '@/assets/js/hasura-client';
+import gql from 'graphql-tag';
 
 export let view: ViewStore;
 
-let id = `workList${view.getViewName()}Table`;;
+const id = `workList${view.getViewName()}Table`;;
+const columns = view.createColumns();
+let apolloClient$: any;
 
-const columns$ = new BehaviorSubject<TableColumn[]>([
-  {
-    title: 'Col1',
-    name: 'col1'
-  },
-  {
-    title: 'Col2',
-    name: 'col2'
-  }
-]);
+const subscribe = () => {
+  const query = gql`
+    subscription LangSubscription {
+      language {
+        id
+        locale
+        name
+        sort
+        updated_by
+        updated_date
+        disabled
+        deleted_by
+        deleted_date
+      }
+    }
+  `
+  apolloClient$ = apolloClient.subscribe({
+    query
+  });
+}
+const onceLoad = () => {
+  reload();
+}
 
-const data$ = new BehaviorSubject<any[]>([
-  {
-    col1: '1',
-    col2: '2'
-  },
-  {
-    col1: '21',
-    col2: '22'
-  },
-]);
+const reload =() => {
+  view.getSimpleList();
+}
 
+onMount(() => {
+  subscribe();
+  onceLoad();
+})
+
+let test: any;
+$: {
+  test = $apolloClient$
+  reload();
+}
 </script>
 
 <div id="workListContainer" class="view-left-main">
-  <SelectableTable   {columns$} {data$} {id}></SelectableTable>
+  <SelectableTable   {columns} data$ = {view.dataList$} {id}></SelectableTable>
   <div style="margin-top: 1px;">Paging</div>
 </div>
 <div class="view-left-bottom" />

@@ -27,7 +27,7 @@
 </script>
 
 <MainLayout>
-  <nav slot="header" class="layout-header">
+  <nav slot="header" >
     <div class="header-left">
       <BranchDropdown />
       <MainNavBar />
