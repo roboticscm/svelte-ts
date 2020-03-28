@@ -1,4 +1,4 @@
-import Errors from './errors';
+import { Errors } from './errors';
 // @ts-ignore
 import axios from 'axios';
 import { API } from '../constants';

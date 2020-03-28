@@ -2,11 +2,17 @@
   import { routerLinkStore } from '../router-link/store';
   import Page404 from '@/pages/404/index.svelte';
   import Page from 'page';
+  import { roleControlStore } from '@/store/role-control';
+  import { take, first, catchError, skip } from 'rxjs/operators';
+  import { appStore } from '@/store/app';
 
   let Component;
   const { currentComponentUri$ } = routerLinkStore;
   export let hashbang: boolean = true;
   let menuPath: string;
+  let fullControl = false;
+  let roleControls = [];
+
   Page.start({
     hashbang,
   });
@@ -24,6 +30,20 @@
     }
   };
 
+  const loadRoleControl = (uri: string) => {
+    roleControlStore
+      .sysGetControlListByDepIdAndUserIdAndMenuPath(appStore.org.departmentId, menuPath)
+      .pipe(take(1))
+      .subscribe((res) => {
+        if (res.data.fullControl) {
+          fullControl = true;
+        } else {
+          roleControls = res.data;
+        }
+        loadComponent(uri);
+      });
+  };
+
   export const show = (path: string) => {
     currentComponentUri$.next(`modules/${path}/index.svelte`);
   };
@@ -32,8 +52,8 @@
     // @ts-ignore
     const uri = $currentComponentUri$;
     menuPath = uri.replace('modules/', '').replace('/index.svelte', '');
-    loadComponent(uri);
+    loadRoleControl(uri);
   }
 </script>
 
-<svelte:component this={Component} {menuPath} />
+<svelte:component this={Component} {menuPath} {fullControl} {roleControls} />

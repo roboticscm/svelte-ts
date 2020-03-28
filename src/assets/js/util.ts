@@ -65,5 +65,5 @@ export const markStringSearch = (source: string, search: string, removeAccent: b
 };
 
 export const genUUID = () => {
-  return Date.now();
+  return `${Date.now()}`;
 };

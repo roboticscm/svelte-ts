@@ -12,16 +12,20 @@
 
   export let showTitle = true;
   export let menuPath: string;
+  export let fullControl: boolean;
+  export let roleControls: [];
 
   let transition = App.USE_ANIMATION ? scale : () => {};
   const view = new ViewStore(menuPath);
   view.tableName = 'language';
-  view.columns = ['name', 'locale'];
-  view.loading = true;
+  view.columns = ['id', 'name', 'locale', 'sort'];
+  view.fullControl = fullControl;
+  view.roleControls = roleControls;
+  view.loading$.next(true);
 
   const subscribe = () => {
     view.completeLoading$.pipe(take(1)).subscribe((_) => {
-      view.loading = false;
+      view.loading$.next(false);
     });
   };
 
@@ -34,7 +38,7 @@
 
 </style>
 
-<ProgressBar loading={view.loading} />
+<ProgressBar loading$={view.loading$} />
 
 {#if showTitle}
   <ViewTitle {view} />
@@ -44,6 +48,6 @@
     <WorkList {view} />
   </div>
   <div transition:transition class="template-wrapper" slot="viewContent">
-    <MainContent {view} />
+    <MainContent {view} {menuPath} />
   </div>
 </TwoColumnView>

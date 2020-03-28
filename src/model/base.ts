@@ -18,3 +18,12 @@ export interface PayloadRes {
   payload: any[];
   fullCount: number;
 }
+
+export interface RoleControl {
+  controlId: string;
+  controlCode: string;
+  renderControl: boolean;
+  disableControl: boolean;
+  confirm: boolean;
+  requirePassword: boolean;
+}

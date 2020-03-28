@@ -14,7 +14,7 @@ const BASE_URL = 'sys/human-or-org/';
 
 class AppStore {
   user$ = new BehaviorSubject<User>(null);
-
+  user: User;
   org$ = new BehaviorSubject<any>(null);
   org: any = {};
 
@@ -26,9 +26,8 @@ class AppStore {
     RxHttp.get(`${BASE_URL}${getMethodNameInSnackCase()}`).subscribe(
       (res: any) => {
         if (res.data.length > 0) {
+          this.user = res.data[0];
           this.user$.next(res.data[0]);
-        } else {
-          this.user$.next(null);
         }
       },
       (error) => this.user$.error(error),

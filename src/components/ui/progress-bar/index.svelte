@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let loading = false;
+  export let loading$: any;
   export let smallSize = false;
 </script>
 
@@ -7,6 +7,6 @@
 
 </style>
 
-{#if loading}
+{#if $loading$}
   <i class="progress-bar {smallSize ? 'small-progress-bar' : ''} fa fa-spinner fa-spin" />
 {/if}

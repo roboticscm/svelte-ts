@@ -179,7 +179,9 @@
   // @ts-ignore
   $: {
     const _ = data;
-    applyTable();
+    setTimeout(() => {
+      applyTable();
+    }, 500);
   }
 </script>
 

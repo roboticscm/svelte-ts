@@ -1,4 +1,4 @@
-export default class CommonValidation {
+export class CommonValidation {
   public static REQUIRED_VALUE = 'COMMON.MSG.REQUIRED_VALUE';
   public static isEmptyString(source: string) {
     if (!source) {

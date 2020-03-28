@@ -2,7 +2,7 @@ import { Debug } from '../debug';
 // @ts-ignore
 import { T } from '@/assets/js/locale/locale';
 
-export default class Errors {
+export class Errors {
   public errors: any;
   constructor() {
     this.errors = {};
@@ -29,7 +29,7 @@ export default class Errors {
     // focus on first element raised error
     let firstError = Object.keys(this.errors)[0];
     if (firstError) {
-      const el = document.getElementById(firstError);
+      const el = document.getElementsByName(firstError)[0];
       if (el) {
         el.focus();
       } else {

@@ -3,4 +3,7 @@ export class User {
   lastName = '';
   firstName = '';
   username = '';
+  fontIcon = '';
+  useFontIcon = false;
+  iconData = '';
 }

@@ -33,4 +33,6 @@ export class App {
   static DEFAULT_ICON = `<i class="fab fa-skyatlas"></i>`;
   static USE_ANIMATION = true;
   static DEFAULT_PAGE_SIZE = 20;
+  static AUTO_COMPLETE = 'off';
+  static SNACKBAR_TIMEOUT = 3000;
 }

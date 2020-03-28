@@ -19,7 +19,9 @@
 
   const hidePopup = () => {
     const ele: any = document.querySelector('#moreNavBarDropdown');
-    ele.classList.remove('show-dropdown');
+    if (ele) {
+      ele.classList.remove('show-dropdown');
+    }
   };
 
   const onNavigate = (event: any) => {
