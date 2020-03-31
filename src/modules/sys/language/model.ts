@@ -3,4 +3,6 @@ export class Language {
   name = '';
   locale = '';
   sort = 0;
+  updatedBy = '';
+  updatedDate = '';
 }

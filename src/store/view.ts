@@ -11,28 +11,33 @@ import gql from 'graphql-tag';
 import { Debug } from '@/assets/js/debug';
 import { ButtonPressed } from '@/components/ui/button/types';
 import { menuControlStore } from '@/store/menu-control';
-import { SObject } from '@/assets/js/sobject';
+import { getDiffFieldsObject, SObject } from '@/assets/js/sobject';
+import { SDate } from '@/assets/js/sdate';
 
 export class ViewStore {
   tableName: string;
   columns: string[] = ['name'];
-  orderBy: string[] = ['updated_date desc, created_date desc, name'];
+  orderBy: string[] = ['updated_or_created_date desc nulls last, name'];
+  trashRestoreColumns: string[] = ['name'];
   page = 1;
   pageSize = App.DEFAULT_PAGE_SIZE;
   onlyMe = false;
   includeDisabled = true;
-  fullCount: number;
+  fullCount$ = new BehaviorSubject<number>(null);
   loading$ = new BehaviorSubject<boolean>(false);
   saveRunning = false;
   deleteRunning = false;
 
   isReadOnlyMode = false; // true: form can edit, false form disable
   isUpdateMode = false; // true: update mode, false: save mode
-
+  hasAnyDeletedRecord: false;
   dataList$ = new BehaviorSubject<any[]>([]);
-
+  hasAnyDeletedRecord$ = new BehaviorSubject<boolean>(false);
   roleControls: RoleControl[];
   fullControl: boolean;
+
+  needSelectId$ = new BehaviorSubject<string>(null);
+  needHighlightId$ = new BehaviorSubject<string>(null);
 
   completeLoading$ = forkJoin([
     this.dataList$.pipe(
@@ -72,7 +77,7 @@ export class ViewStore {
       .subscribe((res: AxiosResponse) => {
         const data: PayloadRes = res.data;
         this.dataList$.next(data.payload);
-        this.fullCount = data.fullCount;
+        this.fullCount$.next(data.fullCount);
       });
   };
 
@@ -87,17 +92,17 @@ export class ViewStore {
       });
   };
 
-  createQuerySubscription = () => {
+  createQuerySubscription = (withVar: boolean = false) => {
     const query = gql`
-      subscription LangSubscription {
-        language {
+      subscription LangSubscription ${withVar ? '($id: bigint!, $updatedBy: bigint!)' : ''} {
+        language ${withVar ? '(where: {_and: [ {id: { _eq: $id }}, {updated_by: { _neq: $updatedBy }}]})' : ''} {
           id
           ${this.columns.map((it) => it + '\n')}
-          updated_by
-          updated_date
+          updatedBy: updated_by
+          updatedDate: updated_date
           disabled
-          deleted_by
-          deleted_date
+          deletedBy: deleted_by
+          deletedDate: deleted_date
         }
       }
     `;
@@ -290,21 +295,32 @@ export class ViewStore {
     return this.verifySimpleAction(buttonId, confirmModalRef, passwordConfirmModalRef, 'DELETE', extraMessage);
   };
 
-  checkForNoDataChange = (beforeData: any, currentData: any, snackbar: any) => {
+  checkObjectArrayChange = (beforeData: any, currentData: any, snackbar: any) => {
     let changedObject = SObject.getDiffRowObjectArray(beforeData, currentData);
 
     if (SObject.isEmptyField(changedObject)) {
       snackbar.showNoDataChange();
       return true;
     }
+    return changedObject;
+  };
 
+  checkObjectChange = (beforeData: any, currentData: any, snackbar: any) => {
+    let changedObject = getDiffFieldsObject(beforeData, currentData);
+
+    if (SObject.isEmptyField(changedObject)) {
+      if (snackbar) {
+        snackbar.showNoDataChange();
+      }
+      return null;
+    }
     return changedObject;
   };
 
   showViewConfigModal = (
     buttonId: string,
     confirmModalRef: any,
-    passwordConfirmModalRef: any,
+    confirmPasswordModalRef: any,
     configModalRef: any,
     snackbarRef: any,
   ) => {
@@ -312,31 +328,108 @@ export class ViewStore {
       return confirmModalRef.show(`${T('COMMON.MSG.SHOW_VIEW_CONFIG')}. ${T('COMMON.MSG.ARE_YOU_SURE')}?`);
     };
 
-
-    this.verifyAction(buttonId, confirmCallback, passwordConfirmModalRef).then ((_) => {
+    this.verifyAction(buttonId, confirmCallback, confirmPasswordModalRef).then((_) => {
       menuControlStore.sysGetControlListByMenuPath(this.menuPath).then((data: any) => {
         configModalRef.show(data).then((buttonPressed: ButtonPressed) => {
           if (buttonPressed === ButtonPressed.OK) {
             const newData = configModalRef.getData();
-            let dataChanged = this.checkForNoDataChange(data, newData, snackbarRef);
+            let dataChanged = this.checkObjectArrayChange(data, newData, snackbarRef);
             if (typeof dataChanged !== 'boolean') {
               dataChanged = dataChanged.filter(
-                  (item: any) => item.code !== 'btnConfig' || (item.code === 'btnConfig' && item.checked),
+                (item: any) => item.code !== 'btnConfig' || (item.code === 'btnConfig' && item.checked),
               );
               if (dataChanged.length > 0) {
                 menuControlStore
-                    .saveOrUpdateOrDelete({
-                      menuPath: this.menuPath,
-                      menuControls: dataChanged,
-                    })
-                    .then((_: any) => {
-                      location.reload();
-                    });
+                  .saveOrUpdateOrDelete({
+                    menuPath: this.menuPath,
+                    menuControls: dataChanged,
+                  })
+                  .then((_: any) => {
+                    location.reload();
+                  });
               }
             }
           }
         });
       });
+    });
+  };
+
+  showTrashRestoreModal = (
+    buttonId: string,
+    onlyMe: boolean,
+    confirmModalRef: any,
+    confirmPasswordModalRef: any,
+    trashRestoreModalRef: any,
+    snackbarRef: any,
+  ) => {
+    this.verifyAction(
+      buttonId,
+      () => {
+        confirmModalRef.show(`${T('COMMON.MSG.SHOW_TRUSH_RESTORE')}. ${T('COMMON.MSG.ARE_YOU_SURE')}?`);
+      },
+      confirmPasswordModalRef,
+    ).then(() => {
+      this.doShowTrashRestoreModal(onlyMe, trashRestoreModalRef, snackbarRef);
+    });
+  };
+
+  doShowTrashRestoreModal = (onlyMe: boolean, trashRestoreModalRef: any, snackbarRef: any) => {
+    tableUtilStore.getAllDeletedRecords(this.tableName, this.trashRestoreColumns, onlyMe).then((res: any) => {
+      const newData = res
+        ? res.map((item: any, index: any) => {
+            item.restore = false;
+            item.foreverDelete = false;
+            item.deletedDate = SDate.convertMilisecondToDateTimeString(item.deletedDate);
+            return item;
+          })
+        : [];
+
+      trashRestoreModalRef.show(newData).then((buttonPressed: ButtonPressed) => {
+        if (buttonPressed === ButtonPressed.OK) {
+          const newData = trashRestoreModalRef.getData();
+          if (newData && newData.length > 0) {
+            const filter = newData
+              .filter((item: any) => item.restore === true || item.foreverDelete === true)
+              .map((item: any) => {
+                delete item.deletedBy;
+                delete item.deletedDate;
+                return item;
+              });
+            if (filter && filter.length > 0) {
+              const deletedIds = filter
+                .filter((item: any) => item.foreverDelete === true)
+                .map((it: any) => it.id)
+                .join(',');
+
+              const restoreIds = filter
+                .filter((item: any) => item.restore === true)
+                .map((it: any) => it.id)
+                .join(',');
+
+              tableUtilStore.restoreOrForeverDelete(this.tableName, deletedIds, restoreIds).then(() => {
+                if (deletedIds && deletedIds.split(',').length === newData.length) {
+                  snackbarRef.showTrashEmpty();
+                } else {
+                  if (restoreIds) {
+                    snackbarRef.showTrashRestoreSuccess();
+                  }
+                }
+              });
+            } else {
+              snackbarRef.showNoDataChange();
+            }
+          }
+        }
+      });
+    });
+  };
+
+  checkDeletedRecord = (onlyMe: boolean) => {
+    tableUtilStore.hasAnyDeletedRecord(this.tableName, onlyMe).then((data: any) => {
+      if (data.length > 0) {
+        this.hasAnyDeletedRecord$.next(data[0].exists);
+      }
     });
   };
 }

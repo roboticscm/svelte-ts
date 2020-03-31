@@ -21,6 +21,26 @@
   export const showDeleteSuccess = (extraMsg: string = '') => {
     show(T('SYS.MSG.DELETE_SUCCESS') + (StringUtil.isEmpty(extraMsg) ? '' : '. ' + extraMsg));
   };
+
+  export const showUpdateSuccess = (extraMsg: string = '') => {
+    show(T('SYS.MSG.UPDATE_SUCCESS') + (StringUtil.isEmpty(extraMsg) ? '' : '. ' + extraMsg));
+  };
+
+  export const showUnknownError = (extraMsg: string = '') => {
+    show(T('SYS.MSG.UNKNOWN_ERROR') + (StringUtil.isEmpty(extraMsg) ? '' : '. ' + extraMsg));
+  };
+
+  export const showTrashEmpty = (extraMsg: string = '') => {
+    show(T('SYS.MSG.TRASH_EMPTY') + (StringUtil.isEmpty(extraMsg) ? '' : '. ' + extraMsg));
+  };
+
+  export const showTrashRestoreSuccess = (extraMsg: string = '') => {
+    show(T('SYS.MSG.TRASH_RESTORE_SUCCESS') + (StringUtil.isEmpty(extraMsg) ? '' : '. ' + extraMsg));
+  };
+
+  export const showNoDataChange = () => {
+    show(T('SYS.MSG.NO_DATA_CHANGE'));
+  };
 </script>
 
 <style lang="scss">

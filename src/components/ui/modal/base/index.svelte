@@ -3,7 +3,7 @@
   import { ButtonType, ButtonPressed } from '@/components/ui/button/types';
   import { ModalType, ModalId } from '@/components/ui/modal/types';
   import { createModal } from '../use-modal';
-  import { onMount, tick } from 'svelte';
+  import { onMount, createEventDispatcher, onDestroy } from 'svelte';
   import { StringUtil } from '@/assets/js/string-util';
   import { T } from '@/assets/js/locale/locale';
   import PasswordInput from '@/components/ui/input/password-input/index.svelte';
@@ -11,23 +11,43 @@
   import { appStore } from '@/store/app';
   import Form from '@/assets/js/form/form';
   import { getMethodNameInSnackCase } from '@/assets/js/util';
+  import { catchError } from 'rxjs/operators';
+  import { of } from 'rxjs';
 
+  const dispatch = createEventDispatcher();
   export let id: string;
   export let title = '';
   export let fontIcon = '';
   export let iconData = '';
   export let showControlButton = true;
   export let menuPath: string;
-  export let modalType:ModalType = ModalType.Custom;
+  export let modalType: ModalType = ModalType.Custom;
   export let showOkButton = true;
   export let showCancelButton: boolean = undefined;
   export let showCloseButton = true;
+  export let contentClass = 'modal-content';
+  export let okButtonTitle: string = undefined;
+  export let cancelButtonTitle: string = undefined;
 
   let modalWrapperRef: any;
   let modalRef: any;
   let passwordRef: any;
 
   const useModal = createModal(menuPath);
+
+  const onResize = (event: any) => {
+    if (modalRef) {
+      useModal.state.width = modalRef.style.width;
+      useModal.state.height = modalRef.style.height;
+      dispatch('containerResize', {
+        width: useModal.state.width,
+        height: useModal.state.height,
+      });
+    }
+  };
+
+  // @ts-ignore
+  const resizeObserver = new ResizeObserver(onResize);
 
   let form = new Form({
     username: appStore.user.username,
@@ -39,7 +59,7 @@
   };
 
   export const show = (content: string = '') => {
-    return new Promise( (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       useModal.state.content = content;
       useModal.state.resolve = resolve;
       form.reset();
@@ -71,24 +91,48 @@
   onMount(() => {
     useModal.loadSettings(modalRef);
     useModal.dragElement(modalRef);
+    resizeObserver.observe(modalRef);
+  });
+
+  onDestroy(() => {
+    if (modalRef) {
+      resizeObserver.unobserve(modalRef);
+    }
   });
 
   function loginWithoutGenToken() {
     form
       .post(`sys/auth/${getMethodNameInSnackCase()}`)
-      .then((res: any) => {
-        if (useModal.state.resolve) {
-          modalWrapperRef.classList.remove('show-modal');
-          useModal.state.resolve(ButtonPressed.OK);
+      .pipe(
+        catchError((error) => {
+          return of(error);
+        }),
+      )
+      .subscribe((res: any) => {
+        if (res.response && res.response.data) {
+          // error
+          form.errors.errors = form.recordErrors(res.response.data);
+        } else {
+          if (useModal.state.resolve) {
+            modalWrapperRef.classList.remove('show-modal');
+            useModal.state.resolve(ButtonPressed.OK);
+          }
         }
-      })
-      .catch((error: any) => {
-        form.errors.errors = { ...form.errors.errors };
-        console.log('error', error);
       });
   }
 
-  const preset = (_id: string, _title: string, _fontIcon: string, _showCancelButton: boolean) => {
+  export const getHeight = () => {
+    return useModal.state.height;
+  };
+
+  const preset = (
+    _id: string,
+    _title: string,
+    _fontIcon: string,
+    _showCancelButton: boolean,
+    _okButtonTitle: string = undefined,
+    _cancelButtonTitle: string = undefined,
+  ) => {
     if (StringUtil.isEmpty(id) && !StringUtil.isEmpty(_id)) {
       id = _id;
     }
@@ -102,6 +146,14 @@
     if (showCancelButton === undefined && _showCancelButton !== undefined) {
       showCancelButton = _showCancelButton;
     }
+
+    if (okButtonTitle === undefined && _okButtonTitle !== undefined) {
+      okButtonTitle = T(`COMMON.BUTTON.${_okButtonTitle}`);
+    }
+
+    if (cancelButtonTitle === undefined && _cancelButtonTitle !== undefined) {
+      cancelButtonTitle = T(`COMMON.BUTTON.${_cancelButtonTitle}`);
+    }
   };
 
   // @ts-ignore
@@ -112,11 +164,11 @@
         break;
 
       case ModalType.Confirm:
-        preset(ModalId.Confirm, 'CONFIRM', '<i class="fa fa-question-circle"></i>', true);
+        preset(ModalId.Confirm, 'CONFIRM', '<i class="fa fa-question-circle"></i>', true, 'YES', 'NO');
         break;
 
       case ModalType.ConfirmPassword:
-        preset(ModalId.ConfirmPassword, 'CONFIRM_PASSWORD', '<i class="fa fa-key"></i>', true);
+        preset(ModalId.ConfirmPassword, 'CONFIRM_PASSWORD', '<i class="fa fa-key"></i>', true, 'YES', 'NO');
         break;
 
       case ModalType.InputText:
@@ -161,7 +213,7 @@
         </div>
       </div>
 
-      <div class="modal-content">
+      <div class={contentClass}>
         {@html useModal.state.content}
 
         {#if modalType === ModalType.ConfirmPassword}
@@ -192,17 +244,16 @@
         <div class="modal-controller" style={'text-align: ' + (showCancelButton ? 'right' : 'center')}>
           {#if showOkButton}
             {#if modalType === ModalType.ConfirmPassword}
-              <Button type="submit" btnType={ButtonType.OkModal} />
+              <Button type="submit" btnType={ButtonType.OkModal} title={okButtonTitle} />
             {:else}
-              <Button on:click={onOK} btnType={ButtonType.OkModal} />
+              <Button on:click={onOK} btnType={ButtonType.OkModal} title={okButtonTitle} />
             {/if}
           {/if}
           {#if showCancelButton}
-            <Button on:click={onCancel} btnType={ButtonType.CancelModal} />
+            <Button on:click={onCancel} btnType={ButtonType.CancelModal} title={cancelButtonTitle} />
           {/if}
         </div>
       {/if}
-
     </div>
   </form>
 </div>

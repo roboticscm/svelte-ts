@@ -2,8 +2,8 @@ import { Window } from '@/assets/js/window';
 import { UrlUtil } from '@/assets/js/url-util';
 import { Settings } from '@/model/settings';
 import { settingsStore } from '@/store/settings';
-import {ModalType} from "@/components/ui/modal/types";
-import {ButtonPressed} from "@/components/ui/button/types";
+import { ModalType } from '@/components/ui/modal/types';
+import { ButtonPressed } from '@/components/ui/button/types';
 
 export const createModal = (menuPath: string, widthInPixel: number = null, heightInPixel: number = null) => {
   const state = {
@@ -12,7 +12,7 @@ export const createModal = (menuPath: string, widthInPixel: number = null, heigh
     left: '',
     top: '',
     content: '',
-    resolve: (ButtonPressed)=>{},
+    resolve: (ButtonPressed) => {},
   };
 
   const closeModal = (modalWrapperRef: any, action: ButtonPressed) => {
@@ -119,6 +119,8 @@ export const createModal = (menuPath: string, widthInPixel: number = null, heigh
             modalRef.style.top = `${pos.top}px`;
           }
         }
+        state.width = modalRef.style.width;
+        state.height = modalRef.style.height;
       })
       .catch((error: any) => {
         console.error(error);

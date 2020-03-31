@@ -15,7 +15,7 @@
   export let showHeader = true;
   export let columns: TableColumn[];
   export let data: any[];
-  export let height: string; // in pixel
+  export let height: string = undefined; // in pixel
 
   let startRow: any = null;
   let selectedRows: number[] = [];
@@ -69,7 +69,7 @@
     });
   };
 
-  const unSelectAll = () => {
+  export const unSelectAll = () => {
     getTableId().selectAll(false, function(obj: any) {
       selectedRows = obj.rows;
       onSelectedRow();
@@ -85,7 +85,7 @@
 
   const findRowById = (id: any) => {
     for (let i = 0; i < data.length; i++) {
-      if (id === data[i].id) {
+      if (id && data[i].id && id.toString() === data[i].id.toString()) {
         return i;
       }
     }
@@ -93,12 +93,21 @@
     return -1;
   };
 
-  const selectRowById = (id: any) => {
+  export const selectRowById = (id: any) => {
     const row = findRowById(id);
     if (row >= 0) {
       getTableId().selectRow(row, function(obj: any) {
         selectedRows = obj.rows;
         onSelectedRow();
+      });
+    }
+  };
+
+  export const highlightRowById = (id: any) => {
+    const row = findRowById(id);
+    if (row >= 0) {
+      getTableId().selectRow(row, function(obj: any) {
+        selectedRows = obj.rows;
       });
     }
   };

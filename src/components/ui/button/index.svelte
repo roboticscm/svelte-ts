@@ -13,6 +13,11 @@
   export let disabled = false;
   export let running = false;
 
+  let btnRef: any;
+  export const getTarget = () => {
+    return btnRef;
+  };
+
   const preset = (_id: string, _title: string, _icon: string, _className: string) => {
     if (StringUtil.isEmpty(id) && !StringUtil.isEmpty(_id)) {
       id = _id;
@@ -60,14 +65,14 @@
         preset(undefined, 'OK', '<i class="fa fa-check"></i>', 'btn-success');
         break;
       case ButtonType.CancelModal:
-        preset(undefined, 'CANCEL', '<i class="fa fa-times"></i>', 'btn-normal');
+        preset(undefined, 'CANCEL', '<i class="fa fa-times"></i>', 'btn-danger');
         break;
       default:
     }
   }
 </script>
 
-<button {id} {type} class={className} {disabled} on:click>
+<button bind:this={btnRef} {id} {type} class={className} {disabled} on:click>
   {#if running}
     <i class="fa fa-spinner fa-spin" />
   {:else}

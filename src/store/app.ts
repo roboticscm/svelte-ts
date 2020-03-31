@@ -2,6 +2,7 @@ import { RxHttp } from '@/assets/js/rx-http';
 import { BehaviorSubject } from 'rxjs';
 import { User } from '@/model/user';
 import { settingsStore } from '@/store/settings';
+import { humanOrOrgStore } from '@/modules/sys/human-or-org/store';
 import { getMethodNameInSnackCase } from '@/assets/js/util';
 import { NavBarConfig } from '@/model/nav-bar-config';
 import { menuStore } from '@/modules/sys/menu/store';
@@ -9,8 +10,6 @@ import { Menu, RoleMenu } from '@/modules/sys/menu/model';
 import { take } from 'rxjs/operators';
 import { T } from '@/assets/js/locale/locale';
 import { StringUtil } from '@/assets/js/string-util';
-
-const BASE_URL = 'sys/human-or-org/';
 
 class AppStore {
   user$ = new BehaviorSubject<User>(null);
@@ -22,16 +21,16 @@ class AppStore {
 
   navBarConfig$ = new BehaviorSubject<NavBarConfig>(new NavBarConfig());
 
-  sysGetUserInfoById() {
-    RxHttp.get(`${BASE_URL}${getMethodNameInSnackCase()}`).subscribe(
-      (res: any) => {
-        if (res.data.length > 0) {
-          this.user = res.data[0];
-          this.user$.next(res.data[0]);
+  getCurrentUserInfo() {
+    humanOrOrgStore
+      .sysGetUserInfoById(null)
+      .then((res: any) => {
+        if (res.length > 0) {
+          this.user = res[0];
+          this.user$.next(res[0]);
         }
-      },
-      (error) => this.user$.error(error),
-    );
+      })
+      .catch((error) => this.user$.error(error));
   }
 
   getUserSettings(companyId: string) {

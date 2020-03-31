@@ -1,7 +1,8 @@
 import { Errors } from './errors';
 // @ts-ignore
-import axios from 'axios';
+import axios, { Method } from 'axios';
 import { API } from '../constants';
+import { RxHttp } from '@/assets/js/rx-http';
 // @ts-ignore
 const JSONbig = require('json-bigint');
 
@@ -60,32 +61,12 @@ export default class Form {
     return this.submit('delete', url);
   }
 
-  submit(requestType: string, url: string) {
-    return new Promise((resolve, reject) => {
-      axios[requestType](`${API.BASE_URL}${url}`, JSONbig.stringify(this.data()), {
-        transformResponse: (res: any) => {
-          if (res.includes('{') || res.includes('[')) {
-            return JSONbig.parse(res);
-          } else {
-            return res;
-          }
-        },
-      })
-        .then((res: any) => {
-          this.onSuccess(res.data);
-          resolve(res.data);
-        })
-        .catch((error: any) => {
-          this.onFail(error.response.data);
-          reject(error.response.data);
-        });
-    });
+  submit(requestType: Method, url: string) {
+    return RxHttp.callApi(requestType, url, undefined, JSONbig.stringify(this.data()));
   }
 
-  onSuccess(data: any) {
-    this.reset();
-  }
-  onFail(errors: Errors) {
+  recordErrors(errors: Errors) {
     this.errors.record(errors);
+    return this.errors.errors;
   }
 }

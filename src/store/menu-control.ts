@@ -1,5 +1,6 @@
 import { Http } from '@/assets/js/http';
 import { getMethodNameInSnackCase } from '@/assets/js/util';
+// @ts-ignore
 const JSONbig = require('json-bigint');
 
 const BASE_URL = 'sys/menu-control/';

@@ -6,6 +6,7 @@
   export let subTitle: string;
   export let containerWidth: string;
   export let menuPath: string;
+  export let columns: any[];
 
   let modalRef: any;
   let excelGridRef: any;
@@ -13,31 +14,52 @@
 
   let height: string;
 
+  const createDynamicColumns = () => {
+    const dynCols = [];
+    columns.forEach((it) => {
+      dynCols.push({
+        type: 'text',
+        title: T(`COMMON.LABEL.${it.toUpperCase()}`),
+        name: it,
+        width: 100,
+        readOnly: true,
+      });
+    });
+    return dynCols;
+  };
+
   let data: any[];
-  const columns = [
+  const fullColumns = [
     {
       type: 'hidden',
-      name: 'controlId',
+      name: 'id',
     },
+    ...createDynamicColumns(),
     {
-      type: 'checkbox',
-      title: T('COMMON.LABEL.USE'),
-      name: 'checked',
-      width: 70,
+      type: 'text',
+      title: T('COMMON.LABEL.DELETED_BY'),
+      name: 'deletedBy',
+      width: 160,
+      readOnly: true,
     },
     {
       type: 'text',
-      title: T('COMMON.LABEL.CODE'),
-      name: 'code',
+      title: T('COMMON.LABEL.DELETED_DATE'),
+      name: 'deletedDate',
       width: 80,
       readOnly: true,
     },
     {
-      type: 'text',
-      title: T('COMMON.LABEL.NAME'),
-      name: 'name',
-      width: 120,
-      readOnly: true,
+      type: 'checkbox',
+      title: T('COMMON.LABEL.RESTORE'),
+      name: 'restore',
+      width: 70,
+    },
+    {
+      type: 'checkbox',
+      title: T('COMMON.LABEL.FOREVER_DELETE'),
+      name: 'foreverDelete',
+      width: 70,
     },
   ];
 
@@ -66,8 +88,8 @@
   on:containerResize={onResize}
   {menuPath}
   contentClass="full-modal-content"
-  fontIcon="<i class='fa fa-cog'></i>"
-  title={T('COMMON.LABEL.CONFIG') + ' - ' + subTitle}
+  fontIcon="<i class='fa fa-trash-restore-alt'></i>"
+  title={T('COMMON.LABEL.TRASH_RESTORE') + ' - ' + subTitle}
   {id}
   bind:this={modalRef}>
   <svelte:component
@@ -76,7 +98,7 @@
     {menuPath}
     bind:this={excelGridRef}
     id={'grid' + id}
-    {columns}
+    columns={fullColumns}
     {data}
     {containerWidth}
     fullWidth={true}>

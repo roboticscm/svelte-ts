@@ -51,8 +51,10 @@
   $: {
     // @ts-ignore
     const uri = $currentComponentUri$;
-    menuPath = uri.replace('modules/', '').replace('/index.svelte', '');
-    loadRoleControl(uri);
+    if (uri) {
+      menuPath = uri.replace('modules/', '').replace('/index.svelte', '');
+      loadRoleControl(uri);
+    }
   }
 </script>
 
