@@ -6,7 +6,7 @@
   import { take, first, catchError, skip } from 'rxjs/operators';
   import { appStore } from '@/store/app';
 
-  let Component;
+  let TheComponent;
   const { currentComponentUri$ } = routerLinkStore;
   export let hashbang: boolean = true;
   let menuPath: string;
@@ -22,10 +22,10 @@
       import(`@/${uri}`)
         .then((res) => {
           const { default: com } = res;
-          Component = com;
+          TheComponent = com;
         })
         .catch((error) => {
-          Component = Page404;
+          TheComponent = Page404;
         });
     }
   };
@@ -58,4 +58,4 @@
   }
 </script>
 
-<svelte:component this={Component} {menuPath} {fullControl} {roleControls} />
+<svelte:component this={TheComponent} {menuPath} {fullControl} {roleControls} />

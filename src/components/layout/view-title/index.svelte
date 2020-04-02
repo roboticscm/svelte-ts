@@ -8,7 +8,7 @@
   export let view: ViewStore;
 
   const viewTitle = view.getViewTitle();
-  const selectedMenu = view.getMenu();
+  const selectedMenu = menuStore.selectedData;
 
   document.title = App.NAME + ' - ' + viewTitle;
 </script>

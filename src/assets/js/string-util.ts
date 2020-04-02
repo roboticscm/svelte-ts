@@ -53,4 +53,13 @@ export class StringUtil {
       return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
   }
+
+  public static toUpperCaseWithUnderscore (str) {
+    if (str) {
+      return str.split(/(?=[A-Z])/).join('_').toUpperCase();
+    } else {
+      return str;
+    }
+
+  }
 }

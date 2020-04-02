@@ -48,7 +48,7 @@
     </div>
   </nav>
 
-  <div slot="content" style="height: 100%;">
+  <div slot="default" style="height: 100%;">
     <RouterView bind:this={routerView} hashbang={false} />
   </div>
 </MainLayout>

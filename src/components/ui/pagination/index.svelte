@@ -10,6 +10,7 @@
   export let autoLoad = false;
   export let showDisabledButton = true;
   export let showFirstLastButton = true;
+  export let menuPath: string;
 
   const sizes = [3, 10, 20, 50, 100, 500, 1000, -1];
   let pageSize = sizes[0];
@@ -49,7 +50,7 @@
   export const loadSettings = () => {
     return new Promise((resolve, reject) => {
       settingsStore
-        .getUserSettings('pageSizeSelectId')
+        .getUserSettings('pageSizeSelectId', menuPath)
         .then((res: any) => {
           const filter = res.filter((it) => it.key === 'lastPageSize');
           if (filter.length > 0) {
@@ -71,7 +72,7 @@
   const onPageSizeChange = (event) => {
     pageSize = +event.target.value;
     settingsStore.saveSettings({
-      menuPath: undefined,
+      menuPath,
       controlId: 'pageSizeSelectId',
       keys: ['lastPageSize'],
       values: [`${pageSize}`],

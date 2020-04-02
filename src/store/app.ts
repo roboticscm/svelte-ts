@@ -5,7 +5,6 @@ import { settingsStore } from '@/store/settings';
 import { humanOrOrgStore } from '@/modules/sys/human-or-org/store';
 import { getMethodNameInSnackCase } from '@/assets/js/util';
 import { NavBarConfig } from '@/model/nav-bar-config';
-import { menuStore } from '@/modules/sys/menu/store';
 import { Menu, RoleMenu } from '@/modules/sys/menu/model';
 import { take } from 'rxjs/operators';
 import { T } from '@/assets/js/locale/locale';

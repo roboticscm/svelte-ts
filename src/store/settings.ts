@@ -15,7 +15,7 @@ class SettingsStore {
     });
   }
 
-  getUserSettings(controlId: string, menuPath = appStore.org.menuPath) {
+  getUserSettings(controlId: string, menuPath: string) {
     return Http.get(`${BASE_URL}${getMethodNameInSnackCase()}`, {
       menuPath,
       controlId,
@@ -23,9 +23,6 @@ class SettingsStore {
   }
 
   saveSettings(obj: Settings) {
-    if (!obj.menuPath) {
-      obj.menuPath = appStore.org.menuPath;
-    }
     return Http.post(`${BASE_URL}save-or-update`, JSONbig.stringify(obj));
   }
 }

@@ -76,22 +76,29 @@ export const createModal = (menuPath: string, widthInPixel: number = null, heigh
   };
 
   const saveModalState = (modalRef: any) => {
-    if (!modalRef.style.left || modalRef.style.left.includes('-')) {
-      state.left = '0';
-    } else {
-      state.left = modalRef.style.left;
+    if (
+      state.top !== modalRef.style.top ||
+      state.left !== modalRef.style.left ||
+      state.width !== modalRef.style.width ||
+      state.height !== modalRef.style.height
+    ) {
+      if (!modalRef.style.left || modalRef.style.left.includes('-')) {
+        state.left = '0';
+      } else {
+        state.left = modalRef.style.left;
+      }
+
+      if (!modalRef.style.top || modalRef.style.top.includes('-')) {
+        state.top = '0';
+      } else {
+        state.top = modalRef.style.top;
+      }
+
+      state.width = modalRef.style.width;
+      state.height = modalRef.style.height;
+
+      // saveSettings(modalRef.id, ['left', 'top', 'width', 'height'], [state.left, state.top, state.width, state.height]);
     }
-
-    if (!modalRef.style.top || modalRef.style.top.includes('-')) {
-      state.top = '0';
-    } else {
-      state.top = modalRef.style.top;
-    }
-
-    state.width = modalRef.style.width;
-    state.height = modalRef.style.height;
-
-    saveSettings(modalRef.id, ['left', 'top', 'width', 'height'], [state.left, state.top, state.width, state.height]);
   };
 
   const loadSettings = (modalRef: any) => {
@@ -121,6 +128,8 @@ export const createModal = (menuPath: string, widthInPixel: number = null, heigh
         }
         state.width = modalRef.style.width;
         state.height = modalRef.style.height;
+        state.top = modalRef.style.top;
+        state.left = modalRef.style.left;
       })
       .catch((error: any) => {
         console.error(error);

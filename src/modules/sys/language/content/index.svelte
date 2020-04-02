@@ -1,38 +1,47 @@
 <script lang="ts">
+  import { tick, onMount, onDestroy } from 'svelte';
+  import {catchError, concatMap, switchMap, filter} from 'rxjs/operators';
+  import { fromEvent, of, Observable, EMPTY } from 'rxjs';
+  import { fromPromise } from 'rxjs/internal-compatibility';
+
   import { T } from '@/assets/js/locale/locale';
   import Form from '@/assets/js/form/form';
   import { ViewStore } from '@/store/view';
   import { Language } from '../model';
-  import Button from '@/components/ui/button/index.svelte';
+  import { SObject } from '@/assets/js/sobject';
+  import { apolloClient } from '@/assets/js/hasura-client';
+  import { ButtonPressed } from '@/components/ui/button/types';
+  import { SDate } from '@/assets/js/sdate';
+  import { humanOrOrgStore } from '@/modules/sys/human-or-org/store';
   import { ButtonType, ButtonId } from '@/components/ui/button/types';
   import { validation } from './validation';
+  import { ModalType } from '@/components/ui/modal/types';
+
+  import Button from '@/components/ui/button/index.svelte';
   import NumberInput from '@/components/ui/input/number-input/index.svelte';
   import TextInput from '@/components/ui/input/text-input/index.svelte';
   import ConfirmModal from '@/components/ui/modal/base/index.svelte';
   import ConfirmDeleteModal from '@/components/ui/modal/base/index.svelte';
   import ConfirmPasswordModal from '@/components/ui/modal/base/index.svelte';
+  import ConfirmConflictDataModal from '@/components/modal/conflict-data-confirm/index.svelte';
   import ConfigModal from '@/components/modal/view-config/index.svelte';
   import TrashRestoreModal from '@/components/modal/trash-restore/index.svelte';
   import Snackbar from '@/components/ui/snackbar/index.svelte';
-  import { ModalType } from '@/components/ui/modal/types';
-  import { store } from '../store';
-  import { catchError, concatMap, switchMap, filter } from 'rxjs/operators';
-  import { from, fromEvent, fromEventPattern, of, Observable, EMPTY } from 'rxjs';
-  import { SObject } from '@/assets/js/sobject';
-  import { tick, onMount, onDestroy } from 'svelte';
-  import { tableUtilStore } from '@/store/table-util';
-  import { fromPromise } from 'rxjs/internal-compatibility';
-  import { apolloClient } from '@/assets/js/hasura-client';
-  import { ButtonPressed } from '@/components/ui/button/types';
-  import { SDate } from '@/assets/js/sdate';
-  import { humanOrOrgStore } from '@/modules/sys/human-or-org/store';
+  import {StringUtil} from "@/assets/js/string-util";
 
+  // Props
   export let view: ViewStore;
   export let menuPath: string;
 
-  const selectedData$ = store.selectedData$;
+  // Observable
+  const selectedData$ = view.selectedData$;
   const hasAnyDeletedRecord$ = view.hasAnyDeletedRecord$;
+  const deleteRunning$ = view.deleteRunning$;
+  const saveRunning$ = view.saveRunning$;
+  const isReadOnlyMode$ = view.isReadOnlyMode$;
+  const isUpdateMode$ = view.isUpdateMode$;
 
+  // Refs
   let nameRef: any;
   let confirmModalRef: any;
   let confirmDeleteModalRef: any;
@@ -42,114 +51,30 @@
   let trashRestoreModalRef: any;
   let btnSaveRef: any;
   let btnUpdateRef: any;
-  let selectedData: Language;
+  let confirmConflictDataModalRef: any;
 
+  // Other vars
+  let selectedData: Language;
   let form = new Form({
     ...new Language(),
   });
-
   let beforeForm: Form;
-
   const query = view.createQuerySubscription(true);
 
+  // ============================== EVENT HANDLE ==========================
   const onAddNew = (event) => {
     view.verifyAddNewAction(event.currentTarget.id, confirmModalRef, confirmPasswordModalRef).then((_) => {
       doAddNew();
     });
   };
 
-  let registerSaveEvent = false;
-  const doAddNew = async () => {
-    if (view.isReadOnlyMode) {
-      registerSaveEvent = true;
-    }
-    view.isReadOnlyMode = false;
-    view.isUpdateMode = false;
-    store.selectedData$.next(null);
-
-    form = new Form({
-      ...new Language(),
-    });
-    tick().then(() => {
-      nameRef.focus();
-      if (registerSaveEvent) {
-        doSaveOrUpdate(fromEvent(btnSaveRef.getTarget(), 'click'), btnSaveRef.getTarget().id);
-        registerSaveEvent = false;
-      }
-    });
-  };
-
-  const validate = () => {
-    form.errors.errors = form.recordErrors(validation(form));
-    if (form.errors.any()) {
-      return false;
-    }
-
-    if (view.isUpdateMode) {
-      const dataChanged = view.checkObjectChange(beforeForm, SObject.clone(form), snackbarRef);
-      if (!dataChanged) {
-        return false;
-      }
-    }
-
-    return true;
-  };
-
-  const doSaveOrUpdate = (ob$: Observable, id: string) => {
-    console.log('????');
-    ob$
-      .pipe(
-        filter((_) => validate()),
-        concatMap((_) =>
-          fromPromise(view.verifySaveAction(id, confirmModalRef, confirmPasswordModalRef)).pipe(
-            catchError((error) => {
-              return of(error);
-            }),
-          ),
-        ),
-        filter((value) => value !== 'fail'),
-        switchMap((_) => {
-          view.saveRunning = true;
-          return form.post('sys/language/save-or-update').pipe(
-            catchError((error) => {
-              return of(error);
-            }),
-          );
-        }),
-      )
-      .subscribe({
-        next: (res) => {
-          if (res.response && res.response.data) {
-            // error
-            if (res.response.data.message) {
-              snackbarRef.showUnknownError(res.response.data.message);
-            } else {
-              form.errors.errors = form.recordErrors(res.response.data);
-            }
-          } else {
-            if (view.isUpdateMode) {
-              // update
-              snackbarRef.showUpdateSuccess();
-              view.needSelectId$.next(selectedData.id);
-            } else {
-              // save
-              snackbarRef.showSaveSuccess();
-              doAddNew();
-            }
-          }
-          view.saveRunning = false;
-        },
-      });
-  };
-
   const onEdit = (event) => {
     view
       .verifyEditAction(event.currentTarget.id, confirmModalRef, confirmPasswordModalRef, selectedData.name)
       .then((_) => {
-        view.isReadOnlyMode = false;
+        isReadOnlyMode$.next(false);
         tick().then(() => {
           nameRef.focus();
-          doSaveOrUpdate(fromEvent(btnUpdateRef.getTarget(), 'click'), btnUpdateRef.getTarget().id);
         });
       });
   };
@@ -158,26 +83,8 @@
     view
       .verifyDeleteAction(event.currentTarget.id, confirmDeleteModalRef, confirmPasswordModalRef, selectedData.name)
       .then((_) => {
-        doDelete();
+        view.doDelete(snackbarRef, doAddNew);
       });
-  };
-
-  const doDelete = () => {
-    if (selectedData) {
-      view.deleteRunning = true;
-      tableUtilStore.softDeleteMany(view.tableName, [selectedData.id]).subscribe({
-        next: (res) => {
-          snackbarRef.showDeleteSuccess(res.data + ' ' + T('COMMON.LABEL.RECORD'));
-        },
-        error: (err: Error) => {
-          snackbarRef.show(err.message);
-        },
-        complete: () => {
-          doAddNew();
-          view.deleteRunning = false;
-        },
-      });
-    }
   };
 
   const onConfig = (event) => {
@@ -200,21 +107,105 @@
       snackbarRef,
     );
   };
+  // ============================== //EVENT HANDLE ==========================
 
-  const getMessageDetail = async (newData: Language, changed: any) => {
-    const user = await humanOrOrgStore.sysGetUserInfoById(newData.updatedBy);
 
-    return `
-      ${T('SYS.MSG.THIS_FORM_EDITED_BY')}: ${user[0].lastName} ${user[0].firstName} - <b>${user[0].username} </b><br>
-      ${T('COMMON.LABEL.AT')}: ${SDate.convertMilisecondToDateTimeString(newData.updatedDate)} <br>
-      ${T('COMMON.LABEL.DETAIL')} : <br>
-      ${JSON.stringify(changed)} <br>
-      <hr>
-      ${T('COMMON.MSG.DO_YOU_WANT_RELOADING_NEW_DATA')}?
-    `;
+  // ============================== HELPER ==========================
+  const getEditedUser = async (userId: string) => {
+    const user = await humanOrOrgStore.sysGetUserInfoById(userId);
+    return `${user[0].lastName} ${user[0].firstName} - <b>${user[0].username} </b>`;
+  };
+  // ============================== //HELPER ==========================
+
+  // ============================== CLIENT VALIDATION ==========================
+  const validate = () => {
+    form.errors.errors = form.recordErrors(validation(form));
+    if (form.errors.any()) {
+      return false;
+    }
+
+    if ($isUpdateMode$) {
+      const dataChanged = view.checkObjectChange(beforeForm, SObject.clone(form), snackbarRef);
+      if (!dataChanged) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+  // ============================== //CLIENT VALIDATION ==========================
+
+  // ============================== FUNCTIONAL ==========================
+  const doAddNew = async () => {
+    isReadOnlyMode$.next(false);
+    isUpdateMode$.next(false);
+    view.selectedData$.next(null);
+
+    form = new Form({
+      ...new Language(),
+    });
+    tick().then(() => {
+      nameRef.focus();
+    });
   };
 
-  store.selectedData$
+  const doSaveOrUpdate = (ob$: Observable<any>) => {
+    ob$
+      .pipe(
+        filter((_) => validate()),
+        concatMap((_) =>
+          fromPromise(
+            view.verifySaveAction(
+              $isUpdateMode$ ? ButtonId.Update : ButtonId.Save,
+              confirmModalRef,
+              confirmPasswordModalRef,
+            ),
+          ).pipe(
+            catchError((error) => {
+              return of(error);
+            }),
+          ),
+        ),
+        filter((value) => value !== 'fail'),
+        switchMap((_) => {
+          saveRunning$.next(true);
+          return form.post('sys/language/save-or-update').pipe(
+            catchError((error) => {
+              return of(error);
+            }),
+          );
+        }),
+      )
+      .subscribe({
+        next: (res) => {
+          if (res.response && res.response.data) {
+            // error
+            if (res.response.data.message) {
+              snackbarRef.showUnknownError(res.response.data.message);
+            } else {
+              form.errors.errors = form.recordErrors(res.response.data);
+            }
+          } else {
+            if ($isUpdateMode$) {
+              // update
+              snackbarRef.showUpdateSuccess();
+              view.needSelectId$.next(selectedData.id);
+            } else {
+              // save
+              snackbarRef.showSaveSuccess();
+              doAddNew();
+            }
+          }
+          saveRunning$.next(false);
+        },
+      });
+  };
+  // ============================== //FUNCTIONAL ==========================
+
+  // ============================== REACTIVE ==========================
+  // Monitoring selected data from other users
+  // When other users edit on the same data, display a confirmation of the change with the current user
+  view.selectedData$
     .pipe(
       switchMap((it) => {
         if (!it) return EMPTY;
@@ -241,32 +232,45 @@
       }
 
       const changed = view.checkObjectChange(formObj, hasuraObj);
-
       if (changed) {
-        if (!view.isReadOnlyMode) {
-          const msg = await getMessageDetail(hasuraObj, changed);
-          confirmModalRef.show(msg).then((buttonPressed: number) => {
+        if (!$isReadOnlyMode$) {
+          const editedUser = await getEditedUser(hasuraObj.updatedBy);
+          confirmConflictDataModalRef.show(formatChangedData(changed), editedUser, hasuraObj.updatedDate).then((buttonPressed: number) => {
             if (buttonPressed === ButtonPressed.OK) {
               view.needSelectId$.next(selectedData.id);
               setTimeout(() => {
-                view.isReadOnlyMode = false;
-              }, 2000);
+                isReadOnlyMode$.next(false);
+              }, 2500);
             } else {
               view.needHighlightId$.next(selectedData.id);
             }
           });
         } else {
-          // view.needHighlightId$.next(selectedData.id);
           view.needSelectId$.next(selectedData.id);
         }
       }
     });
 
-  const selectDataSub = store.selectedData$.subscribe((data) => {
+  const formatChangedData = (changedData: any) => {
+    const result = [];
+      for(let field in changedData) {
+        result.push({
+          field: T('COMMON.LABEL.' + StringUtil.toUpperCaseWithUnderscore(field)),
+          oldValue: field.toLowerCase().includes('date') ? SDate.convertMilisecondToDateTimeString( changedData[field].oldValue) : changedData[field].oldValue,
+          newValue: field.toLowerCase().includes('date') ? SDate.convertMilisecondToDateTimeString( changedData[field].newValue) : changedData[field].newValue,
+        })
+      }
+
+      console.log(result);
+      return result;
+  }
+
+  // when user click on work list. load selected data to the right form
+  const selectDataSub = view.selectedData$.subscribe((data) => {
     selectedData = data;
     if (selectedData) {
-      view.isReadOnlyMode = true;
-      view.isUpdateMode = true;
+      isReadOnlyMode$.next(true);
+      isUpdateMode$.next(true);
       form = new Form({
         ...selectedData,
       });
@@ -276,36 +280,40 @@
       view.loading$.next(false);
     }
   });
+  // ============================== //REACTIVE ==========================
 
-  const captureCtrlS = (e) => {
-    if (e.keyCode == 83 && (navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey)) {
-      e.preventDefault();
-
-      if(view.isUpdateMode) {
-        doSaveOrUpdate(of('1'), btnUpdateRef.getTarget().id);
-      } else {
-        doSaveOrUpdate(of('1'), btnSaveRef.getTarget().id);
-      }
-    }
-  };
-
+  // ============================== HOOK ==========================
   onMount(() => {
     doAddNew();
-    document.addEventListener('keydown', captureCtrlS, false);
-    doSaveOrUpdate(fromEvent(btnSaveRef.getTarget(), 'click'), btnSaveRef.getTarget().id);
+
+    // Capture hot key (Ctrl - S) for save or update
+    const controlS$ = fromEvent(document, 'keydown').pipe(
+      filter((e: any) => {
+        if (e.keyCode == 83 && (navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey)) {
+          e.preventDefault();
+          return true;
+        } else {
+          return false;
+        }
+      }),
+    );
+    doSaveOrUpdate(controlS$);
   });
 
   onDestroy(() => {
     selectDataSub.unsubscribe();
-    document.removeEventListener('keydown', captureCtrlS);
   });
 
-  const onSave = (event) => {
-    // doSaveOrUpdate(of(event), btnSaveRef.getTarget().id);
-  }
+  const useSaveOrUpdateAction = {
+    register(component: HTMLElement, param: any) {
+      doSaveOrUpdate(fromEvent(component, 'click'));
+    },
+  };
+  // ============================== //HOOK ==========================
 </script>
 
 <Snackbar bind:this={snackbarRef} />
+<ConfirmConflictDataModal id={'conflictData' + view.getViewName() + 'Modal'} bind:this={confirmConflictDataModalRef}></ConfirmConflictDataModal>
 <ConfirmModal modalType={ModalType.Confirm} {menuPath} bind:this={confirmModalRef} />
 <ConfirmDeleteModal
   id="mdConfirmDeleteModal"
@@ -337,7 +345,7 @@
         <div class="row">
           <div class="label text-sm-left text-xx-right col-sm-24 col-lg-8">{T('COMMON.LABEL.NAME')}:</div>
           <div class="col-sm-24 col-lg-16">
-            <TextInput name="name" disabled={view.isReadOnlyMode} bind:value={form.name} bind:this={nameRef} />
+            <TextInput name="name" disabled={$isReadOnlyMode$} bind:value={form.name} bind:this={nameRef} />
             {#if form.errors.has('name')}
               <span class="error">{form.errors.get('name')}</span>
             {/if}
@@ -351,7 +359,7 @@
         <div class="row">
           <div class="label text-sm-left text-xx-right col-sm-24 col-lg-8">{T('COMMON.LABEL.LOCALE')}:</div>
           <div class="col-sm-24 col-lg-16">
-            <TextInput name="locale" disabled={view.isReadOnlyMode} bind:value={form.locale} />
+            <TextInput name="locale" disabled={$isReadOnlyMode$} bind:value={form.locale} />
             {#if form.errors.has('locale')}
               <span class="error">{form.errors.get('locale')}</span>
             {/if}
@@ -365,7 +373,7 @@
         <div class="row">
           <div class="label text-sm-left text-xx-right col-sm-24 col-lg-8">{T('COMMON.LABEL.SORT')}:</div>
           <div class="col-sm-24 col-lg-16">
-            <NumberInput name="sort" disabled={view.isReadOnlyMode} bind:value={form.sort} />
+            <NumberInput name="sort" disabled={$isReadOnlyMode$} bind:value={form.sort} />
             {#if form.errors.has('sort')}
               <span class="error">{form.errors.get('sort')}</span>
             {/if}
@@ -382,33 +390,34 @@
     <Button btnType={ButtonType.AddNew} on:click={onAddNew} disabled={view.isDisabled(ButtonId.AddNew)} />
   {/if}
 
-  {#if view.isRendered(ButtonId.Save, !view.isUpdateMode)}
+  {#if view.isRendered(ButtonId.Save, !$isUpdateMode$)}
     <Button
-            on:click={onSave}
+      action={useSaveOrUpdateAction}
       bind:this={btnSaveRef}
       btnType={ButtonType.Save}
       disabled={view.isDisabled(ButtonId.Save, form.errors.any())}
-      running={view.saveRunning} />
+      running={$saveRunning$} />
   {/if}
 
-  {#if view.isRendered(ButtonId.Edit, view.isReadOnlyMode && view.isUpdateMode)}
+  {#if view.isRendered(ButtonId.Edit, $isReadOnlyMode$ && $isUpdateMode$)}
     <Button btnType={ButtonType.Edit} on:click={onEdit} disabled={view.isDisabled(ButtonId.Edit)} />
   {/if}
 
-  {#if view.isRendered(ButtonId.Update, !view.isReadOnlyMode && view.isUpdateMode)}
+  {#if view.isRendered(ButtonId.Update, !$isReadOnlyMode$ && $isUpdateMode$)}
     <Button
+      action={useSaveOrUpdateAction}
       bind:this={btnUpdateRef}
       btnType={ButtonType.Update}
       disabled={view.isDisabled(ButtonId.Update, form.errors.any())}
-      running={view.saveRunning} />
+      running={$saveRunning$} />
   {/if}
 
-  {#if view.isRendered(ButtonId.Delete, view.isUpdateMode)}
+  {#if view.isRendered(ButtonId.Delete, $isUpdateMode$)}
     <Button
       btnType={ButtonType.Delete}
       on:click={onDelete}
       disabled={view.isDisabled(ButtonId.Delete)}
-      running={view.deleteRunning} />
+      running={$deleteRunning$} />
   {/if}
 
   {#if view.isRendered(ButtonId.Config)}

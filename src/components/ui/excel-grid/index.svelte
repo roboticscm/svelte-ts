@@ -17,6 +17,7 @@
   export let menuPath: string;
   export let containerWidth: string;
   export let gridNestedHeaders = [];
+  export let useInModal = true;
 
   let gridRef: any;
 
@@ -43,7 +44,9 @@
     });
   };
   onMount(() => {
-    window.addEventListener('resize', onWindowResize);
+    if (!useInModal) {
+      window.addEventListener('resize', onWindowResize);
+    }
   });
 
   const onChanged = (instance: any, cell: any, x: any, y: any, value: any) => {

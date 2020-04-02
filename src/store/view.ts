@@ -1,18 +1,21 @@
 import { menuStore } from '@/store/menu';
 import { T } from '@/assets/js/locale/locale';
 import { StringUtil } from '@/assets/js/string-util';
-import { BehaviorSubject, forkJoin, of } from 'rxjs';
+import {BehaviorSubject, forkJoin, Observable, of, Subscription} from 'rxjs';
 import { tableUtilStore } from '@/store/table-util';
-import { catchError, first, skip, take } from 'rxjs/operators';
+import {catchError, concatMap, filter, first, skip, switchMap, take} from 'rxjs/operators';
 import { App } from '@/assets/js/constants';
 import { AxiosResponse } from 'axios';
 import { PayloadRes, RoleControl } from '@/model/base';
 import gql from 'graphql-tag';
 import { Debug } from '@/assets/js/debug';
-import { ButtonPressed } from '@/components/ui/button/types';
+import {ButtonId, ButtonPressed} from '@/components/ui/button/types';
 import { menuControlStore } from '@/store/menu-control';
 import { getDiffFieldsObject, SObject } from '@/assets/js/sobject';
 import { SDate } from '@/assets/js/sdate';
+import { Language } from '@/modules/sys/language/model';
+import {fromPromise} from "rxjs/internal-compatibility";
+import Form from "@/assets/js/form/form";
 
 export class ViewStore {
   tableName: string;
@@ -25,12 +28,11 @@ export class ViewStore {
   includeDisabled = true;
   fullCount$ = new BehaviorSubject<number>(null);
   loading$ = new BehaviorSubject<boolean>(false);
-  saveRunning = false;
-  deleteRunning = false;
+  saveRunning$ = new BehaviorSubject<boolean>(false);
+  deleteRunning$ = new BehaviorSubject<boolean>(false);
 
-  isReadOnlyMode = false; // true: form can edit, false form disable
-  isUpdateMode = false; // true: update mode, false: save mode
-  hasAnyDeletedRecord: false;
+  isReadOnlyMode$ = new BehaviorSubject<boolean>(false);// true: form can edit, false form disable
+  isUpdateMode$ = new BehaviorSubject<boolean>(false);// true: update mode, false: save mode
   dataList$ = new BehaviorSubject<any[]>([]);
   hasAnyDeletedRecord$ = new BehaviorSubject<boolean>(false);
   roleControls: RoleControl[];
@@ -38,6 +40,9 @@ export class ViewStore {
 
   needSelectId$ = new BehaviorSubject<string>(null);
   needHighlightId$ = new BehaviorSubject<string>(null);
+
+  selectedData$ = new BehaviorSubject<any>(null);
+  selectedData: any = undefined;
 
   completeLoading$ = forkJoin([
     this.dataList$.pipe(
@@ -55,10 +60,6 @@ export class ViewStore {
 
   getViewName = () => {
     return StringUtil.toTitleCase(menuStore.selectedData && menuStore.selectedData.menuName);
-  };
-
-  getMenu = () => {
-    return menuStore.selectedData;
   };
 
   getSimpleList = (textSearch = '') => {
@@ -81,7 +82,7 @@ export class ViewStore {
       });
   };
 
-  createColumns = () => {
+  createWorkListColumns = () => {
     return this.columns
       .filter((it) => it !== 'id' && it !== 'sort')
       .map((it) => {
@@ -92,10 +93,23 @@ export class ViewStore {
       });
   };
 
+  createWorkListColumnsForHandsonTable = () => {
+    return this.columns
+        .map((it) => {
+          return {
+            hidden: it !== 'id' && it !== 'sort' ? false : true,
+            name: it,
+            title: T(`COMMON.LABEL.${it}`),
+          };
+        });
+  };
+
   createQuerySubscription = (withVar: boolean = false) => {
     const query = gql`
-      subscription LangSubscription ${withVar ? '($id: bigint!, $updatedBy: bigint!)' : ''} {
-        language ${withVar ? '(where: {_and: [ {id: { _eq: $id }}, {updated_by: { _neq: $updatedBy }}]})' : ''} {
+      subscription ${this.tableName}Subscription ${withVar ? '($id: bigint!, $updatedBy: bigint!)' : ''} {
+        ${this.tableName} ${
+      withVar ? '(where: {_and: [ {id: { _eq: $id }}, {updated_by: { _neq: $updatedBy }}]})' : ''
+    } {
           id
           ${this.columns.map((it) => it + '\n')}
           updatedBy: updated_by
@@ -295,17 +309,20 @@ export class ViewStore {
     return this.verifySimpleAction(buttonId, confirmModalRef, passwordConfirmModalRef, 'DELETE', extraMessage);
   };
 
-  checkObjectArrayChange = (beforeData: any, currentData: any, snackbar: any) => {
+  checkObjectArrayChange = (beforeData: any, currentData: any, snackbar: any = undefined) => {
     let changedObject = SObject.getDiffRowObjectArray(beforeData, currentData);
 
     if (SObject.isEmptyField(changedObject)) {
-      snackbar.showNoDataChange();
+      if (snackbar) {
+        snackbar.showNoDataChange();
+      }
+
       return true;
     }
     return changedObject;
   };
 
-  checkObjectChange = (beforeData: any, currentData: any, snackbar: any) => {
+  checkObjectChange = (beforeData: any, currentData: any, snackbar: any = undefined) => {
     let changedObject = getDiffFieldsObject(beforeData, currentData);
 
     if (SObject.isEmptyField(changedObject)) {
@@ -432,4 +449,39 @@ export class ViewStore {
       }
     });
   };
+
+  getOneById = (id: string) => {
+    tableUtilStore
+        .getOneById(this.tableName, id)
+        .pipe(take(1))
+        .subscribe({
+          next: (res) => {
+            if (res.data && res.data.length > 0) {
+              this.selectedData = res.data[0];
+              this.selectedData$.next(res.data[0]);
+            }
+          },
+          error: (err) => {
+            console.log(err);
+          },
+        });
+  };
+
+  doDelete = (snackbarRef: any, doAddNew: Function) => {
+    if (this.selectedData) {
+      this.deleteRunning$.next(true);
+      tableUtilStore.softDeleteMany(this.tableName, [this.selectedData.id]).pipe(take(1)).subscribe({
+        next: (res) => {
+          snackbarRef.showDeleteSuccess(res.data + ' ' + T('COMMON.LABEL.RECORD'));
+        },
+        error: (err: Error) => {
+          snackbarRef.show(err.message);
+        },
+        complete: () => {
+          doAddNew();
+          this.deleteRunning$.next(false);
+        },
+      });
+    }
+  }
 }

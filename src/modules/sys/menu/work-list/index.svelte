@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ViewStore } from '@/store/view';
 
-  import HandsonWorkList from '@/components/work-list/handson-work-list/index.svelte';
+  import SimpleWorkList from '@/components/work-list/simple-work-list/index.svelte';
 
   // Props
   export let view: ViewStore;
@@ -12,6 +12,6 @@
 </script>
 
 <div id={workListContainerId} class="view-left-main">
-  <HandsonWorkList {view} {workListContainerId} {menuPath} />
+  <SimpleWorkList {view} {workListContainerId} {menuPath} />
 </div>
 <div class="view-left-bottom" />

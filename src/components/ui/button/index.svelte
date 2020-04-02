@@ -12,6 +12,7 @@
   export let className = '';
   export let disabled = false;
   export let running = false;
+  export let action: any = undefined;
 
   let btnRef: any;
   export const getTarget = () => {
@@ -70,9 +71,15 @@
       default:
     }
   }
+
+  const useAction = (component, param) => {
+    if (action) {
+      action.register(component, param);
+    }
+  };
 </script>
 
-<button bind:this={btnRef} {id} {type} class={className} {disabled} on:click>
+<button use:useAction bind:this={btnRef} {id} {type} class={className} {disabled} on:click>
   {#if running}
     <i class="fa fa-spinner fa-spin" />
   {:else}

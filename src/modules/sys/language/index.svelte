@@ -1,21 +1,24 @@
 <script lang="ts">
+  import { scale } from 'svelte/transition';
+  import { onMount } from 'svelte';
+  import { take } from 'rxjs/operators';
+
+  import { App } from '@/assets/js/constants';
+  import { ViewStore } from '@/store/view';
+
   import TwoColumnView from '@/components/layout/two-column-view';
   import WorkList from './work-list/index.svelte';
   import MainContent from './content/index.svelte';
-  import { scale } from 'svelte/transition';
   import ViewTitle from '@/components/layout/view-title/index.svelte';
-  import { App } from '@/assets/js/constants';
-  import { ViewStore } from '@/store/view';
-  import { onMount } from 'svelte';
   import ProgressBar from '@/components/ui/progress-bar/index.svelte';
-  import { take } from 'rxjs/operators';
 
+  // Props
   export let showTitle = true;
   export let menuPath: string;
   export let fullControl: boolean;
   export let roleControls: [];
 
-  let transition = App.USE_ANIMATION ? scale : () => {};
+  // Init view
   const view = new ViewStore(menuPath);
   view.tableName = 'language';
   view.columns = ['id', 'name', 'locale', 'sort'];
@@ -23,15 +26,22 @@
   view.roleControls = roleControls;
   view.loading$.next(true);
 
-  const subscribe = () => {
+  // Other vars
+  let transition = App.USE_ANIMATION ? scale : () => {};
+
+  // ================= SUBSCRIPTION ========================
+  const subscription = () => {
     view.completeLoading$.pipe(take(1)).subscribe((_) => {
       view.loading$.next(false);
     });
   };
+  // ================= //SUBSCRIPTION ========================
 
+  // ================= KOOK ========================
   onMount(() => {
-    subscribe();
+    subscription();
   });
+  // ================= //KOOK ========================
 </script>
 
 <style lang="scss">
@@ -43,11 +53,11 @@
 {#if showTitle}
   <ViewTitle {view} />
 {/if}
-<TwoColumnView id="sysLanguage" {showTitle}>
+<TwoColumnView id={'mainLayout' + view.getViewName()} {showTitle} {menuPath}>
   <div transition:transition class="template-wrapper" slot="viewLeft">
-    <WorkList {view} />
+    <WorkList {view} {menuPath} />
   </div>
-  <div transition:transition class="template-wrapper" slot="viewContent">
+  <div transition:transition class="template-wrapper" slot="default">
     <MainContent {view} {menuPath} />
   </div>
 </TwoColumnView>

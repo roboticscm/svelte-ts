@@ -198,14 +198,13 @@
 
 </style>
 
-<div>
+<div style="height: calc(100% - 20px);">
   <slot name="label" />
-
   <table on:click|stopPropagation={onClick} {id} class="table {fixedHeader ? 'table-scroll' : ''}">
     {#if showHeader}
       <thead>
         <tr>
-          {#each columns as col}
+          {#each columns as col, index}
             <th>
               {@html col.title}
             </th>

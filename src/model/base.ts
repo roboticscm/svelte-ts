@@ -1,6 +1,8 @@
 export interface TableColumn {
   title: string;
   name: string;
+  width: number;
+  hidden: boolean;
 }
 
 export interface SimpleListParam {
