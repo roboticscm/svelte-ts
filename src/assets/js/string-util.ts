@@ -54,12 +54,21 @@ export class StringUtil {
     });
   }
 
-  public static toUpperCaseWithUnderscore (str) {
+  public static toUpperCaseWithUnderscore(str) {
     if (str) {
-      return str.split(/(?=[A-Z])/).join('_').toUpperCase();
+      return str
+        .split(/(?=[A-Z])/)
+        .join('_')
+        .toUpperCase();
     } else {
       return str;
     }
-
   }
+
+  public static snakeToCamelCase = (str) => str.replace(
+      /([-_][a-z])/g,
+      (group) => group.toUpperCase()
+          .replace('-', '')
+          .replace('_', '')
+  );
 }

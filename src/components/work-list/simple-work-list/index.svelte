@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy, SvelteComponent } from 'svelte';
-  import {fromEvent, Subscription} from 'rxjs';
+  import { fromEvent, Subscription } from 'rxjs';
   import { apolloClient } from '@/assets/js/hasura-client';
 
   import { ViewStore } from '@/store/view';

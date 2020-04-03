@@ -18,11 +18,14 @@
   export let containerWidth: string;
   export let gridNestedHeaders = [];
   export let useInModal = true;
+  export let mouseUp: any = undefined;
 
   let gridRef: any;
 
   let jExcelObj: any;
   let startTime = Date.now();
+
+  let fireResizeEvent = true;
 
   const onWindowResize = (event) => {
     // const containerWidth = event.target.innerWidth;
@@ -43,6 +46,7 @@
       }
     });
   };
+
   onMount(() => {
     if (!useInModal) {
       window.addEventListener('resize', onWindowResize);
@@ -120,7 +124,9 @@
         // },
         onresizecolumn: (instance: any, col: number, width: number) => {
           recalculateColumnWidth();
-          saveSettings(col, columns[col].width);
+          if (fireResizeEvent) {
+            saveSettings(col, columns[col].width);
+          }
         },
       });
       // jExcelObj.resetSelection(true);
@@ -148,6 +154,7 @@
   };
 
   const loadSettings = () => {
+    fireResizeEvent = false;
     settingsStore
       .getUserSettings(id, menuPath)
       .then((data) => {
@@ -173,8 +180,10 @@
             });
           }
         }
+        fireResizeEvent = true;
       })
       .catch((error: any) => {
+        fireResizeEvent = true;
         console.error(error);
       });
   };
@@ -218,6 +227,7 @@
   };
 
   const resizeGrid = (width: string) => {
+    fireResizeEvent = false;
     let now = Date.now();
     if (now - startTime > 100) {
       startTime = now;
@@ -243,6 +253,24 @@
 
   // @ts-ignore
   $: resizeGrid(containerWidth);
+
+  // @ts-ignore
+  $: if (mouseUp) {
+    const keys: string[] = [];
+    const values: string[] = [];
+    fireResizeEvent = true;
+    columns.map((col, index) => {
+      keys.push('col' + index);
+      values.push(col.width);
+    })
+    settingsStore.saveSettings({
+      menuPath,
+      controlId: id,
+      keys,
+      values
+    });
+  }
+
 </script>
 
 <style lang="scss">

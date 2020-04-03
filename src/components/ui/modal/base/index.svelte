@@ -56,6 +56,7 @@
 
   const onMouseUp = (event) => {
     useModal.saveModalState(modalRef);
+    dispatch('mouseUp', undefined);
   };
 
   export const show = (content: string = '') => {

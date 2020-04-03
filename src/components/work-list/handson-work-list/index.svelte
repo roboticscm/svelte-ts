@@ -1,145 +1,135 @@
 <script lang="ts">
-    import { onMount, onDestroy, SvelteComponent } from 'svelte';
-    import {fromEvent, Subscription} from 'rxjs';
-    import {take} from 'rxjs/operators';
-    import { apolloClient } from '@/assets/js/hasura-client';
+  import { onMount, onDestroy, SvelteComponent, createEventDispatcher } from 'svelte';
+  import { fromEvent, Subscription } from 'rxjs';
+  import { take } from 'rxjs/operators';
+  import { apolloClient } from '@/assets/js/hasura-client';
 
-    import { ViewStore } from '@/store/view';
+  import { ViewStore } from '@/store/view';
 
-    import Pagination from '@/components/ui/pagination/index.svelte';
+  import Pagination from '@/components/ui/pagination/index.svelte';
 
-    export let view: ViewStore;
-    export let workListContainerId: string;
-    export let menuPath: string;
+  export let view: ViewStore;
+  export let workListContainerId: string;
+  export let menuPath: string;
+  export let tableId: string;
 
-    const tableId = `workList${view.getViewName()}Table`;
-    const columns = view.createWorkListColumnsForHandsonTable();
-    const { dataList$, fullCount$ } = view;
+  const columns = view.createWorkListColumnsForHandsonTable();
+  const { dataList$, fullCount$ } = view;
+  const dispatch = createEventDispatcher();
 
-    let apolloClientList$: any;
-    let tableRef: any;
-    let pageRef: any;
-    let needSelectIdSub, needHighlightIdSub, selectDataSub: Subscription;
-    let TableComponent: SvelteComponent;
-    let tableHeight: number;
-    // =========================SUBSCRIPTION===========================
-    const subscription = () => {
-        const query = view.createQuerySubscription();
-        apolloClientList$ = apolloClient.subscribe({
-            query,
-        });
+  let apolloClientList$: any;
+  let tableRef: any;
+  let pageRef: any;
+  let needSelectIdSub, needHighlightIdSub, selectDataSub: Subscription;
+  let TableComponent: SvelteComponent;
+  let tableHeight: number;
+  // =========================SUBSCRIPTION===========================
+  const subscription = () => {
+    const query = view.createQuerySubscription();
+    apolloClientList$ = apolloClient.subscribe({
+      query,
+    });
 
-        needSelectIdSub = view.needSelectId$.subscribe((id: string) => {
-            if (tableRef && id) {
-                setTimeout(()=>{
-                    tableRef.selectRowById(id);
-                }, 2000)
+    needSelectIdSub = view.needSelectId$.subscribe((id: string) => {
+      if (tableRef && id) {
+        setTimeout(() => {
+          tableRef.selectRowById(id);
+        }, 500);
+      }
+    });
 
-            }
-        });
+    needHighlightIdSub = view.needHighlightId$.subscribe((id: string) => {
+      if (tableRef && id) {
+        tableRef.highlightRowById(id);
+      }
+    });
 
-        needHighlightIdSub = view.needHighlightId$.subscribe((id: string) => {
-            if (tableRef && id) {
-                tableRef.highlightRowById(id);
-            }
-        });
-
-        selectDataSub = view.selectedData$.subscribe((data) => {
-            if (data && tableRef) {
-                const selectedId = tableRef.getFirstSelectedRowId();
-                if(selectedId && selectedId.toString() !== data.id.toString()) {
-                    tableRef.highlightRowById(data.id);
-                }
-                // if (!tableRef.getSelected()) {
-                //     tableRef.selectRowById(data.id);
-                // }
-            } else if (tableRef) {
-                tableRef && tableRef.deselectCell();
-            }
-        });
-    };
-    // =========================//SUBSCRIPTION===========================
-
-    // =========================HELPER FUNCTION===========================
-    const reload = () => {
-        view.getSimpleList();
+    selectDataSub = view.selectedData$.subscribe((data) => {
+      if (data && tableRef) {
+        const selectedId = tableRef.getFirstSelectedRowId();
+        if (selectedId && selectedId.toString() !== data.id.toString()) {
+          tableRef.highlightRowById(data.id);
+        }
+      } else if (tableRef) {
         tableRef && tableRef.deselectCell();
-        view.checkDeletedRecord(false);
-    };
+      }
+    });
+  };
+  // =========================//SUBSCRIPTION===========================
 
-    // =========================HELPER FUNCTION===========================
+  // =========================HELPER FUNCTION===========================
+  const reload = () => {
+    view.getSimpleList();
+    tableRef && tableRef.deselectCell();
+    view.checkDeletedRecord(false);
+  };
 
-    // =========================WATCH===========================
-    let firstTimes = true;
+  // =========================HELPER FUNCTION===========================
+
+  // =========================WATCH===========================
+  let firstTimes = true;
+  // @ts-ignore
+  $: {
     // @ts-ignore
-    $: {
-        // @ts-ignore
-        const dataList = $apolloClientList$;
-        if (dataList) {
-            if (!firstTimes) {
-                reload();
-            }
-            firstTimes = false;
-        }
-    }
-    // =========================//WATCH===========================
-
-    // =========================EVENT HANDLE===========================
-    const onSelection = (event) => {
-        if (event.detail && event.detail.length > 0) {
-            view.loading$.next(true);
-            view.getOneById(event.detail[0].id);
-        }
-    };
-
-    const onLoadPage = (event) => {
-        view.pageSize = event.detail.pageSize;
-        view.page = event.detail.page;
+    const dataList = $apolloClientList$;
+    if (dataList) {
+      if (!firstTimes) {
         reload();
-    };
+      }
+      firstTimes = false;
+    }
+  }
+  // =========================//WATCH===========================
 
-    const onPaginationInit = (event) => {
-        view.pageSize = event.detail;
-    };
-    // =========================//EVENT HANDLE===========================
+  // =========================EVENT HANDLE===========================
+  const onLoadPage = (event) => {
+    view.pageSize = event.detail.pageSize;
+    view.page = event.detail.page;
+    reload();
+  };
 
-    // =========================HOOK===========================
-    onMount(() => {
-        subscription();
-        pageRef.loadSettings().then(() => {
-            reload();
-        });
+  const onPaginationInit = (event) => {
+    view.pageSize = event.detail;
+  };
+  // =========================//EVENT HANDLE===========================
 
-        tableHeight = window['$']('#' + workListContainerId).height() - 50;
-        // import SelectableTable component
-        import('@/components/ui/handson-table/index.svelte').then((res) => {
-            // @ts-ignore
-            TableComponent = res.default;
-        });
+  // =========================HOOK===========================
+  onMount(() => {
+    subscription();
+    pageRef.loadSettings().then(() => {
+      reload();
     });
 
-    onDestroy(() => {
-        needSelectIdSub.unsubscribe();
-        needHighlightIdSub.unsubscribe();
-        selectDataSub.unsubscribe();
+    tableHeight = window['$']('#' + workListContainerId).height() - 50;
+    // import SelectableTable component
+    import('@/components/ui/handson-table/index.svelte').then((res) => {
+      // @ts-ignore
+      TableComponent = res.default;
     });
-    // =========================//HOOK===========================
+  });
+
+  onDestroy(() => {
+    needSelectIdSub.unsubscribe();
+    needHighlightIdSub.unsubscribe();
+    selectDataSub.unsubscribe();
+  });
+  // =========================//HOOK===========================
 </script>
 
 <svelte:component
-        this={TableComponent}
-        {menuPath}
-        bind:this={tableRef}
-        on:selection={onSelection}
-        {columns}
-        data={$dataList$}
-        id={tableId} />
+  this={TableComponent}
+  {menuPath}
+  bind:this={tableRef}
+  on:selection
+  {columns}
+  data={$dataList$}
+  id={tableId} />
 <div style="margin-top: 1px;">
-    <Pagination
-            {menuPath}
-            totalRecords={$fullCount$}
-            smallSize={true}
-            on:loadPage={onLoadPage}
-            on:init={onPaginationInit}
-            bind:this={pageRef} />
+  <Pagination
+    {menuPath}
+    totalRecords={$fullCount$}
+    smallSize={true}
+    on:loadPage={onLoadPage}
+    on:init={onPaginationInit}
+    bind:this={pageRef} />
 </div>

@@ -13,6 +13,7 @@
   let ExcelGridComponent: any;
 
   let height: string;
+  let mouseUp: any;
 
   const createDynamicColumns = () => {
     const dynCols = [];
@@ -79,6 +80,10 @@
     containerWidth = event.detail.width;
   };
 
+  const onMouseUp = () => {
+    mouseUp = Date.now();
+  };
+
   export const getData = () => {
     return excelGridRef.getData();
   };
@@ -86,6 +91,7 @@
 
 <Modal
   on:containerResize={onResize}
+  on:mouseUp={onMouseUp}
   {menuPath}
   contentClass="full-modal-content"
   fontIcon="<i class='fa fa-trash-restore-alt'></i>"
@@ -94,6 +100,7 @@
   bind:this={modalRef}>
   <svelte:component
     this={ExcelGridComponent}
+    {mouseUp}
     {height}
     {menuPath}
     bind:this={excelGridRef}

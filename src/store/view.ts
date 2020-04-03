@@ -1,21 +1,21 @@
 import { menuStore } from '@/store/menu';
 import { T } from '@/assets/js/locale/locale';
 import { StringUtil } from '@/assets/js/string-util';
-import {BehaviorSubject, forkJoin, Observable, of, Subscription} from 'rxjs';
+import { BehaviorSubject, forkJoin, Observable, of, Subscription } from 'rxjs';
 import { tableUtilStore } from '@/store/table-util';
-import {catchError, concatMap, filter, first, skip, switchMap, take} from 'rxjs/operators';
+import { catchError, concatMap, filter, first, skip, switchMap, take } from 'rxjs/operators';
 import { App } from '@/assets/js/constants';
 import { AxiosResponse } from 'axios';
 import { PayloadRes, RoleControl } from '@/model/base';
 import gql from 'graphql-tag';
 import { Debug } from '@/assets/js/debug';
-import {ButtonId, ButtonPressed} from '@/components/ui/button/types';
+import { ButtonId, ButtonPressed } from '@/components/ui/button/types';
 import { menuControlStore } from '@/store/menu-control';
 import { getDiffFieldsObject, SObject } from '@/assets/js/sobject';
 import { SDate } from '@/assets/js/sdate';
 import { Language } from '@/modules/sys/language/model';
-import {fromPromise} from "rxjs/internal-compatibility";
-import Form from "@/assets/js/form/form";
+import { fromPromise } from 'rxjs/internal-compatibility';
+import Form from '@/assets/js/form/form';
 
 export class ViewStore {
   tableName: string;
@@ -31,8 +31,8 @@ export class ViewStore {
   saveRunning$ = new BehaviorSubject<boolean>(false);
   deleteRunning$ = new BehaviorSubject<boolean>(false);
 
-  isReadOnlyMode$ = new BehaviorSubject<boolean>(false);// true: form can edit, false form disable
-  isUpdateMode$ = new BehaviorSubject<boolean>(false);// true: update mode, false: save mode
+  isReadOnlyMode$ = new BehaviorSubject<boolean>(false); // true: form can edit, false form disable
+  isUpdateMode$ = new BehaviorSubject<boolean>(false); // true: update mode, false: save mode
   dataList$ = new BehaviorSubject<any[]>([]);
   hasAnyDeletedRecord$ = new BehaviorSubject<boolean>(false);
   roleControls: RoleControl[];
@@ -42,7 +42,7 @@ export class ViewStore {
   needHighlightId$ = new BehaviorSubject<string>(null);
 
   selectedData$ = new BehaviorSubject<any>(null);
-  selectedData: any = undefined;
+  // selectedData: any = undefined;
 
   completeLoading$ = forkJoin([
     this.dataList$.pipe(
@@ -94,14 +94,13 @@ export class ViewStore {
   };
 
   createWorkListColumnsForHandsonTable = () => {
-    return this.columns
-        .map((it) => {
-          return {
-            hidden: it !== 'id' && it !== 'sort' ? false : true,
-            name: it,
-            title: T(`COMMON.LABEL.${it}`),
-          };
-        });
+    return this.columns.map((it) => {
+      return {
+        hidden: it !== 'id' && it !== 'sort' ? false : true,
+        name: it,
+        title: T(`COMMON.LABEL.${it}`),
+      };
+    });
   };
 
   createQuerySubscription = (withVar: boolean = false) => {
@@ -451,26 +450,27 @@ export class ViewStore {
   };
 
   getOneById = (id: string) => {
-    tableUtilStore
-        .getOneById(this.tableName, id)
-        .pipe(take(1))
-        .subscribe({
-          next: (res) => {
-            if (res.data && res.data.length > 0) {
-              this.selectedData = res.data[0];
-              this.selectedData$.next(res.data[0]);
-            }
-          },
-          error: (err) => {
-            console.log(err);
-          },
-        });
+    return tableUtilStore.getOneById(this.tableName, id);
+    // .pipe(take(1))
+    // .subscribe({
+    //   next: (res) => {
+    //     if (res.data && res.data.length > 0) {
+    //       this.selectedData = res.data[0];
+    //       this.selectedData$.next(res.data[0]);
+    //     }
+    //   },
+    //   error: (err) => {
+    //     console.log(err);
+    //   },
+    // });
   };
 
-  doDelete = (snackbarRef: any, doAddNew: Function) => {
-    if (this.selectedData) {
-      this.deleteRunning$.next(true);
-      tableUtilStore.softDeleteMany(this.tableName, [this.selectedData.id]).pipe(take(1)).subscribe({
+  doDelete = (id: string, snackbarRef: any, doAddNew: Function) => {
+    this.deleteRunning$.next(true);
+    tableUtilStore
+      .softDeleteMany(this.tableName, [id])
+      .pipe(take(1))
+      .subscribe({
         next: (res) => {
           snackbarRef.showDeleteSuccess(res.data + ' ' + T('COMMON.LABEL.RECORD'));
         },
@@ -482,6 +482,5 @@ export class ViewStore {
           this.deleteRunning$.next(false);
         },
       });
-    }
-  }
+  };
 }

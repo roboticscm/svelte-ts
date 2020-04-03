@@ -54,10 +54,10 @@
   <ViewTitle {view} />
 {/if}
 <TwoColumnView id={'mainLayout' + view.getViewName()} {showTitle} {menuPath}>
-  <div transition:transition class="template-wrapper" slot="viewLeft">
+  <div style="height: 100%" slot="viewLeft">
     <WorkList {view} {menuPath} />
   </div>
-  <div transition:transition class="template-wrapper" slot="default">
+  <div style="height: 100%" slot="default">
     <MainContent {view} {menuPath} />
   </div>
 </TwoColumnView>

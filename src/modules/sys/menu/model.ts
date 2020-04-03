@@ -1,7 +1,17 @@
 export class Menu {
   id = '';
+  code = '';
   name = '';
   path = '';
+  sort = 0;
+  useFontIcon = false;
+  fontIcon = '';
+  iconData = '';
+  disabled = false;
+  updatedBy = '';
+  updatedDate = '';
+  insertDepIds = [];
+  deleteDepIds = [];
 }
 
 export class RoleMenu {

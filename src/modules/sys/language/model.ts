@@ -5,4 +5,5 @@ export class Language {
   sort = 0;
   updatedBy = '';
   updatedDate = '';
+  disabled = false;
 }

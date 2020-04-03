@@ -11,6 +11,7 @@
   import MainContent from './content/index.svelte';
   import ViewTitle from '@/components/layout/view-title/index.svelte';
   import ProgressBar from '@/components/ui/progress-bar/index.svelte';
+  import { Store } from './store';
 
   export let showTitle = true;
   export let menuPath: string;
@@ -19,6 +20,8 @@
 
   let transition = App.USE_ANIMATION ? scale : () => {};
   const view = new ViewStore(menuPath);
+  const store = new Store(view);
+
   view.tableName = 'menu';
   view.columns = ['id', 'name', 'path', 'sort'];
   view.fullControl = fullControl;
@@ -26,12 +29,18 @@
   view.loading$.next(true);
 
   const subscription = () => {
-    view.completeLoading$.pipe(take(1)).subscribe((_) => {
+    store.completeLoading$.pipe(take(1)).subscribe((_) => {
       view.loading$.next(false);
     });
   };
 
   onMount(() => {
+    store
+      .loadAvailableDep(null)
+      .pipe(take(1))
+      .subscribe((res) => {
+        store.availableDep$.next(res.data);
+      });
     subscription();
   });
 </script>
@@ -46,10 +55,10 @@
   <ViewTitle {view} />
 {/if}
 <TwoColumnView id={'mainLayout' + view.getViewName()} {showTitle} {menuPath}>
-  <div transition:transition style="height: 100%;" slot="viewLeft">
-    <WorkList {view} {menuPath} />
+  <div style="height: 100%;" slot="viewLeft">
+    <WorkList {view} {store} {menuPath} />
   </div>
-  <div transition:transition style="height: 100%;" slot="default">
-    <MainContent {view} {menuPath} />
+  <div style="height: 100%;" slot="default">
+    <MainContent {view} {store} {menuPath} />
   </div>
 </TwoColumnView>
