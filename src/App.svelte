@@ -2,15 +2,15 @@
   import { appStore } from '@/store/app';
   import { menuStore } from '@/store/menu';
   import { onMount, setContext } from 'svelte';
-  import MainLayout from '@/components/layout/main-layout/index.svelte';
-  import MainNavBar from '@/components/layout/main-nav-bar/index.svelte';
-  import BranchDropdown from '@/components/layout/branch-dropdown/index.svelte';
-  import ModulesDropdown from '@/components/layout/modules-dropdown/index.svelte';
-  import UserProfiles from '@/components/layout/user-profiles/index.svelte';
-  import HistoryNavBar from '@/components/layout/history-nav-bar/index.svelte';
-  import SearchBar from '@/components/ui/input/search-bar/index.svelte';
+  import MainLayout from '@/components/layout/main-layout';
+  import MainNavBar from '@/components/layout/main-nav-bar';
+  import BranchDropdown from '@/components/layout/branch-dropdown';
+  import ModulesDropdown from '@/components/layout/modules-dropdown';
+  import UserProfiles from '@/components/layout/user-profiles';
+  import HistoryNavBar from '@/components/layout/history-nav-bar';
+  import SearchBar from '@/components/ui/input/search-bar';
   import { T } from '@/assets/js/locale/locale';
-  import RouterView from '@/components/ui/router-view/index.svelte';
+  import RouterView from '@/components/ui/router-view';
   import { skip, take } from 'rxjs/operators';
   let routerView: any;
 
@@ -27,7 +27,7 @@
 </script>
 
 <MainLayout>
-  <nav slot="header">
+  <nav slot="header" class="layout-header">
     <div class="header-left">
       <BranchDropdown />
       <MainNavBar />
@@ -43,7 +43,7 @@
     <div class="header-right">
       <!--      <HistoryNavBar />-->
       <div class="seperator" />
-      <ModulesDropdown />
+      <ModulesDropdown id="moduleId" />
       <UserProfiles />
     </div>
   </nav>

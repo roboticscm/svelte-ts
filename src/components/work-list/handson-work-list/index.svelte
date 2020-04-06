@@ -3,7 +3,7 @@
   import { fromEvent, Subscription } from 'rxjs';
   import { take } from 'rxjs/operators';
   import { apolloClient } from '@/assets/js/hasura-client';
-
+  import { App } from '@/assets/js/constants';
   import { ViewStore } from '@/store/view';
 
   import Pagination from '@/components/ui/pagination/index.svelte';
@@ -15,6 +15,7 @@
 
   const columns = view.createWorkListColumnsForHandsonTable();
   const { dataList$, fullCount$ } = view;
+
   const dispatch = createEventDispatcher();
 
   let apolloClientList$: any;
@@ -105,6 +106,7 @@
     import('@/components/ui/handson-table/index.svelte').then((res) => {
       // @ts-ignore
       TableComponent = res.default;
+      console.log('loaded');
     });
   });
 
@@ -115,6 +117,10 @@
   });
   // =========================//HOOK===========================
 </script>
+
+{#if !TableComponent}
+  {@html App.PROGRESS_BAR}
+{/if}
 
 <svelte:component
   this={TableComponent}

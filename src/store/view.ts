@@ -16,6 +16,7 @@ import { SDate } from '@/assets/js/sdate';
 import { Language } from '@/modules/sys/language/model';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import Form from '@/assets/js/form/form';
+import { Menu } from '@/modules/sys/menu/model';
 
 export class ViewStore {
   tableName: string;
@@ -42,7 +43,8 @@ export class ViewStore {
   needHighlightId$ = new BehaviorSubject<string>(null);
 
   selectedData$ = new BehaviorSubject<any>(null);
-  // selectedData: any = undefined;
+
+  menuInfo$ = new BehaviorSubject<Menu>(null);
 
   completeLoading$ = forkJoin([
     this.dataList$.pipe(
@@ -52,14 +54,25 @@ export class ViewStore {
     ),
   ]);
 
-  constructor(public menuPath: string) {}
+  constructor(public menuPath: string) {
+    menuStore
+      .sysGetMenuByPath(menuPath)
+      .pipe(take(1))
+      .subscribe((res) => {
+        this.menuInfo$.next(res.data);
+      });
+  }
+
+  getMenuNameFromPath = () => {
+    return this.menuPath.includes('/') ? this.menuPath.split('/')[this.menuPath.split('/').length - 1] : this.menuPath;
+  };
 
   getViewTitle = () => {
-    return T(`COMMON.MENU.${menuStore.selectedData && menuStore.selectedData.menuName}`);
+    return T(`COMMON.MENU.${this.getMenuNameFromPath().toUpperCase()}`);
   };
 
   getViewName = () => {
-    return StringUtil.toTitleCase(menuStore.selectedData && menuStore.selectedData.menuName);
+    return StringUtil.toTitleCase(this.getMenuNameFromPath());
   };
 
   getSimpleList = (textSearch = '') => {

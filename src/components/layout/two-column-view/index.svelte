@@ -28,7 +28,13 @@
       const found = res.find((it) => it.key === 'lastLeftWidth');
       if (found) {
         const { value } = found;
-        const containerEle: any = document.querySelector('.view-container-2-col');
+        let containerEle: any;
+        if (showTitle) {
+          containerEle = document.querySelector('.view-container-2-col');
+        } else {
+          containerEle = document.querySelector('.view-container-2-col-modal');
+        }
+
         containerEle.style['grid-template-columns'] = `${value} ${GUTTER_WIDTH}px auto`;
       }
     });
@@ -41,7 +47,13 @@
         },
       ],
       onDragEnd: (direction: any, track: number) => {
-        const gridEle: any = document.querySelector('.view-container-2-col');
+        let gridEle: any;
+        if (showTitle) {
+          gridEle = document.querySelector('.view-container-2-col');
+        } else {
+          gridEle = document.querySelector('.view-container-2-col-modal');
+        }
+
         const [leftWidth] = gridEle.style['grid-template-columns'].split(' ');
 
         settingsStore.saveSettings(
@@ -67,7 +79,7 @@
   });
 </script>
 
-<div class={showTitle ? 'view-container-2-col' : 'view-container-2-col-modal'}>
+<main class={showTitle ? 'view-container-2-col' : 'view-container-2-col-modal'}>
   <div class="view-left">
     <slot name="viewLeft" />
   </div>
@@ -75,4 +87,4 @@
   <div class="view-content">
     <slot />
   </div>
-</div>
+</main>

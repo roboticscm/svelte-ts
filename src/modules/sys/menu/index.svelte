@@ -9,14 +9,15 @@
   import TwoColumnView from '@/components/layout/two-column-view';
   import WorkList from './work-list/index.svelte';
   import MainContent from './content/index.svelte';
-  import ViewTitle from '@/components/layout/view-title/index.svelte';
-  import ProgressBar from '@/components/ui/progress-bar/index.svelte';
+  import ViewTitle from '@/components/layout/view-title';
+  import ProgressBar from '@/components/ui/progress-bar';
   import { Store } from './store';
 
   export let showTitle = true;
   export let menuPath: string;
   export let fullControl: boolean;
   export let roleControls: [];
+  export let callFrom = 'Self';
 
   let transition = App.USE_ANIMATION ? scale : () => {};
   const view = new ViewStore(menuPath);
@@ -56,7 +57,7 @@
 {/if}
 <TwoColumnView id={'mainLayout' + view.getViewName()} {showTitle} {menuPath}>
   <div style="height: 100%;" slot="viewLeft">
-    <WorkList {view} {store} {menuPath} />
+    <WorkList {view} {store} {menuPath} {callFrom} />
   </div>
   <div style="height: 100%;" slot="default">
     <MainContent {view} {store} {menuPath} />

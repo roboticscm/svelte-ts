@@ -10,6 +10,9 @@
   let excelGridRef: any;
   let ExcelGridComponent: any;
 
+  const defaultWidth = 600;
+  const defaultHeight = 300;
+
   let containerWidth: string;
   let height: string;
   let editedUser: string;
@@ -64,6 +67,8 @@
 </script>
 
 <Modal
+  {defaultWidth}
+  {defaultHeight}
   on:containerResize={onResize}
   {menuPath}
   contentClass="full-modal-content"

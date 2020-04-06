@@ -262,15 +262,14 @@
     columns.map((col, index) => {
       keys.push('col' + index);
       values.push(col.width);
-    })
+    });
     settingsStore.saveSettings({
       menuPath,
       controlId: id,
       keys,
-      values
+      values,
     });
   }
-
 </script>
 
 <style lang="scss">

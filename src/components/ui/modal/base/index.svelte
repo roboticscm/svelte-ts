@@ -13,6 +13,7 @@
   import { getMethodNameInSnackCase } from '@/assets/js/util';
   import { catchError } from 'rxjs/operators';
   import { of } from 'rxjs';
+  import { App } from '@/assets/js/constants';
 
   const dispatch = createEventDispatcher();
   export let id: string;
@@ -28,12 +29,14 @@
   export let contentClass = 'modal-content';
   export let okButtonTitle: string = undefined;
   export let cancelButtonTitle: string = undefined;
+  export let defaultHeight: number = undefined; // in pixel
+  export let defaultWidth: number = undefined; // in pixel
 
   let modalWrapperRef: any;
   let modalRef: any;
   let passwordRef: any;
 
-  const useModal = createModal(menuPath);
+  const useModal = createModal(menuPath, defaultWidth, defaultHeight);
 
   const onResize = (event: any) => {
     if (modalRef) {
@@ -197,12 +200,13 @@
       <div id={id + 'header'} class="modal-header">
         <div class="modal-title">
           <div>
-            {#if fontIcon}
-              {@html fontIcon}
-            {/if}
 
             {#if iconData}
               <img src={iconData} alt="No Image" />
+            {:else if fontIcon}
+              {@html fontIcon}
+            {:else}
+              {@html App.DEFAULT_ICON}
             {/if}
             {@html title}
           </div>

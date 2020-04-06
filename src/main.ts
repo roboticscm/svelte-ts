@@ -1,3 +1,4 @@
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import jQuery from 'jquery';
 import 'jquery-ui';
 (window as any).$ = jQuery;

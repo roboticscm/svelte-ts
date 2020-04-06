@@ -30,9 +30,10 @@ export class Hasura {
 
 export class App {
   static NAME = 'SKy Plus';
-  static DEFAULT_ICON = `<i class="fab fa-skyatlas"></i>`;
+  static DEFAULT_ICON = `<i class="fa fa-bars"></i>`;
   static USE_ANIMATION = true;
   static DEFAULT_PAGE_SIZE = 20;
   static AUTO_COMPLETE = 'off';
   static SNACKBAR_TIMEOUT = 3000;
+  static PROGRESS_BAR = '<i class="fa fa-spinner fa-spin" />';
 }

@@ -1,21 +1,22 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { ViewStore } from '@/store/view';
-  import HandsonWorkList from '@/components/work-list/handson-work-list';
+  // import HandsonWorkList from '@/components/work-list/handson-work-list';
   import { Store } from '../store';
   import { fromEvent, forkJoin } from 'rxjs';
   import { switchMap, tap, filter } from 'rxjs/operators';
-  // import SimpleWorkList from '@/components/work-list/simple-work-list';
+  import SimpleWorkList from '@/components/work-list/simple-work-list';
 
   // Props
   export let view: ViewStore;
   export let store: Store;
   export let menuPath: string;
+  export let callFrom: string;
 
   // Other vars
   const workListContainerId = `workList${view.getViewName()}Container`;
-  const tableId = `workList${view.getViewName()}Table`;
-  let selectedId: string;
+  const tableId = `workList${view.getViewName()}${callFrom.replace('/', '__')}Table`;
+  let selectedId: string = undefined;
 
   const onSelection = (event) => {
     if (event.detail && event.detail.length > 0) {
@@ -27,7 +28,7 @@
     setTimeout(() => {
       fromEvent(document.querySelector('#' + tableId), 'click')
         .pipe(
-          filter((_) => selectedId),
+          filter((_) => selectedId !== undefined),
           tap((_) => view.loading$.next(true)),
           switchMap((_) =>
             forkJoin([
@@ -48,8 +49,8 @@
   });
 </script>
 
-<div id={workListContainerId} class="view-left-main">
-  <!--  <SimpleWorkList {view} {workListContainerId} {menuPath} on:selection={onSelection}/>-->
-  <HandsonWorkList on:selection={onSelection} {view} {workListContainerId} {tableId} {menuPath} />
-</div>
+<section id={workListContainerId} class="view-left-main">
+  <SimpleWorkList {view} {workListContainerId} {menuPath} {tableId} on:selection={onSelection} />
+  <!--  <HandsonWorkList on:selection={onSelection} {view} {workListContainerId} {tableId} {menuPath} />-->
+</section>
 <div class="view-left-bottom" />

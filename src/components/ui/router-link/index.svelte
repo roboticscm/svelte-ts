@@ -42,5 +42,5 @@
       {@html fontIcon || '<i class="fa fa-bars"></i>'}
     </span>
   {/if}
-  {name}
+  {@html name}
 </a>

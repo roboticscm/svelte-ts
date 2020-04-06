@@ -2,8 +2,9 @@
   import './selectable_table.js';
   import { BehaviorSubject } from 'rxjs';
   import { TableColumn } from '@/model/base';
-  import { createEventDispatcher } from 'svelte';
+  import { tick, createEventDispatcher } from 'svelte';
   import { onMount } from 'svelte';
+  import { settingsStore } from '@/store/settings';
 
   const dispatch = createEventDispatcher();
   // import { SObject } from '@/assets/js/sobject';
@@ -11,16 +12,19 @@
   // require('jquery-ui/ui/widgets/sortable');
 
   export let id: string;
-  export let fixedHeader = true;
   export let showHeader = true;
   export let columns: TableColumn[];
   export let data: any[];
   export let height: string = undefined; // in pixel
+  export let showRowNumber = true;
+  export let startRowCount = 1;
+  export let menuPath: string;
 
   let startRow: any = null;
   let selectedRows: number[] = [];
 
   onMount(() => {
+    loadSettings();
     const tbodyEle: any = document.querySelector(`#${id} tbody`);
     // height must be in vh
     if (height) {
@@ -60,6 +64,7 @@
         };
       },
     );
+    // loadSettings();
   };
 
   const selectAll = () => {
@@ -186,24 +191,67 @@
   };
 
   // @ts-ignore
-  $: {
-    const _ = data;
-    setTimeout(() => {
+  $: if (data) {
+    tick().then(() => {
       applyTable();
-    }, 500);
+    });
   }
+
+  const saveSettings = () => {
+    const headerEle = window['$'](`#${id} thead tr th`);
+
+    const keys = [];
+    const values = [];
+
+    headerEle &&
+      headerEle.each(function(col) {
+        keys.push(col);
+        // @ts-ignore
+        values.push(window['$'](this).width());
+      });
+
+    settingsStore.saveSettings({
+      menuPath,
+      controlId: id,
+      keys,
+      values,
+    });
+  };
+
+  const loadSettings = () => {
+    const headerEle = window['$'](`#${id} thead tr th`);
+
+    settingsStore.getUserSettings(id, menuPath).then((res: any[]) => {
+      headerEle.each(function(col) {
+        if (res && res.length > 0) {
+          const filter = res.filter((it) => it.key == col);
+          if (filter && filter.length > 0) {
+            // @ts-ignore
+            window['$'](this).width(+filter[0].value);
+          }
+        }
+      });
+    });
+  };
+
+  const onMouseUpHeader = (event) => {
+    saveSettings();
+  };
 </script>
 
 <style lang="scss">
 
 </style>
 
-<div style="height: calc(100% - 20px);">
+<div style="height: calc(100% - 20px); overflow: auto;">
   <slot name="label" />
-  <table on:click|stopPropagation={onClick} {id} class="table {fixedHeader ? 'table-scroll' : ''}">
+  <table on:click|stopPropagation={onClick} {id} class="table">
     {#if showHeader}
       <thead>
-        <tr>
+        <tr on:mouseup={onMouseUpHeader}>
+          {#if showRowNumber}
+            <th class="freeze">#</th>
+          {/if}
           {#each columns as col, index}
             <th>
               {@html col.title}
@@ -215,6 +263,9 @@
     <tbody>
       {#each data as row, rowIndex}
         <tr>
+          {#if showRowNumber}
+            <th class="freeze row-number">{startRowCount + rowIndex}</th>
+          {/if}
           {#each columns as col, colIndex}
             <td id={`cell_${rowIndex}_${colIndex}_${id}`}>
               {@html row[col.name]}

@@ -1,4 +1,4 @@
-import {StringUtil} from "@/assets/js/string-util";
+import { StringUtil } from '@/assets/js/string-util';
 
 const JSONbig = require('json-bigint');
 
@@ -154,9 +154,9 @@ export class SObject {
     return true;
   }
 
-  static convertFieldsToCamelCase (obj) {
-    for(let field in obj) {
-      if(field.includes('_')) {
+  static convertFieldsToCamelCase(obj) {
+    for (let field in obj) {
+      if (field.includes('_')) {
         const newField = StringUtil.snakeToCamelCase(field);
         obj[newField] = obj[field];
         delete obj[field];

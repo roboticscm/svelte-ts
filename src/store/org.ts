@@ -14,6 +14,13 @@ class OrgStore {
       menuId,
     });
   }
+
+  sysGetRoledDepartmentListByUserId() {
+    return RxHttp.get(`${BASE_URL}${getMethodNameInSnackCase()}`, {
+      includeDeleted: false,
+      includeDisabled: false,
+    });
+  }
 }
 
 export const orgStore = new OrgStore();

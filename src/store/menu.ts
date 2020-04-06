@@ -29,21 +29,31 @@ class MenuStore {
       );
   }
 
-  sysGetRoledMenuListByUserIdAndDepId(depId: any) {
-    RxHttp.get(`${BASE_URL}${getMethodNameInSnackCase()}`, {
+  sysGetMenuByPath(menuPath: string) {
+    return RxHttp.get(`${BASE_URL}${getMethodNameInSnackCase()}`, {
+      menuPath,
+    });
+  }
+
+  sysGetRoledMenuListByUserIdAndDepId(depId: any, isSubscribed = true) {
+    const ob$ = RxHttp.get(`${BASE_URL}${getMethodNameInSnackCase()}`, {
       depId,
       includeDeleted: false,
       includeDisabled: false,
-    }).subscribe(
-      (res: any) => {
-        this.dataList$.next(res.data);
-        if (res.data.length > 0) {
-          this.selectedData = res.data[0];
-          this.selectedData$.next(res.data[0]);
-        }
-      },
-      (error) => Debug.errorSection('MenuStore - sysGetRoledMenuListByUserIdAndDepId', error),
-    );
+    });
+    if (isSubscribed) {
+      ob$.subscribe(
+        (res: any) => {
+          this.dataList$.next(res.data);
+          if (res.data.length > 0) {
+            this.selectedData = res.data[0];
+            this.selectedData$.next(res.data[0]);
+          }
+        },
+        (error) => Debug.errorSection('MenuStore - sysGetRoledMenuListByUserIdAndDepId', error),
+      );
+    }
+    return ob$;
   }
 
   setSelectedData(menuPath: string) {

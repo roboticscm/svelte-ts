@@ -12,15 +12,17 @@ const sveltePreprocess = require('svelte-preprocess');
 const CopyPlugin = require('copy-webpack-plugin');
 const onwarn = (warning, onwarn) => warning.code === 'css-unused-selector' || onwarn(warning);
 
+const alias = {
+      svelte: path.resolve('node_modules', 'svelte'),
+      '@': path.resolve(__dirname, 'src'),
+    };
+
 module.exports = {
   entry: {
     bundle: ['./src/main.ts'],
   },
   resolve: {
-    alias: {
-      svelte: path.resolve('node_modules', 'svelte'),
-      '@': path.resolve(__dirname, 'src'),
-    },
+    alias: alias,
     extensions: ['.mjs', '.js', '.ts', '.svelte', '.css', '.scss'],
     mainFields: ['svelte', 'browser', 'module', 'main'],
   },
@@ -88,7 +90,7 @@ module.exports = {
       //   ],
       // },
       {
-        test: /\.(svg|ico|jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|cur|ani|pdf)(\?.*)?$/,
+        test: /\.(md|svg|ico|jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|cur|ani|pdf)(\?.*)?$/,
         loader: 'file-loader',
       },
       {

@@ -81,7 +81,6 @@
       __path={'/' + row.path.replace('/', '--')}
       activeClass="active" />
   {/each}
-
   {#if $dataList$.length > $navBarConfig$.mainNavBarViewCount}
     <div class="more-dropdown-container" on:mouseover|stopPropagation={showPopup} on:mouseout={hidePopup}>
       <div>
@@ -91,6 +90,7 @@
       <div id="moreNavBarDropdown" class="dropdown-content">
         {#each $dataList$.slice($navBarConfig$.mainNavBarViewCount, $navBarConfig$.mainNavBarViewCount + $navBarConfig$.historyNavBarViewCount) as row}
           <RouterLink
+            className="inline"
             bind:this={routerLink}
             menuName={row.menuName}
             iconData={row.iconData}

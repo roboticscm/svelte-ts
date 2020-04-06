@@ -367,6 +367,7 @@
    * @return {void}.
    */
   onMount(() => {
+    console.log('Language content mount');
     // reset form
     doAddNew();
     // Capture hot key (Ctrl - S) for save or update
@@ -440,7 +441,7 @@
 <!--//Invisible Element-->
 
 <!--Main content-->
-<div class="view-content-main">
+<section class="view-content-main">
   <form class="form" on:keydown={(event) => form.errors.clear(event.target.name)}>
     <div class="row ">
       <!-- Name -->
@@ -486,11 +487,11 @@
       <!-- // Sort -->
     </div>
   </form>
-</div>
+</section>
 <!--//Main content-->
 
 <!--Form controller-->
-<div class="view-content-bottom">
+<section class="view-content-bottom">
   {#if view.isRendered(ButtonId.AddNew)}
     <Button btnType={ButtonType.AddNew} on:click={onAddNew} disabled={view.isDisabled(ButtonId.AddNew)} />
   {/if}
@@ -535,5 +536,5 @@
       on:click={onTrashRestore}
       disabled={view.isDisabled(ButtonId.TrashRestore)} />
   {/if}
-</div>
+</section>
 <!--//Form controller-->

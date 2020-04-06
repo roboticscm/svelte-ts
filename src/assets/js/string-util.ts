@@ -65,10 +65,11 @@ export class StringUtil {
     }
   }
 
-  public static snakeToCamelCase = (str) => str.replace(
-      /([-_][a-z])/g,
-      (group) => group.toUpperCase()
-          .replace('-', '')
-          .replace('_', '')
-  );
+  public static snakeToCamelCase = (str) =>
+    str.replace(/([-_][a-z])/g, (group) =>
+      group
+        .toUpperCase()
+        .replace('-', '')
+        .replace('_', ''),
+    );
 }

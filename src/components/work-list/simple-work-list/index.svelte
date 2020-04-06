@@ -6,12 +6,13 @@
   import { ViewStore } from '@/store/view';
 
   import Pagination from '@/components/ui/pagination/index.svelte';
+  import { skip } from 'rxjs/operators';
 
   export let view: ViewStore;
   export let workListContainerId: string;
   export let menuPath: string;
+  export let tableId: string;
 
-  const tableId = `workList${view.getViewName()}Table`;
   const columns = view.createWorkListColumns();
   const { dataList$, fullCount$ } = view;
 
@@ -79,12 +80,12 @@
   // =========================//WATCH===========================
 
   // =========================EVENT HANDLE===========================
-  const onSelection = (event) => {
-    if (event.detail && event.detail.length > 0) {
-      view.loading$.next(true);
-      view.getOneById(event.detail[0].id);
-    }
-  };
+  // const onSelection = (event) => {
+  //   if (event.detail && event.detail.length > 0) {
+  //     view.loading$.next(true);
+  //     view.getOneById(event.detail[0].id);
+  //   }
+  // };
 
   const onLoadPage = (event) => {
     view.pageSize = event.detail.pageSize;
@@ -122,10 +123,12 @@
 
 <svelte:component
   this={TableComponent}
+  startRowCount={(view.page - 1) * view.pageSize + 1}
   height={tableHeight + 'px'}
   bind:this={tableRef}
-  on:selection={onSelection}
+  on:selection
   {columns}
+  {menuPath}
   data={$dataList$}
   id={tableId} />
 <div style="margin-top: 1px;">

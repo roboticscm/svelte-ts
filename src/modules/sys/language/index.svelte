@@ -9,14 +9,15 @@
   import TwoColumnView from '@/components/layout/two-column-view';
   import WorkList from './work-list/index.svelte';
   import MainContent from './content/index.svelte';
-  import ViewTitle from '@/components/layout/view-title/index.svelte';
-  import ProgressBar from '@/components/ui/progress-bar/index.svelte';
+  import ViewTitle from '@/components/layout/view-title';
+  import ProgressBar from '@/components/ui/progress-bar';
 
   // Props
   export let showTitle = true;
   export let menuPath: string;
   export let fullControl: boolean;
   export let roleControls: [];
+  export let callFrom = 'Self';
 
   // Init view
   const view = new ViewStore(menuPath);
@@ -41,6 +42,14 @@
   onMount(() => {
     subscription();
   });
+
+  export const getViewTitle = () => {
+    return view.getViewTitle();
+  };
+
+  export const getMenuInfo$ = () => {
+    return view.menuInfo$;
+  };
   // ================= //KOOK ========================
 </script>
 
@@ -55,7 +64,7 @@
 {/if}
 <TwoColumnView id={'mainLayout' + view.getViewName()} {showTitle} {menuPath}>
   <div style="height: 100%" slot="viewLeft">
-    <WorkList {view} {menuPath} />
+    <WorkList {view} {menuPath} {callFrom} on:callback />
   </div>
   <div style="height: 100%" slot="default">
     <MainContent {view} {menuPath} />

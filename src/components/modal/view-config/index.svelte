@@ -2,6 +2,9 @@
   import Modal from '@/components/ui/modal/base/index.svelte';
   import { T } from '@/assets/js/locale/locale';
 
+  const defaultWidth = 800;
+  const defaultHeight = 400;
+
   export let id: string;
   export let subTitle: string;
   export let containerWidth: string;
@@ -63,6 +66,8 @@
 </script>
 
 <Modal
+  {defaultWidth}
+  {defaultHeight}
   on:containerResize={onResize}
   {menuPath}
   contentClass="full-modal-content"

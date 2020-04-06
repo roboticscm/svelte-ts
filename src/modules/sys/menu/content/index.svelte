@@ -241,9 +241,12 @@
     // reset form
     form = resetForm();
 
-    store.loadAvailableDep(null).pipe(take(1)).subscribe((res) => {
-      availableDep$.next(res.data);
-    });
+    store
+      .loadAvailableDep(null)
+      .pipe(take(1))
+      .subscribe((res) => {
+        availableDep$.next(res.data);
+      });
     if (assignedDepTreeRef) {
       assignedDep$.next([]);
     }
@@ -378,7 +381,7 @@
       form = new Form({
         ...selectedData,
         insertDepIds: [],
-        deleteDepIds: []
+        deleteDepIds: [],
       });
 
       form = SObject.convertFieldsToCamelCase(form);
@@ -439,6 +442,15 @@
   // ============================== //HOOK ==========================
 </script>
 
+<style lang="scss">
+  .image-container {
+    height: 100px;
+  }
+  .menu-font-icon {
+    font-size: 1.6rem !important;
+  }
+</style>
+
 <!--Invisible Element-->
 <Snackbar bind:this={snackbarRef} />
 <ConfirmConflictDataModal
@@ -469,7 +481,7 @@
 <!--//Invisible Element-->
 
 <!--Main content-->
-<div class="view-content-main">
+<section class="view-content-main">
   <form class="form" on:keydown={(event) => form.errors.clear(event.target.name)}>
     <div class="row ">
       <div class="col-xs-24 col-lg-21">
@@ -608,11 +620,11 @@
       </div>
     </div>
   </form>
-</div>
+</section>
 <!--//Main content-->
 
 <!--Form controller-->
-<div class="view-content-bottom">
+<section class="view-content-bottom">
   {#if view.isRendered(ButtonId.AddNew)}
     <Button btnType={ButtonType.AddNew} on:click={onAddNew} disabled={view.isDisabled(ButtonId.AddNew)} />
   {/if}
@@ -657,15 +669,5 @@
       on:click={onTrashRestore}
       disabled={view.isDisabled(ButtonId.TrashRestore)} />
   {/if}
-</div>
+</section>
 <!--//Form controller-->
-
-
-<style lang="scss">
-  .image-container {
-    height: 100px;
-  }
-  .menu-font-icon {
-    font-size: 1.6rem !important;
-  }
-</style>

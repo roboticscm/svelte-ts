@@ -7,7 +7,7 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "lib": ["es2017", "dom"],
+    "lib": ["es2017", "dom", "esnext.asynciterable"],
     "types": ["svelte"],
     "declaration": false,
     "strictNullChecks": false,
@@ -19,6 +19,7 @@
     "allowUnusedLabels": false,
     "forceConsistentCasingInFileNames": true,
     "noEmitOnError": false, // without it, webpack wouldn't resolve vue files without exxtension
+    "noEmit": false,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "pretty": true,

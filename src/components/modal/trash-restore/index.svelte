@@ -90,6 +90,8 @@
 </script>
 
 <Modal
+  defaultWidth={800}
+  defaultHeight={400}
   on:containerResize={onResize}
   on:mouseUp={onMouseUp}
   {menuPath}
