@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
   import Button from '@/components/ui/button';
-  import { ButtonType } from '@/components/ui/button/types';
   import ViewWrapperModal from '@/components/modal/view-wrapper';
   import { T } from '@/assets/js/locale/locale';
   import { ViewStore } from '@/store/view';
@@ -24,13 +23,21 @@
   import { markStringSearch } from '@/assets/js/util';
   import Pagination from '@/components/ui/pagination';
 
+  import { ModalType } from '@/components/ui/modal/types';
+  import { ButtonType, ButtonId } from '@/components/ui/button/types';
+
+  import SC from '@/components/set-common';
+
   export let view: ViewStore;
   export let menuPath: string;
 
   view.loading$.next(true);
   const store = new Store(view);
+  const { hasAnyDeletedRecord$ } = view;
 
   const { usedLanguages$, companies$ } = store;
+
+  let scRef: any;
 
   let viewWrapperModalRef: any;
   let languageViewRef: any;
@@ -56,8 +63,10 @@
   let columns: TableColumn[] = [];
 
   const onAddNewLanguage = (event) => {
-    viewWrapperModalRef.show().then((res) => {
-      console.log(res);
+    loadLanguageView().then((res) => {
+      viewWrapperModalRef.show().then((res) => {
+        console.log(res);
+      });
     });
   };
 
@@ -240,7 +249,7 @@
       }, 250);
     });
 
-    loadLanguageView();
+    // loadLanguageView();
   });
 
   const calcTableHeight = (delta: number) => {
@@ -413,6 +422,24 @@
   const onPaginationInit = (event) => {
     view.pageSize = event.detail;
   };
+
+  /**
+   * Event handle for Config button.
+   * @param {event} Mouse click event.
+   * @return {void}.
+   */
+  const onConfig = (event) => {
+    view.showViewConfigModal(event.currentTarget.id, scRef);
+  };
+
+  /**
+   * Event handle for Trash Restore button.
+   * @param {event} Mouse click event.
+   * @return {void}.
+   */
+  const onTrashRestore = (event) => {
+    view.showTrashRestoreModal(event.currentTarget.id, false, scRef);
+  };
 </script>
 
 <style lang="scss">
@@ -431,6 +458,9 @@
   }
 </style>
 
+<!--Invisible Element-->
+<SC bind:this={scRef} {view} {menuPath} />
+
 <ProgressBar loading$={view.loading$} />
 <ViewWrapperModal
   menuInfo={$menuInfo$}
@@ -442,7 +472,7 @@
   id={'modalWrapper' + view.getViewName() + 'Id'}>
   <svelte:component
     this={LanguageView}
-    showWorkList = {false}
+    showWorkList={false}
     bind:this={languageViewRef}
     showTitle={false}
     on:callback={langCallback}
@@ -451,6 +481,7 @@
     fullControl={langFullControl}
     roleControls={langRoleControls} />
 </ViewWrapperModal>
+<!--//Invisible Element-->
 
 <section class="view-content-main">
   <!-- Change language -->
@@ -564,4 +595,14 @@
 
 <section class="view-content-bottom">
   <Button btnType={ButtonType.AddNew} title={T('COMMON.BUTTON.ADD_NEW_LANGUAGE')} on:click={onAddNewLanguage} />
+  {#if view.isRendered(ButtonId.Config)}
+    <Button btnType={ButtonType.Config} on:click={onConfig} disabled={view.isDisabled(ButtonId.Config)} />
+  {/if}
+
+  {#if view.isRendered(ButtonId.TrashRestore, $hasAnyDeletedRecord$)}
+    <Button
+      btnType={ButtonType.TrashRestore}
+      on:click={onTrashRestore}
+      disabled={view.isDisabled(ButtonId.TrashRestore)} />
+  {/if}
 </section>

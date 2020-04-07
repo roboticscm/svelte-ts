@@ -22,13 +22,7 @@
   import NumberInput from '@/components/ui/input/number-input';
   import TextInput from '@/components/ui/input/text-input';
   import Checkbox from '@/components/ui/input/checkbox';
-  import ConfirmModal from '@/components/ui/modal/base';
-  import ConfirmDeleteModal from '@/components/ui/modal/base';
-  import ConfirmPasswordModal from '@/components/ui/modal/base';
-  import ConfirmConflictDataModal from '@/components/modal/conflict-data-confirm';
-  import ConfigModal from '@/components/modal/view-config';
-  import TrashRestoreModal from '@/components/modal/trash-restore';
-  import Snackbar from '@/components/ui/snackbar';
+  import SC from '@/components/set-common';
   import SimpleImageSelector from '@/components/ui/simple-image-selector';
   import TreeView from '@/components/ui/tree-view';
   import { Store } from '../store';
@@ -46,15 +40,9 @@
 
   // Refs
   let codeRef: any;
-  let confirmModalRef: any;
-  let confirmDeleteModalRef: any;
-  let confirmPasswordModalRef: any;
-  let snackbarRef: any;
-  let configModalRef: any;
-  let trashRestoreModalRef: any;
+  let scRef: any;
   let btnSaveRef: any;
   let btnUpdateRef: any;
-  let confirmConflictDataModalRef: any;
   let availableDepTreeRef: any;
   let assignedDepTreeRef: any;
 
@@ -83,7 +71,7 @@
    */
   const onAddNew = (event) => {
     // verify permission
-    view.verifyAddNewAction(event.currentTarget.id, confirmModalRef, confirmPasswordModalRef).then((_) => {
+    view.verifyAddNewAction(event.currentTarget.id, scRef).then((_) => {
       // if everything is OK, call the action
       doAddNew();
     });
@@ -96,16 +84,14 @@
    */
   const onEdit = (event) => {
     // verify permission
-    view
-      .verifyEditAction(event.currentTarget.id, confirmModalRef, confirmPasswordModalRef, selectedData.name)
-      .then((_) => {
-        // just switch to edit mode
-        isReadOnlyMode$.next(false);
-        tick().then(() => {
-          // the moving focus to the first element
-          codeRef.focus();
-        });
+    view.verifyEditAction(event.currentTarget.id, scRef, selectedData.name).then((_) => {
+      // just switch to edit mode
+      isReadOnlyMode$.next(false);
+      tick().then(() => {
+        // the moving focus to the first element
+        codeRef.focus();
       });
+    });
   };
 
   /**
@@ -115,12 +101,10 @@
    */
   const onDelete = (event) => {
     // verify permission
-    view
-      .verifyDeleteAction(event.currentTarget.id, confirmDeleteModalRef, confirmPasswordModalRef, selectedData.name)
-      .then((_) => {
-        // if everything is OK, call the action
-        view.doDelete(selectedData.id, snackbarRef, doAddNew);
-      });
+    view.verifyDeleteAction(event.currentTarget.id, scRef, selectedData.name).then((_) => {
+      // if everything is OK, call the action
+      view.doDelete(selectedData.id, scRef.snackbarRef(), doAddNew);
+    });
   };
 
   /**
@@ -129,13 +113,7 @@
    * @return {void}.
    */
   const onConfig = (event) => {
-    view.showViewConfigModal(
-      event.currentTarget.id,
-      confirmModalRef,
-      confirmPasswordModalRef,
-      configModalRef,
-      snackbarRef,
-    );
+    view.showViewConfigModal(event.currentTarget.id, scRef);
   };
 
   /**
@@ -144,14 +122,7 @@
    * @return {void}.
    */
   const onTrashRestore = (event) => {
-    view.showTrashRestoreModal(
-      event.currentTarget.id,
-      false,
-      confirmModalRef,
-      confirmPasswordModalRef,
-      trashRestoreModalRef,
-      snackbarRef,
-    );
+    view.showTrashRestoreModal(event.currentTarget.id, false, scRef);
   };
 
   /**
@@ -217,7 +188,7 @@
     (form as any).deleteDepIds = assignedDepTreeRef.getCheckedLeafIds(false);
     // @ts-ignore
     if ($isUpdateMode$) {
-      const dataChanged = view.checkObjectChange(beforeForm, SObject.clone(form), snackbarRef);
+      const dataChanged = view.checkObjectChange(beforeForm, SObject.clone(form), scRef.snackbarRef());
       if (!dataChanged) {
         return false;
       }
@@ -272,8 +243,7 @@
             view.verifySaveAction(
               // @ts-ignore
               $isUpdateMode$ ? ButtonId.Update : ButtonId.Save,
-              confirmModalRef,
-              confirmPasswordModalRef,
+              scRef,
             ),
           ).pipe(
             catchError((error) => {
@@ -298,7 +268,7 @@
           if (res.response && res.response.data) {
             // if error
             if (res.response.data.message) {
-              snackbarRef.showUnknownError(res.response.data.message);
+              scRef.snackbarRef().showUnknownError(res.response.data.message);
             } else {
               form.errors.errors = form.recordErrors(res.response.data);
             }
@@ -307,11 +277,11 @@
             // @ts-ignore
             if ($isUpdateMode$) {
               // update
-              snackbarRef.showUpdateSuccess();
+              scRef.snackbarRef().showUpdateSuccess();
               view.needSelectId$.next(selectedData.id);
             } else {
               // save
-              snackbarRef.showSaveSuccess();
+              scRef.snackbarRef().showSaveSuccess();
               doAddNew();
             }
           }
@@ -359,7 +329,8 @@
         // @ts-ignore
         if (!$isReadOnlyMode$) {
           const editedUser = await getEditedUserDetail(hasuraObj.updatedBy);
-          confirmConflictDataModalRef
+          scRef
+            .confirmConflictDataModalRef()
             .show(restructureChangedData(changed), editedUser, hasuraObj.updatedDate)
             .then((buttonPressed: number) => {
               if (buttonPressed === ButtonPressed.OK) {
@@ -457,32 +428,7 @@
 </style>
 
 <!--Invisible Element-->
-<Snackbar bind:this={snackbarRef} />
-<ConfirmConflictDataModal
-  {menuPath}
-  id={'conflictData' + view.getViewName() + 'Modal'}
-  bind:this={confirmConflictDataModalRef} />
-<ConfirmModal modalType={ModalType.Confirm} {menuPath} bind:this={confirmModalRef} />
-<ConfirmDeleteModal
-  id="mdConfirmDeleteModal"
-  title={T('COMMON.LABEL.DELETE')}
-  modalType={ModalType.Confirm}
-  {menuPath}
-  bind:this={confirmDeleteModalRef} />
-<ConfirmPasswordModal modalType={ModalType.ConfirmPassword} {menuPath} bind:this={confirmPasswordModalRef} />
-<ConfigModal
-  {menuPath}
-  subTitle={view.getViewTitle()}
-  id={'configModal' + view.getViewName()}
-  bind:this={configModalRef}
-  containerWidth="500px" />
-<TrashRestoreModal
-  columns={view.trashRestoreColumns}
-  {menuPath}
-  subTitle={view.getViewTitle()}
-  id={'trashRestoreModal' + view.getViewName()}
-  bind:this={trashRestoreModalRef}
-  containerWidth="600px" />
+<SC bind:this={scRef} {view} {menuPath} />
 <!--//Invisible Element-->
 
 <!--Main content-->

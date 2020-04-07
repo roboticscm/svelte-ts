@@ -265,60 +265,65 @@ export class ViewStore {
   verifySimpleAction = (
     buttonId: string,
     confirmModalRef: any,
-    passwordConfirmModalRef: any,
+    confirmPasswordModalRef: any,
     msg: string,
     extraMessage: string = '',
   ) => {
     return this.verifyAction(
       buttonId,
       () => confirmModalRef.show(`${T(`COMMON.MSG.${msg}`)} <b>${extraMessage}</b>. ${T('COMMON.MSG.ARE_YOU_SURE')}?`),
-      passwordConfirmModalRef,
+      confirmPasswordModalRef,
     );
   };
 
-  verifyAddNewAction = (
-    buttonId: string,
-    confirmModalRef: any,
-    passwordConfirmModalRef: any,
-    extraMessage: string = '',
-  ) => {
-    return this.verifySimpleAction(buttonId, confirmModalRef, passwordConfirmModalRef, 'ADD_NEW', extraMessage);
+  verifyAddNewAction = (buttonId: string, scRef: any, extraMessage: string = '') => {
+    return this.verifySimpleAction(
+      buttonId,
+      scRef.confirmModalRef(),
+      scRef.confirmPasswordModalRef(),
+      'ADD_NEW',
+      extraMessage,
+    );
   };
 
-  verifySaveAction = (
-    buttonId: string,
-    confirmModalRef: any,
-    passwordConfirmModalRef: any,
-    extraMessage: string = '',
-  ) => {
-    return this.verifySimpleAction(buttonId, confirmModalRef, passwordConfirmModalRef, 'SAVE', extraMessage);
+  verifySaveAction = (buttonId: string, scRef: any, extraMessage: string = '') => {
+    return this.verifySimpleAction(
+      buttonId,
+      scRef.confirmModalRef(),
+      scRef.confirmPasswordModalRef(),
+      'SAVE',
+      extraMessage,
+    );
   };
 
-  verifyEditAction = (
-    buttonId: string,
-    confirmModalRef: any,
-    passwordConfirmModalRef: any,
-    extraMessage: string = '',
-  ) => {
-    return this.verifySimpleAction(buttonId, confirmModalRef, passwordConfirmModalRef, 'EDIT', extraMessage);
+  verifyEditAction = (buttonId: string, scRef: any, extraMessage: string = '') => {
+    return this.verifySimpleAction(
+      buttonId,
+      scRef.confirmModalRef(),
+      scRef.confirmPasswordModalRef(),
+      'EDIT',
+      extraMessage,
+    );
   };
 
-  verifyUpdateAction = (
-    buttonId: string,
-    confirmModalRef: any,
-    passwordConfirmModalRef: any,
-    extraMessage: string = '',
-  ) => {
-    return this.verifySimpleAction(buttonId, confirmModalRef, passwordConfirmModalRef, 'UPDATE', extraMessage);
+  verifyUpdateAction = (buttonId: string, scRef: any, extraMessage: string = '') => {
+    return this.verifySimpleAction(
+      buttonId,
+      scRef.confirmModalRef(),
+      scRef.confirmPasswordModalRef(),
+      'UPDATE',
+      extraMessage,
+    );
   };
 
-  verifyDeleteAction = (
-    buttonId: string,
-    confirmModalRef: any,
-    passwordConfirmModalRef: any,
-    extraMessage: string = '',
-  ) => {
-    return this.verifySimpleAction(buttonId, confirmModalRef, passwordConfirmModalRef, 'DELETE', extraMessage);
+  verifyDeleteAction = (buttonId: string, scRef: any, extraMessage: string = '') => {
+    return this.verifySimpleAction(
+      buttonId,
+      scRef.confirmModalRef(),
+      scRef.confirmPasswordModalRef(),
+      'DELETE',
+      extraMessage,
+    );
   };
 
   checkObjectArrayChange = (beforeData: any, currentData: any, snackbar: any = undefined) => {
@@ -346,60 +351,50 @@ export class ViewStore {
     return changedObject;
   };
 
-  showViewConfigModal = (
-    buttonId: string,
-    confirmModalRef: any,
-    confirmPasswordModalRef: any,
-    configModalRef: any,
-    snackbarRef: any,
-  ) => {
+  showViewConfigModal = (buttonId: string, scRef: any) => {
     const confirmCallback = () => {
-      return confirmModalRef.show(`${T('COMMON.MSG.SHOW_VIEW_CONFIG')}. ${T('COMMON.MSG.ARE_YOU_SURE')}?`);
+      return scRef.confirmModalRef().show(`${T('COMMON.MSG.SHOW_VIEW_CONFIG')}. ${T('COMMON.MSG.ARE_YOU_SURE')}?`);
     };
 
-    this.verifyAction(buttonId, confirmCallback, confirmPasswordModalRef).then((_) => {
+    this.verifyAction(buttonId, confirmCallback, scRef.confirmPasswordModalRef()).then((_) => {
       menuControlStore.sysGetControlListByMenuPath(this.menuPath).then((data: any) => {
-        configModalRef.show(data).then((buttonPressed: ButtonPressed) => {
-          if (buttonPressed === ButtonPressed.OK) {
-            const newData = configModalRef.getData();
-            let dataChanged = this.checkObjectArrayChange(data, newData, snackbarRef);
-            if (typeof dataChanged !== 'boolean') {
-              dataChanged = dataChanged.filter(
-                (item: any) => item.code !== 'btnConfig' || (item.code === 'btnConfig' && item.checked),
-              );
-              if (dataChanged.length > 0) {
-                menuControlStore
-                  .saveOrUpdateOrDelete({
-                    menuPath: this.menuPath,
-                    menuControls: dataChanged,
-                  })
-                  .then((_: any) => {
-                    location.reload();
-                  });
+        scRef
+          .configModalRef()
+          .show(data)
+          .then((buttonPressed: ButtonPressed) => {
+            if (buttonPressed === ButtonPressed.OK) {
+              const newData = scRef.configModalRef().getData();
+              let dataChanged = this.checkObjectArrayChange(data, newData, scRef.snackbarRef());
+              if (typeof dataChanged !== 'boolean') {
+                dataChanged = dataChanged.filter(
+                  (item: any) => item.code !== 'btnConfig' || (item.code === 'btnConfig' && item.checked),
+                );
+                if (dataChanged.length > 0) {
+                  menuControlStore
+                    .saveOrUpdateOrDelete({
+                      menuPath: this.menuPath,
+                      menuControls: dataChanged,
+                    })
+                    .then((_: any) => {
+                      location.reload();
+                    });
+                }
               }
             }
-          }
-        });
+          });
       });
     });
   };
 
-  showTrashRestoreModal = (
-    buttonId: string,
-    onlyMe: boolean,
-    confirmModalRef: any,
-    confirmPasswordModalRef: any,
-    trashRestoreModalRef: any,
-    snackbarRef: any,
-  ) => {
+  showTrashRestoreModal = (buttonId: string, onlyMe: boolean, scRef: any) => {
     this.verifyAction(
       buttonId,
       () => {
-        confirmModalRef.show(`${T('COMMON.MSG.SHOW_TRUSH_RESTORE')}. ${T('COMMON.MSG.ARE_YOU_SURE')}?`);
+        scRef.confirmModalRef().show(`${T('COMMON.MSG.SHOW_TRUSH_RESTORE')}. ${T('COMMON.MSG.ARE_YOU_SURE')}?`);
       },
-      confirmPasswordModalRef,
+      scRef.confirmPasswordModalRef(),
     ).then(() => {
-      this.doShowTrashRestoreModal(onlyMe, trashRestoreModalRef, snackbarRef);
+      this.doShowTrashRestoreModal(onlyMe, scRef.trashRestoreModalRef(), scRef.snackbarRef());
     });
   };
 
@@ -464,18 +459,6 @@ export class ViewStore {
 
   getOneById = (id: string) => {
     return tableUtilStore.getOneById(this.tableName, id);
-    // .pipe(take(1))
-    // .subscribe({
-    //   next: (res) => {
-    //     if (res.data && res.data.length > 0) {
-    //       this.selectedData = res.data[0];
-    //       this.selectedData$.next(res.data[0]);
-    //     }
-    //   },
-    //   error: (err) => {
-    //     console.log(err);
-    //   },
-    // });
   };
 
   doDelete = (id: string, snackbarRef: any, doAddNew: Function) => {

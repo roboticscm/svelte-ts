@@ -63,7 +63,7 @@
 {#if showTitle}
   <ViewTitle {view} />
 {/if}
-<TwoColumnView minLeftPane = {!showWorkList} id={'mainLayout' + view.getViewName()} {showTitle} {menuPath}>
+<TwoColumnView minLeftPane={!showWorkList} id={'mainLayout' + view.getViewName()} {showTitle} {menuPath}>
   <div style="height: 100%" slot="viewLeft">
     <WorkList {view} {menuPath} {callFrom} on:callback />
   </div>
