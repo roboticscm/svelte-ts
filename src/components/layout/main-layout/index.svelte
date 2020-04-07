@@ -19,7 +19,7 @@
       onDragEnd: (direction: any, track: number) => {
         const gridEle: any = document.querySelector('.layout-container');
         const [headerHeight] = gridEle.style['grid-template-rows'].split(' ');
-        settingsStore.saveSettings({
+        settingsStore.saveUserSettings({
           menuPath: 'sys/main-layout',
           controlId: 'mainLayoutId',
           keys: ['lastHeaderHeight'],

@@ -1,8 +1,10 @@
 export interface TableColumn {
-  title: string;
+  title?: string;
   name: string;
-  width: number;
-  hidden: boolean;
+  width?: number;
+  hidden?: boolean;
+  type?: string;
+  readOnly?: boolean;
 }
 
 export interface SimpleListParam {

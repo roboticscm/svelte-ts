@@ -50,7 +50,7 @@
 </script>
 
 <section id={workListContainerId} class="view-left-main">
-  <SimpleWorkList {view} {workListContainerId} {menuPath} {tableId} on:selection={onSelection} />
+  <SimpleWorkList {view} {menuPath} {tableId} on:selection={onSelection} />
   <!--  <HandsonWorkList on:selection={onSelection} {view} {workListContainerId} {tableId} {menuPath} />-->
 </section>
 <div class="view-left-bottom" />

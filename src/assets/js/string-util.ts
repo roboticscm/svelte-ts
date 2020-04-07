@@ -72,4 +72,8 @@ export class StringUtil {
         .replace('-', '')
         .replace('_', ''),
     );
+
+  public static removeMark = (str) => {
+    return str.replace(/<mark>/g, '').replace(/<\/mark>/g, '');
+  };
 }

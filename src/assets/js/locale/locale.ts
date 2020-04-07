@@ -115,6 +115,7 @@ const defaultValue = (key: string) => {
 };
 
 export const T = (fullKey: string) => {
+  // return fullKey;
   if (fullKey.includes('.') && !fullKey.includes(' ')) {
     const split = fullKey.split('.');
     if (split.length === 3) {

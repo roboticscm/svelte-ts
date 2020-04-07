@@ -68,6 +68,9 @@
       case ButtonType.CancelModal:
         preset(undefined, 'CANCEL', '<i class="fa fa-times"></i>', 'btn-danger');
         break;
+      case ButtonType.Apply:
+        preset(undefined, 'APPLY', '<i class="fa fa-check"></i>', 'btn-success');
+        break;
       default:
     }
   }

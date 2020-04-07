@@ -31,7 +31,7 @@
   };
 
   const saveSettings = (menuPath: string) => {
-    settingsStore.saveSettings({
+    settingsStore.saveUserSettings({
       menuPath: 'system',
       controlId: 'mainNavBarId',
       keys: ['lastMenuPath'],

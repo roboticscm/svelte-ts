@@ -14,7 +14,7 @@
 
   const onNavigate = (event: Event, departmentId: any) => {
     settingsStore
-      .saveSettings({
+      .saveUserSettings({
         menuPath: 'system',
         controlId: id,
         keys: ['lastDepartmentId'],
@@ -24,7 +24,7 @@
         // get last menu path of department
         menuStore.sysGetRoledMenuListByUserIdAndDepId(departmentId, false).subscribe((res: any) => {
           if (res.data.length > 0) {
-            settingsStore.saveSettings({
+            settingsStore.saveUserSettings({
               menuPath: 'system',
               controlId: 'mainNavBarId',
               keys: ['lastMenuPath'],

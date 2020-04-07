@@ -15,7 +15,6 @@
   export let showHeader = true;
   export let columns: TableColumn[];
   export let data: any[];
-  export let height: string = undefined; // in pixel
   export let showRowNumber = true;
   export let startRowCount = 1;
   export let menuPath: string;
@@ -25,11 +24,6 @@
 
   onMount(() => {
     loadSettings();
-    const tbodyEle: any = document.querySelector(`#${id} tbody`);
-    // height must be in vh
-    if (height) {
-      tbodyEle.style.maxHeight = height;
-    }
   });
 
   const onSelectedRow = () => {
@@ -45,8 +39,7 @@
   };
 
   const applyTable = () => {
-    startRow = null;
-    selectedRows = [];
+    // selectedRows = [];
 
     getTableId().SelectableTable(
       {
@@ -64,7 +57,6 @@
         };
       },
     );
-    // loadSettings();
   };
 
   const selectAll = () => {
@@ -118,7 +110,8 @@
   };
 
   const getSelectedData = () => {
-    return selectedRows.map((index) => data[index]);
+    const result = selectedRows.map((index) => data[index]);
+    return result;
   };
 
   function dotheneedful(sibling) {
@@ -139,7 +132,7 @@
     if (e.code == 'ArrowUp') {
       let idx = startRow.cellIndex;
 
-      let nextrow = startRow.parentElement.previousElementSibling;
+      let nextrow = startRow.parentElement && startRow.parentElement.previousElementSibling;
       if (nextrow != null) {
         let sibling = nextrow.cells[idx];
         let [, row] = sibling.id.split('_');
@@ -153,7 +146,7 @@
       }
     } else if (e.code == 'ArrowDown') {
       let idx = startRow.cellIndex;
-      let nextrow = startRow.parentElement.nextElementSibling;
+      let nextrow = startRow.parentElement && startRow.parentElement.nextElementSibling;
       if (nextrow != null) {
         let sibling = nextrow.cells[idx];
         dotheneedful(sibling);
@@ -164,10 +157,9 @@
     dispatch('keyup', { event: e, data: getSelectedData() });
   }
 
-  const focus = () => {
+  export const focus = () => {
     // register key for navigation
     startRow = document.querySelector(`#cell_0_0_${id}`);
-
     startRow.focus();
     document.onkeydown = (e) => {
       checkKey(e);
@@ -195,6 +187,9 @@
     tick().then(() => {
       applyTable();
     });
+    // setTimeout(()=> {
+    //   applyTable();
+    // }, 500);
   }
 
   const saveSettings = () => {
@@ -210,7 +205,7 @@
         values.push(window['$'](this).width());
       });
 
-    settingsStore.saveSettings({
+    settingsStore.saveUserSettings({
       menuPath,
       controlId: id,
       keys,
@@ -243,7 +238,7 @@
 
 </style>
 
-<div style="height: calc(100% - 20px); overflow: auto;">
+<div style="height: 100%; overflow: auto;">
   <slot name="label" />
   <table on:click|stopPropagation={onClick} {id} class="table">
     {#if showHeader}

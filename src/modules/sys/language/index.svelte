@@ -18,6 +18,7 @@
   export let fullControl: boolean;
   export let roleControls: [];
   export let callFrom = 'Self';
+  export let showWorkList = true;
 
   // Init view
   const view = new ViewStore(menuPath);
@@ -62,10 +63,11 @@
 {#if showTitle}
   <ViewTitle {view} />
 {/if}
-<TwoColumnView id={'mainLayout' + view.getViewName()} {showTitle} {menuPath}>
+<TwoColumnView minLeftPane = {!showWorkList} id={'mainLayout' + view.getViewName()} {showTitle} {menuPath}>
   <div style="height: 100%" slot="viewLeft">
     <WorkList {view} {menuPath} {callFrom} on:callback />
   </div>
+
   <div style="height: 100%" slot="default">
     <MainContent {view} {menuPath} />
   </div>

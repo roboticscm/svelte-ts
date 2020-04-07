@@ -15,7 +15,7 @@
   export let height = '70vh';
   export let gridMergeCells = {};
   export let menuPath: string;
-  export let containerWidth: string;
+  export let containerWidth: string = undefined;
   export let gridNestedHeaders = [];
   export let useInModal = true;
   export let mouseUp: any = undefined;
@@ -145,7 +145,7 @@
   };
 
   const saveSettings = (col: number, width: number) => {
-    settingsStore.saveSettings({
+    settingsStore.saveUserSettings({
       menuPath,
       controlId: id,
       keys: [col + ''],
@@ -192,13 +192,16 @@
     return jExcelObj;
   };
 
-  onDestroy(() => {
-    window.removeEventListener('resize', onWindowResize);
-
+  const destroyGrid = () => {
     const ele = document.getElementById(id);
     if (ele) {
-      jexcel.destroy(ele, true);
+      jexcel.destroy(ele);
+      jExcelObj = null;
     }
+  };
+  onDestroy(() => {
+    window.removeEventListener('resize', onWindowResize);
+    destroyGrid();
   });
 
   onMount(() => {
@@ -263,13 +266,18 @@
       keys.push('col' + index);
       values.push(col.width);
     });
-    settingsStore.saveSettings({
+    settingsStore.saveUserSettings({
       menuPath,
       controlId: id,
       keys,
       values,
     });
   }
+
+  export const refresh = () => {
+    destroyGrid();
+    createGrid(data);
+  };
 </script>
 
 <style lang="scss">

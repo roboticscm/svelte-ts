@@ -2,14 +2,13 @@
   import { onMount, onDestroy, SvelteComponent } from 'svelte';
   import { fromEvent, Subscription } from 'rxjs';
   import { apolloClient } from '@/assets/js/hasura-client';
-
+  import SelectableTable from '@/components/ui/selectable-table';
   import { ViewStore } from '@/store/view';
 
-  import Pagination from '@/components/ui/pagination/index.svelte';
+  import Pagination from '@/components/ui/pagination';
   import { skip } from 'rxjs/operators';
 
   export let view: ViewStore;
-  export let workListContainerId: string;
   export let menuPath: string;
   export let tableId: string;
 
@@ -20,8 +19,7 @@
   let tableRef: any;
   let pageRef: any;
   let needSelectIdSub, needHighlightIdSub, selectDataSub: Subscription;
-  let TableComponent: SvelteComponent;
-  let tableHeight: number;
+
   // =========================SUBSCRIPTION===========================
   const subscription = () => {
     const query = view.createQuerySubscription();
@@ -104,13 +102,6 @@
     pageRef.loadSettings().then(() => {
       reload();
     });
-
-    tableHeight = window['$']('#' + workListContainerId).height() - 50;
-    // import SelectableTable component
-    import('@/components/ui/selectable-table/index.svelte').then((res) => {
-      // @ts-ignore
-      TableComponent = res.default;
-    });
   });
 
   onDestroy(() => {
@@ -121,16 +112,16 @@
   // =========================//HOOK===========================
 </script>
 
-<svelte:component
-  this={TableComponent}
-  startRowCount={(view.page - 1) * view.pageSize + 1}
-  height={tableHeight + 'px'}
-  bind:this={tableRef}
-  on:selection
-  {columns}
-  {menuPath}
-  data={$dataList$}
-  id={tableId} />
+<div style="height: calc(100% - 20px);">
+  <SelectableTable
+    startRowCount={(view.page - 1) * view.pageSize + 1}
+    bind:this={tableRef}
+    on:selection
+    {columns}
+    {menuPath}
+    data={$dataList$}
+    id={tableId} />
+</div>
 <div style="margin-top: 1px;">
   <Pagination
     {menuPath}

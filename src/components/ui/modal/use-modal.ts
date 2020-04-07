@@ -72,7 +72,7 @@ export const createModal = (menuPath: string, widthInPixel: number = null, heigh
       keys,
       values,
     });
-    settingsStore.saveSettings(obj);
+    settingsStore.saveUserSettings(obj);
   };
 
   const saveModalState = (modalRef: any) => {

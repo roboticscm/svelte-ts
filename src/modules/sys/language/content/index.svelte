@@ -28,6 +28,7 @@
   import ConfigModal from '@/components/modal/view-config';
   import TrashRestoreModal from '@/components/modal/trash-restore';
   import Snackbar from '@/components/ui/snackbar';
+  import { Debug } from '@/assets/js/debug';
 
   // Props
   export let view: ViewStore;
@@ -285,6 +286,10 @@
               doAddNew();
             }
           }
+          saveRunning$.next(false);
+        },
+        error: (error) => {
+          Debug.errorSection('Language - doSaveOrUpdate', error);
           saveRunning$.next(false);
         },
       });

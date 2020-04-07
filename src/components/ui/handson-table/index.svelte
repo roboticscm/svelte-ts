@@ -8,6 +8,7 @@
   export let data: any[];
   export let columns: TableColumn[];
   export let menuPath: string;
+  export let showHeader = true;
 
   const dispatch = createEventDispatcher();
   let highlightId: any = undefined;
@@ -36,9 +37,9 @@
       stretchH: 'all',
       width: '100%',
       height: 'calc(100% - 20px)',
-      colHeaders: columns.map((c: TableColumn) => c.title),
+      colHeaders: showHeader ? columns.map((c: TableColumn) => c.title) : false,
       columns: columns.map((c: TableColumn) => {
-        return { data: c.name };
+        return { data: c.name, renderer: 'html' };
       }),
       hiddenColumns: {
         columns: columns
@@ -61,6 +62,9 @@
       manualColumnResize: true,
       manualRowMove: true,
       manualColumnMove: true,
+      beforeKeyDown: (event) => {
+        dispatch('beforeKeyDown', event);
+      },
       afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
         preventScrolling.value = true;
         dispatch('selection', getObjectData().slice(row, row2 + 1));
@@ -101,7 +105,7 @@
       }
     }
 
-    settingsStore.saveSettings({
+    settingsStore.saveUserSettings({
       controlId: id,
       menuPath,
       keys,
@@ -158,6 +162,10 @@
     }
     const colData = tableInstance.getDataAtProp('id');
     return colData[selectedRows[0][0]];
+  };
+
+  export const selectCell = (row: number, col: number) => {
+    tableInstance.selectCell(row, col);
   };
 
   // @ts-ignore

@@ -2,6 +2,7 @@
   import { T } from '@/assets/js/locale/locale';
   import { settingsStore } from '@/store/settings';
   import { createEventDispatcher } from 'svelte';
+  import { App } from '@/assets/js/constants';
 
   const dispatch = createEventDispatcher();
 
@@ -56,6 +57,8 @@
           if (filter.length > 0) {
             pageSize = +filter[0].value;
             dispatch('init', pageSize);
+          } else {
+            pageSize = App.DEFAULT_PAGE_SIZE;
           }
           resolve('ok');
         })
@@ -71,7 +74,7 @@
 
   const onPageSizeChange = (event) => {
     pageSize = +event.target.value;
-    settingsStore.saveSettings({
+    settingsStore.saveUserSettings({
       menuPath,
       controlId: 'pageSizeSelectId',
       keys: ['lastPageSize'],

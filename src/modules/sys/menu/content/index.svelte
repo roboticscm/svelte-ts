@@ -32,6 +32,7 @@
   import SimpleImageSelector from '@/components/ui/simple-image-selector';
   import TreeView from '@/components/ui/tree-view';
   import { Store } from '../store';
+  import { Debug } from '@/assets/js/debug';
 
   // Props
   export let view: ViewStore;
@@ -314,6 +315,10 @@
               doAddNew();
             }
           }
+          saveRunning$.next(false);
+        },
+        error: (error) => {
+          Debug.errorSection('Language - doSaveOrUpdate', error);
           saveRunning$.next(false);
         },
       });

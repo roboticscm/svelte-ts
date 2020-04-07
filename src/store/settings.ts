@@ -22,7 +22,7 @@ class SettingsStore {
     });
   }
 
-  saveSettings(obj: Settings) {
+  saveUserSettings(obj: Settings) {
     return Http.post(`${BASE_URL}save-or-update`, JSONbig.stringify(obj));
   }
 }

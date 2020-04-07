@@ -47,7 +47,7 @@ export class RxHttp {
 
     let paramsString = '?';
     for (let key in paramObj) {
-      paramsString += `${key}=${paramObj[key]}&`;
+      paramsString += `${key}=${encodeURIComponent(paramObj[key])}&`;
     }
     // remove last &
     return paramsString.substring(0, paramsString.length - 1);

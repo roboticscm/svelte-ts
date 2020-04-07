@@ -12,6 +12,7 @@ export enum ButtonType {
   CloseModal,
   OkModal,
   CancelModal,
+  Apply,
   Custom,
 }
 
@@ -31,5 +32,6 @@ export enum ButtonId {
   Preview = 'btnPreview',
   Config = 'btnConfig',
   TrashRestore = 'btnTrashRestore',
-  iewLog = 'btnViewLog',
+  ViewLog = 'btnViewLog',
+  Apply = 'btnApply',
 }

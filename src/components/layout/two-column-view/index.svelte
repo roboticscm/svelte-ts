@@ -9,6 +9,7 @@
   export let showTitle: boolean = true;
   export let id: string = '';
   export let menuPath: string;
+  export let minLeftPane = false;
 
   let contentSplit: any;
 
@@ -26,17 +27,18 @@
     // loadSettings
     settingsStore.getUserSettings(`left${id}`, menuPath).then((res: any[]) => {
       const found = res.find((it) => it.key === 'lastLeftWidth');
+      let leftWidth = 260; // default
       if (found) {
-        const { value } = found;
-        let containerEle: any;
-        if (showTitle) {
-          containerEle = document.querySelector('.view-container-2-col');
-        } else {
-          containerEle = document.querySelector('.view-container-2-col-modal');
-        }
-
-        containerEle.style['grid-template-columns'] = `${value} ${GUTTER_WIDTH}px auto`;
+        leftWidth = +found.value;
       }
+
+      let containerEle: any;
+      if (showTitle) {
+        containerEle = document.querySelector('.view-container-2-col');
+      } else {
+        containerEle = document.querySelector('.view-container-2-col-modal');
+      }
+      containerEle.style['grid-template-columns'] = `${minLeftPane ? 0 : leftWidth} ${GUTTER_WIDTH}px auto`;
     });
 
     return Split({
@@ -56,7 +58,7 @@
 
         const [leftWidth] = gridEle.style['grid-template-columns'].split(' ');
 
-        settingsStore.saveSettings(
+        settingsStore.saveUserSettings(
           new Settings({
             menuPath: menuPath,
             controlId: `left${id}`,
