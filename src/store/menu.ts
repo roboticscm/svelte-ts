@@ -5,8 +5,7 @@ import { skip, take } from 'rxjs/operators';
 import { HistoryMenu, RoleMenu } from '@/modules/sys/menu/model';
 import { getMethodNameInSnackCase } from '@/assets/js/util';
 import { Debug } from '@/assets/js/debug';
-// @ts-ignore
-const JSONbig = require('json-bigint');
+import { SJSON } from '@/assets/js/sjson';
 
 const BASE_URL = 'sys/menu/';
 class MenuStore {
@@ -72,7 +71,7 @@ export const menuStore = new MenuStore();
 const BASE_URL_HISTORY = 'sys/menu-history/';
 class HistoryMenuStore {
   saveOrUpdate(obj: HistoryMenu) {
-    return Http.post(`${BASE_URL_HISTORY}${getMethodNameInSnackCase()}`, JSONbig.stringify(obj));
+    return Http.post(`${BASE_URL_HISTORY}${getMethodNameInSnackCase()}`, SJSON.stringify(obj));
   }
 }
 export const historyMenuStore = new HistoryMenuStore();

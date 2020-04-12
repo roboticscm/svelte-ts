@@ -1,8 +1,10 @@
-const { aliases, scssAliases, onwarn } = require('../config/webpack.parts');
+const { resolve, onwarn } = require('../webpack.config');
 const merge = require('webpack-merge');
 const { CheckerPlugin } = require('awesome-typescript-loader');
 const path = require('path');
 const createCompiler = require('@storybook/addon-docs/mdx-compiler-plugin');
+const magicImporter = require('node-sass-magic-importer');
+const sveltePreprocess = require('svelte-preprocess');
 
 module.exports = ({ config, mode }) => {
   // console.dir(config, { depth: null });
@@ -11,14 +13,33 @@ module.exports = ({ config, mode }) => {
       rules: [
         {
           test: /\.(svelte|html)$/,
-          loader: 'svelte-loader',
+          loader: 'svelte-loader-hot',
           options: {
             onwarn: onwarn,
-            preprocess: require('svelte-preprocess')({
+            preprocess: sveltePreprocess({
               scss: {
-                importer: [scssAliases(aliases)]
-              }
-            })
+                importer: [magicImporter()],
+              },
+              typescript: {
+                // skips type checking
+                transpileOnly: false,
+              },
+            }),
+            hotReload: true,
+            hotOptions: {
+              // whether to preserve local state (i.e. any `let` variable) or
+              // only public props (i.e. `export let ...`)
+              noPreserveState: false,
+              // optimistic will try to recover from runtime errors happening
+              // during component init. This goes funky when your components are
+              // not pure enough.
+              optimistic: true,
+              noReload: false,
+              // noPreserveStateKey: '__'
+              // See docs of svelte-loader-hot for all available options:
+              //
+              // https://github.com/rixo/svelte-loader-hot#usage
+            },
           }
         },
         {
@@ -61,8 +82,7 @@ module.exports = ({ config, mode }) => {
       ]
     }
   });
-  mergedConfig.resolve.alias = { ...mergedConfig.resolve.alias, ...aliases };
+  mergedConfig.resolve.alias = { ...mergedConfig.resolve.alias, ...resolve.alias };
   mergedConfig.plugins.push(new CheckerPlugin());
-  //console.dir(mergedConfig, {depth: null});
   return mergedConfig;
 };

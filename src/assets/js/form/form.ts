@@ -3,8 +3,7 @@ import { Errors } from './errors';
 import axios, { Method } from 'axios';
 import { API } from '../constants';
 import { RxHttp } from '@/assets/js/rx-http';
-// @ts-ignore
-const JSONbig = require('json-bigint');
+import { SJSON } from '@/assets/js/sjson';
 
 export default class Form {
   originalData: any;
@@ -62,7 +61,7 @@ export default class Form {
   }
 
   submit(requestType: Method, url: string) {
-    return RxHttp.callApi(requestType, url, undefined, JSONbig.stringify(this.data()));
+    return RxHttp.callApi(requestType, url, undefined, SJSON.stringify(this.data()));
   }
 
   recordErrors(errors: Errors) {

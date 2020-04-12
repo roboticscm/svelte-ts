@@ -74,6 +74,11 @@
 
   const onPageSizeChange = (event) => {
     pageSize = +event.target.value;
+    const totalPages = Math.ceil(totalRecords / pageSize);
+    if (curPage > totalPages) {
+      curPage = 1;
+    }
+
     settingsStore.saveUserSettings({
       menuPath,
       controlId: 'pageSizeSelectId',
@@ -92,6 +97,7 @@
 
   const onPageChange = (event) => {
     curPage = +event.currentTarget.value;
+
     requireLoadPage();
   };
 

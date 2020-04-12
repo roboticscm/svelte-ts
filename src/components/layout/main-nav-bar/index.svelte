@@ -57,12 +57,13 @@
   .more-dropdown-container {
     padding-left: $large-padding;
     padding-right: $large-padding;
+    padding-top: calc((var(--header-height) - 2rem) / 2);
+    text-align: center;
     &:hover {
       background: var(--bg-secondary);
       outline: $default-border;
     }
   }
-
   .dropdown-context-text {
     line-height: var(--large-icon-size);
     font-size: 0.8rem;
@@ -83,12 +84,10 @@
   {/each}
   {#if $dataList$.length > $navBarConfig$.mainNavBarViewCount}
     <div class="more-dropdown-container" on:mouseover|stopPropagation={showPopup} on:mouseout={hidePopup}>
-      <div>
-        <i class="nav-bar-item__icon fa fa-angle-double-down" />
-      </div>
-      <div>...</div>
+      <i class="fa fa-angle-double-down" />
+      <div>({$dataList$.length - $navBarConfig$.mainNavBarViewCount})</div>
       <div id="moreNavBarDropdown" class="dropdown-content">
-        {#each $dataList$.slice($navBarConfig$.mainNavBarViewCount, $navBarConfig$.mainNavBarViewCount + $navBarConfig$.historyNavBarViewCount) as row}
+        {#each $dataList$.slice($navBarConfig$.mainNavBarViewCount, $dataList$.length) as row}
           <RouterLink
             className="inline"
             bind:this={routerLink}

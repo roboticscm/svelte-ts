@@ -28,9 +28,6 @@
   view.roleControls = roleControls;
   view.loading$.next(true);
 
-  // Other vars
-  let transition = App.USE_ANIMATION ? scale : () => {};
-
   // ================= SUBSCRIPTION ========================
   const subscription = () => {
     view.completeLoading$.pipe(take(1)).subscribe((_) => {

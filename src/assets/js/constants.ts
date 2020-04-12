@@ -36,4 +36,5 @@ export class App {
   static AUTO_COMPLETE = 'off';
   static SNACKBAR_TIMEOUT = 3000;
   static PROGRESS_BAR = '<i class="fa fa-spinner fa-spin" />';
+  static MIN_PASSWORD_LENGTH = 6;
 }

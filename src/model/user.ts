@@ -6,4 +6,14 @@ export class User {
   fontIcon = '';
   useFontIcon = false;
   iconData = '';
+  email = '';
+  password = '';
+  activated = true;
+
+  insertDepartmentIds = [];
+  removeDepartmentIds = [];
+  defaultOwnerOrgId: string = undefined;
+
+  // transient column
+  name = '';
 }

@@ -5,6 +5,7 @@
   export let data: any[];
   export let disabled = false;
   export let isCheckableNode = false;
+  export let radioType: string = undefined;
 
   const dispatch = createEventDispatcher();
 
@@ -45,26 +46,92 @@
     }
   };
 
-  export const getCheckedLeafIds = (checked: boolean) => {
+  export const getCheckedLeafIds = (checked = true) => {
     const treeObj = getTreeInstance();
     let nodes = treeObj && treeObj.getCheckedNodes(checked);
 
     if (nodes && nodes.length > 0) {
-      return nodes.filter((node: any) => !node.isParent).map((node: any) => node.id);
+      return nodes.filter((node: any) => !node.isParent).map((node: any) => node.id.toString());
     } else {
       return [];
     }
+  };
+
+  export const getCheckedIds = (checked = true) => {
+    const treeObj = getTreeInstance();
+    let nodes = treeObj && treeObj.getCheckedNodes(checked);
+
+    if (nodes && nodes.length > 0) {
+      return nodes.map((node: any) => node.id.toString());
+    } else {
+      return [];
+    }
+  };
+
+  export const hasCheckChild = (parentNode) => {
+    const treeObj = getTreeInstance();
+
+    const nodes = treeObj.transformToArray(parentNode);
+    for (let i = 0, l = nodes.length; i < l; i++) {
+      if (nodes[i].checked) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  export const getCheckedIdsParent = () => {
+    const treeObj = getTreeInstance();
+
+    const rootNodes = treeObj && treeObj.getNodes();
+    const result = [];
+    if (rootNodes) {
+      const nodes = treeObj.transformToArray(rootNodes);
+      for (let i = 0, l = nodes.length; i < l; i++) {
+        if ((nodes[i].isParent && hasCheckChild(nodes[i])) || nodes[i].checked) {
+          result.push(nodes[i].id.toString());
+        }
+      }
+    }
+
+    return result;
+  };
+
+  export const getCheckedNodes = (checked = true) => {
+    const treeObj = getTreeInstance();
+    return treeObj && treeObj.getCheckedNodes(checked);
+  };
+
+  export const getCheckedData = (checked = true) => {
+    const checkedIds: any[] = getCheckedIds(true);
+    if (!checkedIds) {
+      return undefined;
+    }
+
+    return data.filter((it: any) => checkedIds.indexOf(it.id.toString()) >= 0);
+  };
+
+  export const getCheckedDataParent = (checked = true) => {
+    const checkedIds: any[] = getCheckedIdsParent();
+    if (!checkedIds) {
+      return undefined;
+    }
+
+    return data.filter((it: any) => checkedIds.indexOf(it.id.toString()) >= 0);
   };
 
   export const disableTree = (disable: boolean) => {
     const treeObj = getTreeInstance();
 
     const rootNodes = treeObj && treeObj.getNodes();
+
     if (rootNodes) {
       const nodes = treeObj.transformToArray(rootNodes);
       for (let i = 0, l = nodes.length; i < l; i++) {
+        // nodes[i].nocheck = disable;
         treeObj.setChkDisabled(nodes[i], disable);
       }
+      // treeObj.refresh();
     }
   };
 
@@ -90,7 +157,10 @@
     (window['$'] as any).fn.zTree.destroy(window['$']('#' + id));
     const setting = {
       check: {
-        enable: isCheckableNode,
+        enable: isCheckableNode || radioType,
+        chkStyle: isCheckableNode ? 'checkbox' : radioType ? 'radio' : '',
+        radioType,
+        nocheckInherit: true,
       },
       view: {
         fontCss: setFontCss,
@@ -105,8 +175,12 @@
           event.preventDefault();
           dispatch('click', { event, treeId, treeNode });
         },
+        onCheck: (event: any, treeId: any, treeNode: any) => {
+          dispatch('check', { event, treeId, treeNode });
+        },
       },
     };
+
     (window['$'] as any).fn.zTree.init(window['$']('#' + id), setting, data);
 
     tick().then(() => disableTree(disabled));

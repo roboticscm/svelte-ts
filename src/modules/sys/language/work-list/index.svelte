@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { onMount, createEventDispatcher } from 'svelte';
+  import { onMount, createEventDispatcher, onDestroy } from 'svelte';
   import { ViewStore } from '@/store/view';
-  // import HandsonWorkList from '@/components/work-list/handson-work-list';
-  import { fromEvent, forkJoin } from 'rxjs';
+  import { fromEvent, forkJoin, Observable, Subscription } from 'rxjs';
   import { switchMap, tap, filter } from 'rxjs/operators';
   import SimpleWorkList from '@/components/work-list/simple-work-list';
+  import { SObject } from '@/assets/js/sobject';
 
   // Props
   export let view: ViewStore;
@@ -16,28 +16,46 @@
   const tableId = `workList${view.getViewName()}${callFrom.replace('/', '__')}Table`;
   let selectedId: string = undefined;
   const dispatch = createEventDispatcher();
+  let selectSub: Subscription;
+
+  const doSelect = (ob$: Observable<any>) => {
+    return ob$
+      .pipe(
+        filter((_) => selectedId !== undefined),
+        tap((_) => view.loading$.next(true)),
+        switchMap((_) => forkJoin([view.getOneById(selectedId)])),
+      )
+      .subscribe((res: any[]) => {
+        view.selectedData$.next(SObject.convertFieldsToCamelCase(res[0].data[0]));
+        view.loading$.next(false);
+        selectedId = undefined;
+      });
+  };
 
   const onSelection = (event) => {
     if (event.detail && event.detail.length > 0) {
       selectedId = event.detail[0].id;
-      dispatch('callback', event.detail[0].id);
+
+      const change$ = new Observable((observer) => {
+        observer.next(event);
+      });
+      selectSub = doSelect(change$);
+
+      // dispatch('callback', event.detail[0].id);
     }
   };
 
   onMount(() => {
-    setTimeout(() => {
-      fromEvent(document.querySelector('#' + tableId), 'click')
-        .pipe(
-          filter((_) => selectedId !== undefined),
-          tap((_) => view.loading$.next(true)),
-          switchMap((_) => forkJoin([view.getOneById(selectedId)])),
-        )
-        .subscribe((res: any[]) => {
-          view.selectedData$.next(res[0].data[0]);
-          view.loading$.next(false);
-          selectedId = undefined;
-        });
-    }, 500);
+    // setTimeout(() => {
+    //   const event$ = fromEvent(document.querySelector('#' + tableId), 'click');
+    //   selectSub = doSelect(event$);
+    // }, 500);
+  });
+
+  onDestroy(() => {
+    if (selectSub) {
+      selectSub.unsubscribe();
+    }
   });
 </script>
 

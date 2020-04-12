@@ -1,7 +1,6 @@
 import { Http } from '@/assets/js/http';
 import { getMethodNameInSnackCase } from '@/assets/js/util';
-// @ts-ignore
-const JSONbig = require('json-bigint');
+import { SJSON } from '@/assets/js/sjson';
 
 const BASE_URL = 'sys/menu-control/';
 
@@ -12,7 +11,7 @@ class MenuControlStore {
     });
   }
   saveOrUpdateOrDelete(obj: any) {
-    return Http.post(`${BASE_URL}${getMethodNameInSnackCase()}`, JSONbig.stringify(obj));
+    return Http.post(`${BASE_URL}${getMethodNameInSnackCase()}`, SJSON.stringify(obj));
   }
 }
 

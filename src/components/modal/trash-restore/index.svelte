@@ -111,6 +111,6 @@
     {data}
     {containerWidth}
     fullWidth={true}>
-    <span slot="label" class="label">{T('COMMON.LABEL.CONTROL_LIST')}:</span>
+    <span slot="label" class="label">{T('COMMON.LABEL.DELETED_ITEMS')}:</span>
   </svelte:component>
 </Modal>

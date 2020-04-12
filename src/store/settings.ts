@@ -3,9 +3,8 @@ import { getMethodNameInSnackCase } from '@/assets/js/util';
 import { Http } from '@/assets/js/http';
 import { Settings } from '@/model/settings';
 import { appStore } from '@/store/app';
+import { SJSON } from '@/assets/js/sjson';
 
-//@ts-ignore
-const JSONbig = require('json-bigint');
 const BASE_URL = 'sys/user-settings/';
 
 class SettingsStore {
@@ -23,7 +22,7 @@ class SettingsStore {
   }
 
   saveUserSettings(obj: Settings) {
-    return Http.post(`${BASE_URL}save-or-update`, JSONbig.stringify(obj));
+    return Http.post(`${BASE_URL}save-or-update`, SJSON.stringify(obj));
   }
 }
 

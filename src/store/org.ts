@@ -21,6 +21,22 @@ class OrgStore {
       includeDisabled: false,
     });
   }
+
+  sysGetOwnerOrgRoleTree() {
+    return RxHttp.get(`${BASE_URL}${getMethodNameInSnackCase()}`);
+  }
+
+  sysGetHumanOrgTree(humanId: string) {
+    return RxHttp.get(`${BASE_URL}${getMethodNameInSnackCase()}`, {
+      humanId,
+    });
+  }
+
+  sysGetAssignedHumanOrgTree(humanId: string) {
+    return RxHttp.get(`${BASE_URL}${getMethodNameInSnackCase()}`, {
+      humanId,
+    });
+  }
 }
 
 export const orgStore = new OrgStore();

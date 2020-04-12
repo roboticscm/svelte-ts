@@ -1,10 +1,10 @@
 import { StringUtil } from '@/assets/js/string-util';
 
-const JSONbig = require('json-bigint');
+import { SJSON } from '@/assets/js/sjson';
 
 export class SObject {
   static clone(obj) {
-    return JSONbig.parse(JSONbig.stringify(obj));
+    return SJSON.parse(SJSON.stringify(obj));
   }
 
   static isEmptyField(obj) {
@@ -20,7 +20,7 @@ export class SObject {
     } else if ((obj1 === null && obj2 !== null) || (obj1 !== null && obj2 === null)) {
       return false;
     } else {
-      return JSONbig.stringify(obj1) === JSONbig.stringify(obj2);
+      return SJSON.stringify(obj1) === SJSON.stringify(obj2);
     }
   }
 
@@ -229,7 +229,7 @@ export const getDiffFieldsObject = (obj1, obj2) => {
     // Check if all items exist and are in the same order
     for (var i = 0; i < arr1.length; i++) {
       // if (arr1[i] !== arr2[i] && ((arr1[i] !== null && arr2[i] !== '') || (arr1[i] !== '' && arr2[i] !== null)))
-      if (arr1[i] !== arr2[i]) return false;
+      if (arr1[i] != arr2[i]) return false;
     }
 
     // Otherwise, return true
@@ -259,7 +259,7 @@ export const getDiffFieldsObject = (obj1, obj2) => {
     //   console.log(type1 === '[object Null]', type2 === '[object String]');
     //   diffs[key] = [item1, item2];
     //   console.log('2', type1, type2);
-
+    //
     //   return;
     // }
 
@@ -283,11 +283,11 @@ export const getDiffFieldsObject = (obj1, obj2) => {
     // Else if it's a function, convert to a string and compare
     // Otherwise, just compare
     if (type1 === '[object Function]') {
-      if (item1.toString() !== item2.toString()) {
+      if (item1.toString() != item2.toString()) {
         diffs[key] = { oldValue: item1, newValue: item2 };
       }
     } else {
-      if (!((item1 === null && item2 === '') || (item1 === '' && item2 === null) || item1 === item2)) {
+      if (!((item1 == null && item2 == '') || (item1 == '' && item2 == null) || item1 == item2)) {
         diffs[key] = { oldValue: item1, newValue: item2 };
       }
     }
@@ -309,11 +309,7 @@ export const getDiffFieldsObject = (obj1, obj2) => {
     if (obj2.hasOwnProperty(key)) {
       if (
         !obj1[key] &&
-        !(
-          (obj1[key] === null && obj2[key] === '') ||
-          (obj1[key] === '' && obj2[key] === null) ||
-          obj1[key] === obj2[key]
-        )
+        !((obj1[key] == null && obj2[key] == '') || (obj1[key] == '' && obj2[key] == null) || obj1[key] == obj2[key])
       ) {
         diffs[key] = { oldValue: obj1[key], newValue: obj2[key] };
       }

@@ -43,6 +43,7 @@
 
   // Other vars
   let selectedData: Language;
+  let saveOrUpdateSub;
   /**
    * Reset form (reset input and errors)
    * @param {none}
@@ -55,7 +56,7 @@
   };
   let form = resetForm();
   let beforeForm: Form;
-  const query = view.createQuerySubscription(true);
+
   const saveUpdateUri = 'sys/language/save-or-update';
 
   // ============================== EVENT HANDLE ==========================
@@ -121,40 +122,6 @@
   };
   // ============================== //EVENT HANDLE ==========================
 
-  // ============================== HELPER ==========================
-  /**
-   * Get edited user detail, who edited this form in the same time with the current user
-   * @param {userId} Id of the user.
-   * @return {string}. template: <Last Name> <First Name> - [bold]<User Name>[/bold]
-   */
-  const getEditedUserDetail = async (userId: string) => {
-    const user = await humanOrOrgStore.sysGetUserInfoById(userId);
-    return `${user[0].lastName} ${user[0].firstName} - <b>${user[0].username} </b>`;
-  };
-
-  /**
-   * Restructure the changed data.
-   * @param {changedData} Object present for changed data.
-   * @return {object}. {field: xxx, oldValue: xxx, newValue: xxx}
-   */
-  const restructureChangedData = (changedData: any) => {
-    const result = [];
-    for (let field in changedData) {
-      result.push({
-        field: T('COMMON.LABEL.' + StringUtil.toUpperCaseWithUnderscore(field)),
-        oldValue: field.toLowerCase().includes('date')
-          ? SDate.convertMilisecondToDateTimeString(changedData[field].oldValue)
-          : changedData[field].oldValue,
-        newValue: field.toLowerCase().includes('date')
-          ? SDate.convertMilisecondToDateTimeString(changedData[field].newValue)
-          : changedData[field].newValue,
-      });
-    }
-
-    return result;
-  };
-  // ============================== //HELPER ==========================
-
   // ============================== CLIENT VALIDATION ==========================
   /**
    * Client validation and check for no data change.
@@ -208,7 +175,7 @@
    * @return {void}.
    */
   const doSaveOrUpdate = (ob$: Observable<any>) => {
-    ob$
+    saveOrUpdateSub = ob$
       .pipe(
         filter((_) => validate()) /* filter if form pass client validation */,
         concatMap((_) =>
@@ -267,63 +234,8 @@
         },
       });
   };
-  // ============================== //FUNCTIONAL ==========================
 
-  // ============================== REACTIVE ==========================
-  // Monitoring selected data from other users
-  // When other users edit on the same data, display a confirmation of the change with the current user
-  view.selectedData$
-    .pipe(
-      switchMap((it) => {
-        if (!it) return EMPTY;
-        return apolloClient.subscribe({
-          query,
-          variables: {
-            id: it.id,
-            updatedBy: localStorage.getItem('userId'),
-          },
-        });
-      }),
-    )
-    .subscribe(async (res) => {
-      if (res.data.language.length === 0) {
-        return;
-      }
-      const hasuraObj = res.data.language[0];
-      delete hasuraObj.__typename;
-      delete hasuraObj.id;
-      const obj = SObject.clone(form);
-      const formObj = {};
-      for (const field in hasuraObj) {
-        formObj[field] = obj[field];
-      }
-
-      const changed = view.checkObjectChange(formObj, hasuraObj);
-      if (changed) {
-        // @ts-ignore
-        if (!$isReadOnlyMode$) {
-          const editedUser = await getEditedUserDetail(hasuraObj.updatedBy);
-          scRef
-            .confirmConflictDataModalRef()
-            .show(restructureChangedData(changed), editedUser, hasuraObj.updatedDate)
-            .then((buttonPressed: number) => {
-              if (buttonPressed === ButtonPressed.OK) {
-                view.needSelectId$.next(selectedData.id);
-                setTimeout(() => {
-                  isReadOnlyMode$.next(false);
-                }, 1000);
-              } else {
-                view.needHighlightId$.next(selectedData.id);
-              }
-            });
-        } else {
-          view.needSelectId$.next(selectedData.id);
-        }
-      }
-    });
-
-  // when user click on work list. load selected data to the right form
-  const selectDataSub = view.selectedData$.subscribe((data) => {
+  const doSelect = (data: any) => {
     selectedData = data;
     if (selectedData) {
       isReadOnlyMode$.next(true);
@@ -331,11 +243,41 @@
       form = new Form({
         ...selectedData,
       });
-
       // save init value for checking data change
       beforeForm = SObject.clone(form);
-      view.loading$.next(false);
     }
+  };
+  // ============================== //FUNCTIONAL ==========================
+
+  // ============================== REACTIVE ==========================
+  // Monitoring selected data from other users
+  // When other users edit on the same data, display a confirmation of the change with the current user
+  view.allColumns$.subscribe((cols) => {
+    if (cols && cols.length > 0) {
+      const query = view.createQuerySubscription(true);
+      view.selectedData$
+        .pipe(
+          switchMap((it) => {
+            if (!it) return EMPTY;
+            return apolloClient.subscribe({
+              query,
+              variables: {
+                id: it.id.toString(),
+                updatedBy: localStorage.getItem('userId'),
+              },
+            });
+          }),
+        )
+        .subscribe(async (res) => {
+          // @ts-ignore
+          view.doNotifyConflictData(form, res.data, selectedData.id, $isReadOnlyMode$, scRef);
+        });
+    }
+  });
+
+  // when user click on work list. load selected data to the right form
+  const selectDataSub = view.selectedData$.subscribe((data) => {
+    doSelect(data);
   });
   // ============================== //REACTIVE ==========================
 
@@ -375,6 +317,9 @@
    */
   onDestroy(() => {
     selectDataSub.unsubscribe();
+    if (saveOrUpdateSub) {
+      saveOrUpdateSub.unsubscribe();
+    }
   });
 
   /**

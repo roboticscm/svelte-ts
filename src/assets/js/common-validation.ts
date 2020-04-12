@@ -1,3 +1,5 @@
+import { StringUtil } from '@/assets/js/string-util';
+
 export class CommonValidation {
   public static REQUIRED_VALUE = 'COMMON.MSG.REQUIRED_VALUE';
   public static isEmptyString(source: string) {
@@ -6,6 +8,15 @@ export class CommonValidation {
     }
 
     return source.trim().length === 0;
+  }
+
+  public static MIN_LENGTH = 'COMMON.MSG.VALUE_MUST_BE_AT_LEAST_%min%_CHARS';
+  public static isMinLength(source: string, min: number) {
+    if (!source) {
+      return false;
+    }
+
+    return source.trim().length >= min;
   }
 
   public static LENGTH_BETWEEN = 'COMMON.MSG.VALUE_MUST_BE_BETWEEN_%min_AND_%max_CHARS';
@@ -34,5 +45,14 @@ export class CommonValidation {
 
     const number = Number(source);
     return number >= from && number <= to;
+  }
+
+  public static INVALID_EMAIL = 'COMMON.MSG.INVALID_EMAIL';
+  public static isValidEmail(email: string) {
+    if (StringUtil.isEmpty(email)) {
+      return true;
+    }
+    const reg = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return reg.test(String(email).toLowerCase());
   }
 }

@@ -5,6 +5,7 @@
   import { T } from '@/assets/js/locale/locale';
   import Page from 'page';
   import { menuStore } from '@/store/menu';
+  import { StringUtil } from '../../../assets/js/string-util';
 
   const { currentComponentUri$ } = routerLinkStore;
   const dispatch = createEventDispatcher();
@@ -32,9 +33,15 @@
   };
 
   Page(__path, navigate);
+
+  const isActiveComponent = () => {
+    const uri = StringUtil.replaceAll($currentComponentUri$, '/', '--');
+    const path = __path.replace('/', '--') + '--';
+    return uri.includes(path);
+  };
 </script>
 
-<a href={__path} class="{className} {$currentComponentUri$.includes(__path.replace('--', '/')) ? activeClass : ''}">
+<a href={__path} class="{className} {isActiveComponent() ? activeClass : ''}">
   {#if !useFontIcon && iconData}
     <img src={iconData} alt={name} />
   {:else}

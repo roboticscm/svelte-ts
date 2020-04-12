@@ -10,10 +10,16 @@ class TableUtilStore {
     return RxHttp.get(`${BASE_URL}${getMethodNameInSnackCase()}`, param);
   }
 
-  getOneById(tableName, id: string) {
+  getOneById(tableName: string, id: string) {
     return RxHttp.get(`${BASE_URL}${getMethodNameInSnackCase()}`, {
       tableName,
       id,
+    });
+  }
+
+  getAllColumnsOfTable(tableName: string) {
+    return RxHttp.get(`${BASE_URL}${getMethodNameInSnackCase()}`, {
+      tableName,
     });
   }
 

@@ -19,15 +19,15 @@
   export let roleControls: [];
   export let callFrom = 'Self';
 
-  let transition = App.USE_ANIMATION ? scale : () => {};
   const view = new ViewStore(menuPath);
   const store = new Store(view);
 
   view.tableName = 'menu';
-  view.columns = ['id', 'name', 'path', 'sort'];
+  view.columns = ['id', 'code', 'name', 'path', 'sort'];
   view.fullControl = fullControl;
   view.roleControls = roleControls;
   view.loading$.next(true);
+  view.loadTableMetaData();
 
   const subscription = () => {
     store.completeLoading$.pipe(take(1)).subscribe((_) => {

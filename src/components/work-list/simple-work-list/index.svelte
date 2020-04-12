@@ -18,13 +18,17 @@
   let apolloClientList$: any;
   let tableRef: any;
   let pageRef: any;
-  let needSelectIdSub, needHighlightIdSub, selectDataSub: Subscription;
+  let allColumnsSub, needSelectIdSub, needHighlightIdSub, selectDataSub: Subscription;
 
   // =========================SUBSCRIPTION===========================
   const subscription = () => {
-    const query = view.createQuerySubscription();
-    apolloClientList$ = apolloClient.subscribe({
-      query,
+    allColumnsSub = view.allColumns$.subscribe((cols) => {
+      if (cols && cols.length > 0) {
+        const query = view.createQuerySubscription();
+        apolloClientList$ = apolloClient.subscribe({
+          query,
+        });
+      }
     });
 
     needSelectIdSub = view.needSelectId$.subscribe((id: string) => {
@@ -108,6 +112,9 @@
     needSelectIdSub.unsubscribe();
     needHighlightIdSub.unsubscribe();
     selectDataSub.unsubscribe();
+    if (allColumnsSub) {
+      allColumnsSub.unsubscribe();
+    }
   });
   // =========================//HOOK===========================
 </script>
@@ -119,6 +126,7 @@
     on:selection
     {columns}
     {menuPath}
+    showRowNumber={false}
     data={$dataList$}
     id={tableId} />
 </div>

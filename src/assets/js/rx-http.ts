@@ -1,6 +1,8 @@
 // @ts-ignore
 import Axios from 'axios-observable';
 import { API } from './constants';
+import { SJSON } from '@/assets/js/sjson';
+
 // @ts-ignore
 import { Method } from 'axios';
 // @ts-ignore
@@ -20,7 +22,7 @@ export class RxHttp {
       data: jsonData,
       transformResponse: (res: any) => {
         if (res.includes('{') || res.includes('[')) {
-          return JSONbig.parse(res);
+          return SJSON.parse(res);
         } else {
           return res;
         }

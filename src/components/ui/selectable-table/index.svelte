@@ -38,6 +38,9 @@
     return jId;
   };
 
+  const getFirstRowEle = () => {
+    return document.querySelector(`#${id} tbody tr :first-child`);
+  };
   const applyTable = () => {
     // selectedRows = [];
 
@@ -50,7 +53,7 @@
         onSelectedRow();
 
         // register key for navigation
-        startRow = document.querySelector(`#cell_${obj.rows[0]}_0_${id}`);
+        startRow = document.querySelector(`#row_${obj.rows[0]}_Id :first-child`);
         startRow.focus();
         document.onkeydown = (e) => {
           checkKey(e);
@@ -114,16 +117,16 @@
     return result;
   };
 
-  function dotheneedful(sibling) {
+  function dotheneedful(sibling, row) {
     if (sibling != null) {
       sibling.focus();
-      startRow = sibling;
-      let [, row] = sibling.id.split('_');
-      row = Number(row);
+      // let [, row] = sibling.id.split('_');
+      // row = Number(row);
       getTableId().selectRow(row, function(obj: any) {
         selectedRows = obj.rows;
         onSelectedRow();
       });
+      startRow = sibling;
     }
   }
 
@@ -133,13 +136,12 @@
       let idx = startRow.cellIndex;
 
       let nextrow = startRow.parentElement && startRow.parentElement.previousElementSibling;
+      console.log(startRow);
       if (nextrow != null) {
         let sibling = nextrow.cells[idx];
-        let [, row] = sibling.id.split('_');
-        row = Number(row);
-
+        let row = Number(sibling.id.split('_')[1]);
         if (row >= 0) {
-          dotheneedful(sibling);
+          dotheneedful(sibling, row);
           // startingY += 200;
           // window.scrollTo(0, startingY);
         }
@@ -149,9 +151,12 @@
       let nextrow = startRow.parentElement && startRow.parentElement.nextElementSibling;
       if (nextrow != null) {
         let sibling = nextrow.cells[idx];
-        dotheneedful(sibling);
-        // startingY -= 200;
-        // window.scrollTo(0, startingY);
+        let row = Number(sibling.id.split('_')[1]);
+        if (row < data.length) {
+          dotheneedful(sibling, row);
+          // startingY += 200;
+          // window.scrollTo(0, startingY);
+        }
       }
     }
     dispatch('keyup', { event: e, data: getSelectedData() });
@@ -159,7 +164,7 @@
 
   export const focus = () => {
     // register key for navigation
-    startRow = document.querySelector(`#cell_0_0_${id}`);
+    startRow = getFirstRowEle();
     startRow.focus();
     document.onkeydown = (e) => {
       checkKey(e);
@@ -248,23 +253,27 @@
             <th class="freeze">#</th>
           {/if}
           {#each columns as col, index}
-            <th>
-              {@html col.title}
-            </th>
+            {#if col.type !== 'hidden'}
+              <th>
+                {@html col.title}
+              </th>
+            {/if}
           {/each}
         </tr>
       </thead>
     {/if}
     <tbody>
       {#each data as row, rowIndex}
-        <tr>
+        <tr id={'row_' + rowIndex + '_Id'}>
           {#if showRowNumber}
-            <th class="freeze row-number">{startRowCount + rowIndex}</th>
+            <th id={`cell_${rowIndex}_${0}_${id}`} class="freeze row-number">{startRowCount + rowIndex}</th>
           {/if}
           {#each columns as col, colIndex}
-            <td id={`cell_${rowIndex}_${colIndex}_${id}`}>
-              {@html row[col.name]}
-            </td>
+            {#if col.type !== 'hidden'}
+              <td id={`cell_${rowIndex}_${colIndex}_${id}`}>
+                {@html row[col.name]}
+              </td>
+            {/if}
           {/each}
         </tr>
       {/each}

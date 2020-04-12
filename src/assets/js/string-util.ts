@@ -47,14 +47,14 @@ export class StringUtil {
     return replaceStr;
   }
 
-  public static toTitleCase(str) {
+  public static toTitleCase(str: string) {
     if (!str) return str;
     return str.replace(/\w\S*/g, function(txt) {
       return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
   }
 
-  public static toUpperCaseWithUnderscore(str) {
+  public static toUpperCaseWithUnderscore(str: string) {
     if (str) {
       return str
         .split(/(?=[A-Z])/)
@@ -65,7 +65,7 @@ export class StringUtil {
     }
   }
 
-  public static snakeToCamelCase = (str) =>
+  public static snakeToCamelCase = (str: string) =>
     str.replace(/([-_][a-z])/g, (group) =>
       group
         .toUpperCase()
@@ -73,7 +73,20 @@ export class StringUtil {
         .replace('_', ''),
     );
 
-  public static removeMark = (str) => {
+  public static removeMark = (str: string) => {
     return str.replace(/<mark>/g, '').replace(/<\/mark>/g, '');
+  };
+
+  public static removeExtraSpace = (source: string) => {
+    return source;
+  };
+
+  public static splitHumanName = (fullName: string) => {
+    if (!fullName) {
+      return ['', ''];
+    }
+    fullName = StringUtil.removeExtraSpace(fullName);
+    const splits = fullName.split(' ');
+    return [splits.slice(0, length - 1).join(' '), splits[splits.length - 1]];
   };
 }

@@ -33,20 +33,9 @@ export class Store {
 
   loadAvailableDep(menuId: string) {
     return orgStore.sysGetAvailableDepartmentTreeForMenu(menuId);
-    // .pipe(take(1))
-    // .subscribe((res) => {
-    //   this.availableDep$.next(res.data);
-    // });
   }
 
   loadAssignedDep(menuId: string) {
     return orgStore.sysGetDepartmentTreeByMenuId(menuId);
-    // .pipe(take(1))
-    // .subscribe((res) => {
-    //     setTimeout(()=> {
-    //         this.assignedDep$.next(res.data);
-    //     }, 5000);
-    //
-    // });
   }
 }

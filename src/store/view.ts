@@ -1,7 +1,7 @@
 import { menuStore } from '@/store/menu';
 import { T } from '@/assets/js/locale/locale';
 import { StringUtil } from '@/assets/js/string-util';
-import { BehaviorSubject, forkJoin, Observable, of, Subscription } from 'rxjs';
+import { BehaviorSubject, forkJoin, fromEvent, Observable, of, Subscription } from 'rxjs';
 import { tableUtilStore } from '@/store/table-util';
 import { catchError, concatMap, filter, first, skip, switchMap, take } from 'rxjs/operators';
 import { App } from '@/assets/js/constants';
@@ -17,11 +17,12 @@ import { Language } from '@/modules/sys/language/model';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import Form from '@/assets/js/form/form';
 import { Menu } from '@/modules/sys/menu/model';
+import { humanOrOrgStore } from '@/modules/sys/human-or-org/store';
 
 export class ViewStore {
   tableName: string;
   columns: string[] = ['name'];
-  orderBy: string[] = ['updated_or_created_date desc nulls last, name'];
+  orderBy: string[] = ['updated_or_created_date desc nulls last'];
   trashRestoreColumns: string[] = ['name'];
   page = 1;
   pageSize = App.DEFAULT_PAGE_SIZE;
@@ -46,6 +47,9 @@ export class ViewStore {
 
   menuInfo$ = new BehaviorSubject<Menu>(null);
 
+  allColumns$ = new BehaviorSubject<any[]>([]);
+  allColumns: any[] = [];
+
   completeLoading$ = forkJoin([
     this.dataList$.pipe(
       skip(1),
@@ -62,6 +66,13 @@ export class ViewStore {
         this.menuInfo$.next(res.data);
       });
   }
+
+  loadTableMetaData = () => {
+    tableUtilStore.getAllColumnsOfTable(this.tableName).subscribe((res) => {
+      this.allColumns = res.data;
+      this.allColumns$.next(res.data);
+    });
+  };
 
   getMenuNameFromPath = () => {
     return this.menuPath.includes('/') ? this.menuPath.split('/')[this.menuPath.split('/').length - 1] : this.menuPath;
@@ -96,14 +107,13 @@ export class ViewStore {
   };
 
   createWorkListColumns = () => {
-    return this.columns
-      .filter((it) => it !== 'id' && it !== 'sort')
-      .map((it) => {
-        return {
-          name: it,
-          title: T(`COMMON.LABEL.${it}`),
-        };
-      });
+    return this.columns.map((it) => {
+      return {
+        type: ['id', 'sort', 'code'].indexOf(it) >= 0 ? 'hidden' : 'text',
+        name: it,
+        title: T(`COMMON.LABEL.${it}`),
+      };
+    });
   };
 
   createWorkListColumnsForHandsonTable = () => {
@@ -117,22 +127,18 @@ export class ViewStore {
   };
 
   createQuerySubscription = (withVar: boolean = false) => {
-    const query = gql`
+    const query = `
       subscription ${this.tableName}Subscription ${withVar ? '($id: bigint!, $updatedBy: bigint!)' : ''} {
         ${this.tableName} ${
       withVar ? '(where: {_and: [ {id: { _eq: $id }}, {updated_by: { _neq: $updatedBy }}]})' : ''
     } {
-          id
-          ${this.columns.map((it) => it + '\n')}
-          updatedBy: updated_by
-          updatedDate: updated_date
-          disabled
-          deletedBy: deleted_by
-          deletedDate: deleted_date
+          ${this.allColumns.map((it) => it.columnName).join('\n')}
         }
       }
     `;
-    return query;
+
+    // console.log(query);
+    return gql(query);
   };
 
   // Begin control state
@@ -478,5 +484,65 @@ export class ViewStore {
           this.deleteRunning$.next(false);
         },
       });
+  };
+
+  restructureChangedData = (changedData: any) => {
+    const result = [];
+    for (let field in changedData) {
+      result.push({
+        field: T('COMMON.LABEL.' + StringUtil.toUpperCaseWithUnderscore(field)),
+        oldValue: field.toLowerCase().includes('date')
+          ? SDate.convertMilisecondToDateTimeString(changedData[field].oldValue)
+          : changedData[field].oldValue,
+        newValue: field.toLowerCase().includes('date')
+          ? SDate.convertMilisecondToDateTimeString(changedData[field].newValue)
+          : changedData[field].newValue,
+      });
+    }
+
+    return result;
+  };
+
+  getEditedUserDetail = async (userId: string) => {
+    const user = await humanOrOrgStore.sysGetUserInfoById(userId);
+    return `${user[0].lastName} ${user[0].firstName} - <b>${user[0].username} </b>`;
+  };
+
+  doNotifyConflictData = async (form, data: any, selectedId: string, isReadOnlyMode, scRef: any) => {
+    if (data[this.tableName].length === 0) {
+      return;
+    }
+
+    const hasuraObj = SObject.convertFieldsToCamelCase(data[this.tableName][0]);
+    delete hasuraObj._Typename;
+    delete hasuraObj.id;
+    const obj = SObject.clone(form);
+    const formObj = {};
+    for (const field in hasuraObj) {
+      formObj[field] = obj[field];
+    }
+
+    const changed = this.checkObjectChange(formObj, hasuraObj);
+    if (changed) {
+      // @ts-ignore
+      if (!isReadOnlyMode) {
+        const editedUser = await this.getEditedUserDetail(hasuraObj.updatedBy);
+        scRef
+          .confirmConflictDataModalRef()
+          .show(this.restructureChangedData(changed), editedUser, hasuraObj.updatedDate)
+          .then((buttonPressed: number) => {
+            if (buttonPressed === ButtonPressed.OK) {
+              this.needSelectId$.next(selectedId);
+              setTimeout(() => {
+                this.isReadOnlyMode$.next(false);
+              }, 2000);
+            } else {
+              this.needHighlightId$.next(selectedId);
+            }
+          });
+      } else {
+        this.needSelectId$.next(selectedId);
+      }
+    }
   };
 }

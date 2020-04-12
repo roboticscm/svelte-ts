@@ -1,8 +1,7 @@
+import { SJSON } from '@/assets/js/sjson';
 // @ts-ignore
 const axios = require('axios');
 import { API } from './constants';
-// @ts-ignore
-const JSONbig = require('json-bigint');
 
 export class Http {
   public static async callApi(method: string, url: string, params: any, jsonData: any) {
@@ -20,7 +19,7 @@ export class Http {
         data: jsonData,
         transformResponse: (res: any) => {
           if (res.includes('{') || res.includes('[')) {
-            return JSONbig.parse(res);
+            return SJSON.parse(res);
           } else {
             return res;
           }
