@@ -33,8 +33,8 @@ export class SJSON {
   public static parse = (json: string) => {
     return JSONbig.parse(json, (key, value) => {
       if (value && value.constructor && value.constructor.name === 'BigNumber') {
-        const newValue = BigInt(value.toString());
-        return newValue;
+        // @ts-ignore
+        return BigInt(value.toString());
       }
       return value;
     });

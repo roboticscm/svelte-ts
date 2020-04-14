@@ -1,4 +1,5 @@
 import { T } from '@/assets/js/locale/locale';
+import {tick} from "svelte";
 
 export const nestedHeaders = [
   [
@@ -224,3 +225,54 @@ export const makeMergeCells = (data: any) => {
     ...menuMerges,
   };
 };
+
+export const calcTableHeight = (id: string) => {
+  const height = window['$']('#' + id).height();
+  return `${height - 20}px`;
+};
+
+
+export const preprocessData = (changeData: any, originData: any) => {
+  let prevMenuId: any = null;
+  for (let i = 0; i < changeData.length; i++) {
+    if (prevMenuId === null || prevMenuId !== changeData[i].menuId) {
+      let filter = originData.filter((item: any) => {
+        return item.menuId === changeData[i].menuId && item.menuName.length > 0;
+      });
+      changeData[i].menuName = filter[0].menuName;
+    }
+
+    prevMenuId = changeData[i].menuId;
+  }
+
+  return changeData;
+};
+
+export const fillNullColor = (data: any[], excelGridRef: any) => {
+  let nullRows = [];
+
+  for (let i = 0; i < data.length; i++) {
+    if (data[i].renderControl === null) {
+      data[i].renderControl = true;
+      nullRows.push('M' + (i + 1));
+    }
+  }
+
+  tick().then(() => {
+    nullRows.map((item: any) => {
+      excelGridRef.getGridInstance().setStyle(item, 'background-color', 'yellow');
+    });
+  });
+
+}
+
+export const getTableData = (excelGridRef: any) => {
+  const data = excelGridRef.getData();
+
+  for (let i = 0; i < data.length; i++) {
+    if (i > 0 && data[i].menuId === data[i - 1].menuId) {
+      data[i].checked = data[i - 1].checked;
+    }
+  }
+  return data;
+}

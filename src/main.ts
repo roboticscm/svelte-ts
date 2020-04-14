@@ -3,6 +3,7 @@ import jQuery from 'jquery';
 import 'jquery-ui';
 (window as any).$ = jQuery;
 (window as any).jQuery = jQuery;
+import '@/assets/js/vendor/jquery.easyui.min';
 import '../../sass/sass/index.scss';
 import '@/assets/js/vendor/jquery.ztree.all';
 
@@ -131,3 +132,7 @@ interface Window {
 }
 // @ts-ignore
 declare var ResizeObserver: ResizeObserver;
+
+type BigInt = number;
+// @ts-ignore
+declare const BigInt: typeof Number;

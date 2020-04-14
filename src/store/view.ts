@@ -137,7 +137,6 @@ export class ViewStore {
       }
     `;
 
-    // console.log(query);
     return gql(query);
   };
 

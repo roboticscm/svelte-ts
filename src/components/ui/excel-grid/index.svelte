@@ -188,10 +188,6 @@
       });
   };
 
-  const getGridInstance = () => {
-    return jExcelObj;
-  };
-
   const destroyGrid = () => {
     const ele = document.getElementById(id);
     if (ele) {
@@ -278,6 +274,10 @@
     destroyGrid();
     createGrid(data);
   };
+
+  export const getGridInstance = () => {
+    return jExcelObj;
+  }
 </script>
 
 <style lang="scss">

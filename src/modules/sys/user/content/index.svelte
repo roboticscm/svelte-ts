@@ -206,7 +206,6 @@
     // @ts-ignore
     if ($isUpdateMode$) {
       const dataChanged = view.checkObjectChange(beforeForm, SObject.clone(form), scRef.snackbarRef());
-      console.log(dataChanged);
       if (!dataChanged) {
         return false;
       }
@@ -551,7 +550,7 @@
 
     <!--  Department Tree -->
     <div class="row">
-      <div class="default-border col-md-24 col-lg-12">
+      <div class="default-border col-sm-24 col-md-12">
         <TreeView
           on:check={onCheckAvailTree}
           bind:this={availableDepTreeRef}
@@ -562,7 +561,7 @@
           <div slot="label" class="label">{T('SYS.LABEL.AVAILABLE_DEPARTMENT')}:</div>
         </TreeView>
       </div>
-      <div class="default-border col-md-24 col-lg-12 pl-md-0 pl-lg-1 pt-md-1 pt-lg-0">
+      <div class="default-border col-sm-24 col-md-12 pl-md-0 pl-lg-1 pt-md-1 pt-lg-0">
         <TreeView
           bind:this={defaultDepTreeRef}
           id={'assignedDepTree' + view.getViewName() + 'Id'}

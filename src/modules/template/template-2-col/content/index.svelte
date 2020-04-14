@@ -1,13 +1,13 @@
 <script lang="ts">
   import { tick, onMount, onDestroy } from 'svelte';
-  import { catchError, concatMap, switchMap, filter, tap } from 'rxjs/operators';
+  import { catchError, concatMap, switchMap, filter } from 'rxjs/operators';
   import { fromEvent, of, Observable, EMPTY } from 'rxjs';
   import { fromPromise } from 'rxjs/internal-compatibility';
 
   import { T } from '@/assets/js/locale/locale';
   import Form from '@/assets/js/form/form';
   import { ViewStore } from '@/store/view';
-  import { TemplateModel } from '../model'; // TODO Replace with your  Model class
+  import { TemplateModel } from '../model';
   import { SObject } from '@/assets/js/sobject';
   import { apolloClient } from '@/assets/js/hasura-client';
   import { ButtonPressed } from '@/components/ui/button/types';
@@ -25,13 +25,10 @@
   import SC from '@/components/set-common';
   import Snackbar from '@/components/ui/snackbar';
   import { Debug } from '@/assets/js/debug';
-  import { useView } from '../use-view';
-
+  import ComboTree from '@/components/ui/combo-tree';
   // Props
   export let view: ViewStore;
   export let menuPath: string;
-
-  const uv = useView(view);
 
   // Observable
   // @ts-ignore
@@ -45,7 +42,7 @@
   let btnUpdateRef: any;
 
   // Other vars
-  let selectedData: TemplateModel; // TODO Repalce with your Model class
+  let selectedData: TemplateModel;
   let saveOrUpdateSub;
   /**
    * Reset form (reset input and errors)
@@ -54,13 +51,13 @@
    */
   const resetForm = () => {
     return new Form({
-      ...new TemplateModel(), // TODO Replace with your Model class
+      ...new TemplateModel(),
     });
   };
   let form = resetForm();
   let beforeForm: Form;
-  const query = view.createQuerySubscription(true);
-  const saveUpdateUri = 'sys/language/save-or-update'; // TODO Replace with your URL API (SAVE OR UPDATE)
+
+  const saveUpdateUri = 'sys/language/save-or-update';
 
   // ============================== EVENT HANDLE ==========================
   /**
@@ -157,7 +154,6 @@
    * @param {none}
    * @return {void}.
    */
-
   const doAddNew = () => {
     // reset status flag
     isReadOnlyMode$.next(false);
@@ -247,48 +243,8 @@
       form = new Form({
         ...selectedData,
       });
-
       // save init value for checking data change
       beforeForm = SObject.clone(form);
-      view.loading$.next(false);
-    }
-  };
-
-  const doNotifyConflictData = async (data: any) => {
-    if (data.language.length === 0) {
-      return;
-    }
-
-    const hasuraObj = data.language[0];
-    delete hasuraObj.__typename;
-    delete hasuraObj.id;
-    const obj = SObject.clone(form);
-    const formObj = {};
-    for (const field in hasuraObj) {
-      formObj[field] = obj[field];
-    }
-
-    const changed = view.checkObjectChange(formObj, hasuraObj);
-    if (changed) {
-      // @ts-ignore
-      if (!$isReadOnlyMode$) {
-        const editedUser = await view.getEditedUserDetail(hasuraObj.updatedBy);
-        scRef
-          .confirmConflictDataModalRef()
-          .show(view.restructureChangedData(changed), editedUser, hasuraObj.updatedDate)
-          .then((buttonPressed: number) => {
-            if (buttonPressed === ButtonPressed.OK) {
-              view.needSelectId$.next(selectedData.id);
-              setTimeout(() => {
-                isReadOnlyMode$.next(false);
-              }, 1000);
-            } else {
-              view.needHighlightId$.next(selectedData.id);
-            }
-          });
-      } else {
-        view.needSelectId$.next(selectedData.id);
-      }
     }
   };
   // ============================== //FUNCTIONAL ==========================
@@ -296,28 +252,33 @@
   // ============================== REACTIVE ==========================
   // Monitoring selected data from other users
   // When other users edit on the same data, display a confirmation of the change with the current user
-  view.selectedData$
-    .pipe(
-      switchMap((it) => {
-        if (!it) return EMPTY;
-        return apolloClient.subscribe({
-          query,
-          variables: {
-            id: it.id,
-            updatedBy: localStorage.getItem('userId'),
-          },
+  view.allColumns$.subscribe((cols) => {
+    if (cols && cols.length > 0) {
+      const query = view.createQuerySubscription(true);
+      view.selectedData$
+        .pipe(
+          switchMap((it) => {
+            if (!it) return EMPTY;
+            return apolloClient.subscribe({
+              query,
+              variables: {
+                id: it.id.toString(),
+                updatedBy: localStorage.getItem('userId'),
+              },
+            });
+          }),
+        )
+        .subscribe(async (res) => {
+          // @ts-ignore
+          view.doNotifyConflictData(form, res.data, selectedData.id, $isReadOnlyMode$, scRef);
         });
-      }),
-    )
-    .subscribe(async (res) => {
-      doNotifyConflictData(res.data);
-    });
+    }
+  });
 
   // when user click on work list. load selected data to the right form
   const selectDataSub = view.selectedData$.subscribe((data) => {
     doSelect(data);
   });
-
   // ============================== //REACTIVE ==========================
 
   // ============================== HOOK ==========================
@@ -327,12 +288,11 @@
    * @return {void}.
    */
   onMount(() => {
+    console.log('Language content mount');
     // reset form
     doAddNew();
     // Capture hot key (Ctrl - S) for save or update
-    // doSaveOrUpdate(uv.registerShortcutKey());
     const controlS$ = fromEvent(document, 'keydown').pipe(
-      tap(console.log),
       filter((e: any) => {
         if (e.keyCode == 83 && (navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey)) {
           e.preventDefault();
@@ -426,6 +386,7 @@
       <!-- // Sort -->
     </div>
   </form>
+  <ComboTree />
 </section>
 <!--//Main content-->
 

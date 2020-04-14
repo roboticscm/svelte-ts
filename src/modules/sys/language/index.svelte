@@ -27,6 +27,7 @@
   view.fullControl = fullControl;
   view.roleControls = roleControls;
   view.loading$.next(true);
+  view.loadTableMetaData();
 
   // ================= SUBSCRIPTION ========================
   const subscription = () => {

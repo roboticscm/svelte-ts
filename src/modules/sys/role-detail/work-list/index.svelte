@@ -37,10 +37,21 @@
     }
   };
 
-  const onClickRoleTree = (event) => {
-    const orgId = extractOrgId(event.detail.treeNode);
-    const roleId = extractRoleId(event.detail.treeNode);
+  const onClickRoleTree = (event: any) => {
+    const treeNode: any = event.detail.treeNode;
+
+    if (treeNode.isParent) {
+      store.selectedData$.next(null);
+      return;
+    }
+
+    const orgId = extractOrgId(treeNode);
+    const roleId = extractRoleId(treeNode);
     view.loading$.next(true);
+    store.selectedData$.next({
+      id: treeNode.id,
+      name: treeNode.name,
+    });
     store.loadRoleDetail(orgId, roleId);
   };
 </script>
@@ -51,8 +62,7 @@
     on:click={onClickRoleTree}
     bind:this={roleTreeRef}
     id={'roleTree' + view.getViewName() + 'Id'}
-    data={$roles$}
-    disabled={$isReadOnlyMode$}>
+    data={$roles$}>
     <div slot="label" class="label">{T('SYS.LABEL.AVAILABLE_ROLE')}:</div>
   </TreeView>
 </section>

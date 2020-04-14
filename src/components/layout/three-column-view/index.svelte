@@ -9,8 +9,8 @@
   export let id: string = '';
   export let menuPath: string;
   export let minLeftPane = false;
-  export let defaultLeftWidth = 250; // in pixel
-  export let defaultRightWidth = 150; // in pixel
+  export let defaultLeftWidth = '250px';
+  export let defaultRightWidth = '150px';
 
   const dispatch = createEventDispatcher();
   let contentSplit: any;

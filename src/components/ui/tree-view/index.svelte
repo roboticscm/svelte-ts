@@ -197,7 +197,7 @@
 
 <div class="tree-wrapper">
   <slot name="label" />
-  <ul {id} class="tree ztree" />
+  <ul {id} class="stree ztree" />
   {#if !data || data.length === 0}
     <div class="no-data">
       <img src={noDataImage} alt="" />

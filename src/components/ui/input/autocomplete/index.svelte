@@ -98,14 +98,14 @@
     );
     events$
       .pipe(
-        distinctUntilChanged((before, after) => {
+        distinctUntilChanged((before: any, after: any) => {
           return before.value === after.value && after.type !== 'click';
         }),
-        tap((event: string) => {
+        tap((event: any) => {
           textSearch = event.value;
           searching$.next(true);
         }),
-        switchMap((event) => searchFunc(event.value)),
+        switchMap((event: any) => searchFunc(event.value)),
       )
       .subscribe({
         next: (res) => {
@@ -216,7 +216,7 @@
     hideAutoDropdown();
   };
 
-  const onTableKeyup = (event) => {
+  const onTableKeyup = (event: any) => {
     if (event.detail.event.code === 'Enter') {
       selectItem(event.detail.data);
       hideAutoDropdown();

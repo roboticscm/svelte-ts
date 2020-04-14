@@ -1,11 +1,18 @@
 <script lang="ts">
-    import {onMount} from 'svelte';
+  import { onMount } from 'svelte';
 
-    onMount(() => {
+  onMount(() => {
+    window['$']('#cc').combotree({
+      onChange: () => {
+        window['$']('#cc').combotree('setText', 'abc');
+      },
+    });
+    window['$']('#cc').combotree('loadData', [{ id: 'CAM', text: 'Campuchia', children: null }]);
+  });
 
-        window['$']('#cc').combotree('setValues', [1,3,21,{id:73,text:'text73'}]);
-    })
+  const onClick = () => {};
 </script>
 
-<select id="cc" class="easyui-combotree" style="width:100%;">
-</select>
+<input id="cc" value="01" />
+
+<button on:click={onClick} />

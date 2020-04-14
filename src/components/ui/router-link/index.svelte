@@ -7,6 +7,7 @@
   import { menuStore } from '@/store/menu';
   import { StringUtil } from '../../../assets/js/string-util';
 
+  // @ts-ignore
   const { currentComponentUri$ } = routerLinkStore;
   const dispatch = createEventDispatcher();
 
@@ -35,6 +36,7 @@
   Page(__path, navigate);
 
   const isActiveComponent = () => {
+    // @ts-ignore
     const uri = StringUtil.replaceAll($currentComponentUri$, '/', '--');
     const path = __path.replace('/', '--') + '--';
     return uri.includes(path);

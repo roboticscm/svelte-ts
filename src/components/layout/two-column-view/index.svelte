@@ -9,7 +9,7 @@
   export let id: string = '';
   export let menuPath: string;
   export let minLeftPane = false;
-  export let defaultLeftWidth = 260; // in pixel
+  export let defaultLeftWidth = '260px'; // in pixel
 
   let contentSplit: any;
 
@@ -22,9 +22,10 @@
     // loadSettings
     settingsStore.getUserSettings(`left${id}`, menuPath).then((res: any[]) => {
       const found = res.find((it) => it.key === 'lastLeftWidth');
+
       let leftWidth = defaultLeftWidth;
       if (found) {
-        leftWidth = +found.value;
+        leftWidth = found.value;
       }
 
       let containerEle: any;
@@ -33,6 +34,7 @@
       } else {
         containerEle = document.querySelector('.view-container-2-col-modal');
       }
+
       containerEle.style['grid-template-columns'] = `${minLeftPane ? 0 : leftWidth} ${GUTTER_WIDTH}px auto`;
     });
 

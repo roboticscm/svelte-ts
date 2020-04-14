@@ -3,8 +3,14 @@ import { catchError, first, skip, take, withLatestFrom, zipAll } from 'rxjs/oper
 import { BehaviorSubject, forkJoin, of, zip } from 'rxjs';
 import { ViewStore } from '@/store/view';
 import { RoleStore } from '@/store/role';
+import { Role } from './model';
+import {RxHttp} from "@/assets/js/rx-http";
+import {getMethodNameInSnackCase} from "@/assets/js/util";
+
+const BASE_URL = 'sys/role-detail/';
 export class Store {
   roles$ = new BehaviorSubject<any[]>([]);
+  selectedData$ = new BehaviorSubject<Role>(null);
   roleDetails$ = new BehaviorSubject<any[]>([]);
   dragEndSplitter$ = new BehaviorSubject<any>(null);
   constructor(public viewStore: ViewStore) {}
@@ -28,4 +34,14 @@ export class Store {
       this.roleDetails$.next(res.data);
     });
   };
+
+  saveOrUpdateOrDelete(roleId: any, roleDetailWithControls: any[]) {
+    return RxHttp.post(
+        `${BASE_URL}${getMethodNameInSnackCase()}`,
+        JSON.stringify({
+          roleId,
+          roleDetailWithControls
+        })
+    );
+  }
 }
