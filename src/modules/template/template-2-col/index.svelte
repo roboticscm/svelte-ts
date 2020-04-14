@@ -22,10 +22,11 @@
   // Init view
   const view = new ViewStore(menuPath);
   view.tableName = 'language'; // TODO - Replace with your table
-  view.columns = ['id', 'name', 'locale', 'sort']; // TODO - Replace with colmns viewed on Work List, id and sort are hidden
+  view.columns = ['id', 'name', 'locale', 'sort']; // TODO - Replace with columns viewed on Work List, id and sort are hidden
   view.fullControl = fullControl;
   view.roleControls = roleControls;
   view.loading$.next(true);
+  view.loadTableMetaData();
 
   // ================= SUBSCRIPTION ========================
   const subscription = () => {
