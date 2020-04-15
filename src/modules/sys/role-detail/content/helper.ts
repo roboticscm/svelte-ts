@@ -1,5 +1,6 @@
 import { T } from '@/assets/js/locale/locale';
-import {tick} from "svelte";
+import { tick } from 'svelte';
+import { Observable } from 'rxjs';
 
 export const nestedHeaders = [
   [
@@ -43,7 +44,7 @@ export const columns = [
   },
   {
     type: 'checkbox',
-    title: '[x]',
+    title: ' ',
     name: 'checked',
     width: 40,
   },
@@ -231,7 +232,6 @@ export const calcTableHeight = (id: string) => {
   return `${height - 20}px`;
 };
 
-
 export const preprocessData = (changeData: any, originData: any) => {
   let prevMenuId: any = null;
   for (let i = 0; i < changeData.length; i++) {
@@ -239,13 +239,14 @@ export const preprocessData = (changeData: any, originData: any) => {
       let filter = originData.filter((item: any) => {
         return item.menuId === changeData[i].menuId && item.menuName.length > 0;
       });
-      changeData[i].menuName = filter[0].menuName;
+      if (filter && filter.length > 0) {
+        changeData[i].menuName = filter[0].menuName;
+      }
     }
-
     prevMenuId = changeData[i].menuId;
   }
 
-  return changeData;
+  return changeData.filter((it: any) => it.controlId !== null && it.controlId !== '');
 };
 
 export const fillNullColor = (data: any[], excelGridRef: any) => {
@@ -263,8 +264,7 @@ export const fillNullColor = (data: any[], excelGridRef: any) => {
       excelGridRef.getGridInstance().setStyle(item, 'background-color', 'yellow');
     });
   });
-
-}
+};
 
 export const getTableData = (excelGridRef: any) => {
   const data = excelGridRef.getData();
@@ -275,4 +275,4 @@ export const getTableData = (excelGridRef: any) => {
     }
   }
   return data;
-}
+};

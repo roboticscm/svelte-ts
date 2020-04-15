@@ -11,7 +11,7 @@
   let roleTreeRef: any;
 
   const { isReadOnlyMode$ } = view;
-  const { roles$ } = store;
+  const { roles$, needSelectRole$ } = store;
 
   const reload = () => {
     store.loadRoleTree();
@@ -53,7 +53,13 @@
       name: treeNode.name,
     });
     store.loadRoleDetail(orgId, roleId);
+    store.loadFilterOrgTree(roleId);
   };
+
+  // @ts-ignore
+  $: if ($needSelectRole$) {
+    roleTreeRef.selectNodeById($needSelectRole$, true);
+  }
 </script>
 
 <!--Main content-->

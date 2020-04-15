@@ -5,6 +5,7 @@
   import { tick, createEventDispatcher } from 'svelte';
   import { onMount } from 'svelte';
   import { settingsStore } from '@/store/settings';
+  import { T } from '@/assets/js/locale/locale';
 
   const dispatch = createEventDispatcher();
   // import { SObject } from '@/assets/js/sobject';
@@ -54,7 +55,9 @@
 
         // register key for navigation
         startRow = document.querySelector(`#row_${obj.rows[0]}_Id :first-child`);
-        startRow.focus();
+        if (startRow) {
+          startRow.focus();
+        }
         document.onkeydown = (e) => {
           checkKey(e);
         };
@@ -245,16 +248,28 @@
 
 <div style="height: 100%; overflow: auto;">
   <slot name="label" />
+  <span title={T('COMMON.LABEL.SELECT_ALL')}>
+    <slot name="selectAll" {selectAll} />
+  </span>
+
+  <span title={T('COMMON.LABEL.UN_SELECT_ALL')}>
+    <slot name="unSelectAll" {unSelectAll} />
+  </span>
+
+  <span title={T('COMMON.LABEL.TOGGLE_SELECTION')}>
+    <slot name="toggleSelection" {toggleSelection} />
+  </span>
+
   <table on:click|stopPropagation={onClick} {id} class="table">
     {#if showHeader}
       <thead>
         <tr on:mouseup={onMouseUpHeader}>
           {#if showRowNumber}
-            <th class="freeze">#</th>
+            <th title={T('COMMON.LABEL.ROW_NUMBER')} class="freeze">#</th>
           {/if}
           {#each columns as col, index}
             {#if col.type !== 'hidden'}
-              <th>
+              <th title={col.title}>
                 {@html col.title}
               </th>
             {/if}
@@ -270,7 +285,7 @@
           {/if}
           {#each columns as col, colIndex}
             {#if col.type !== 'hidden'}
-              <td id={`cell_${rowIndex}_${colIndex}_${id}`}>
+              <td title={row[col.name]} id={`cell_${rowIndex}_${colIndex}_${id}`}>
                 {@html row[col.name]}
               </td>
             {/if}

@@ -190,6 +190,14 @@ export class SObject {
   //
   //   return distinctObj;
   // }
+
+  static distinctArrayObject(data) {
+    return Array.from(new Set(data.map((it) => it.index))).map((index) => {
+      const ret = data.find((s) => s.index === index);
+      delete ret.index;
+      return ret;
+    });
+  }
 }
 
 /*!

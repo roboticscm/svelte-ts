@@ -31,12 +31,14 @@ export class SJSON {
   // }
 
   public static parse = (json: string) => {
-    return JSONbig.parse(json, (key, value) => {
-      if (value && value.constructor && value.constructor.name === 'BigNumber') {
-        // @ts-ignore
-        return BigInt(value.toString());
-      }
-      return value;
-    });
+    // return JSONbig.parse(json, (key, value) => {
+    //   if (value && value.constructor && value.constructor.name === 'BigNumber') {
+    //     // @ts-ignore
+    //     return BigInt(value.toString());
+    //   }
+    //   return value;
+    // });
+
+    return JSONbig.parse(json);
   };
 }

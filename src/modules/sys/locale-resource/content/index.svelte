@@ -140,11 +140,12 @@
     });
 
     // distinct array object
-    const distinctObj = Array.from(new Set(_data.map((it: any) => it.index))).map((index) => {
-      const ret = _data.find((s) => s.index === index);
-      delete ret.index;
-      return ret;
-    });
+    const distinctObj = SObject.distinctArrayObject(_data);
+    // const distinctObj = Array.from(new Set(_data.map((it: any) => it.index))).map((index) => {
+    //   const ret = _data.find((s) => s.index === index);
+    //   delete ret.index;
+    //   return ret;
+    // });
 
     const temp = distinctObj;
     // add blank row at the end

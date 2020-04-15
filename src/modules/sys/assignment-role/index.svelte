@@ -5,10 +5,9 @@
   import { App } from '@/assets/js/constants';
   import { ViewStore } from '@/store/view';
 
-  import ThreeColumnView from '@/components/layout/three-column-view';
+  import TwoColumnView from '@/components/layout/two-column-view';
   import WorkList from './work-list/index.svelte';
   import MainContent from './content/index.svelte';
-  import Right from './right/index.svelte';
   import ViewTitle from '@/components/layout/view-title';
   import ProgressBar from '@/components/ui/progress-bar';
   import { Store } from './store';
@@ -17,28 +16,28 @@
   export let menuPath: string;
   export let fullControl: boolean;
   export let roleControls: [];
+  export let callFrom = 'Self';
 
   const view = new ViewStore(menuPath);
   const store = new Store(view);
 
-  view.tableName = 'role-detail';
+  view.tableName = 'assignment_role';
+  view.columns = ['id'];
   view.fullControl = fullControl;
   view.roleControls = roleControls;
   view.loading$.next(true);
+  // view.loadTableMetaData();
 
   const subscription = () => {
-    store.completeLoading$.pipe(take(1)).subscribe((_) => {
+    store.completeLoading$.subscribe((_) => {
       view.loading$.next(false);
     });
   };
 
   onMount(() => {
+    store.loadOrgTree();
     subscription();
   });
-
-  const onDragEndSplitter = (event) => {
-    store.dragEndSplitter$.next(event);
-  };
 </script>
 
 <style lang="scss">
@@ -50,14 +49,11 @@
 {#if showTitle}
   <ViewTitle {view} />
 {/if}
-<ThreeColumnView on:dragEnd={onDragEndSplitter} id={'mainLayout' + view.getViewName()} {showTitle} {menuPath}>
+<TwoColumnView id={'mainLayout' + view.getViewName()} {showTitle} {menuPath}>
   <div style="height: 100%;" slot="viewLeft">
-    <WorkList {view} {store} />
+    <WorkList {view} {store} {menuPath} {callFrom} />
   </div>
   <div style="height: 100%;" slot="default">
     <MainContent {view} {store} {menuPath} />
   </div>
-  <div style="height: 100%;" slot="viewRight">
-    <Right {view} {store} />
-  </div>
-</ThreeColumnView>
+</TwoColumnView>

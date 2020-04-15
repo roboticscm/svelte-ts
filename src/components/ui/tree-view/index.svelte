@@ -24,12 +24,15 @@
     return (window['$'] as any).fn.zTree.getZTreeObj(id);
   };
 
-  export const selectNodeById = (id: any) => {
+  export const selectNodeById = (id: any, fireClickEvent = false) => {
     const treeObj = getTreeInstance();
     if (treeObj && id) {
       const nodes = treeObj.getNodesByParam('id', id, null);
       if (nodes && nodes.length > 0) {
         treeObj.selectNode(nodes[0]);
+        if (fireClickEvent) {
+          dispatch('click', { event: {}, treeId: id, treeNode: nodes[0] });
+        }
       }
     }
   };
@@ -172,7 +175,6 @@
       },
       callback: {
         onClick: (event: any, treeId: any, treeNode: any) => {
-          event.preventDefault();
           dispatch('click', { event, treeId, treeNode });
         },
         onCheck: (event: any, treeId: any, treeNode: any) => {

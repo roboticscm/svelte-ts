@@ -135,6 +135,7 @@ module.exports = {
   devtool: prod ? false : 'source-map',
   devServer: {
     contentBase: 'public',
+    host: '0.0.0.0',
     hot: true,
     overlay: true,
     historyApiFallback: true,

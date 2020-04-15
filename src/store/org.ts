@@ -37,6 +37,10 @@ class OrgStore {
       humanId,
     });
   }
+
+  sysGetOwnerOrgTree() {
+    return RxHttp.get(`${BASE_URL}${getMethodNameInSnackCase()}`);
+  }
 }
 
 export const orgStore = new OrgStore();

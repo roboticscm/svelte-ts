@@ -132,6 +132,7 @@
         <!--      first button-->
         {#if showFirstLastButton && (firstStatus || showDisabledButton)}
           <button
+            title={T('COMMON.LABEL.FIRST')}
             disabled={!firstStatus}
             on:click={() => jumpToPage(1)}
             class={smallSize ? 'btn-small-info' : 'btn-info'}>
@@ -141,6 +142,7 @@
         <!--      prev button-->
         {#if prevStatus || showDisabledButton}
           <button
+            title={T('COMMON.LABEL.PREVIOUS')}
             disabled={!prevStatus}
             on:click={() => jumpToPage(curPage - 1)}
             class={smallSize ? 'btn-small-success' : 'btn-success'}>
@@ -148,8 +150,10 @@
           </button>
         {/if}
         <!--      page-->
-        <select on:change={onPageChange} class={smallSize ? 'small-control-dropdown' : 'control-dropdown'}>
-          <option disabled>{T('SYS.LABEL.RECORDS')}</option>
+        <select
+          title={T('SYS.LABEL.RECORDS')}
+          on:change={onPageChange}
+          class={smallSize ? 'small-control-dropdown' : 'control-dropdown'}>
           {#each getPages() as page}
             <option selected={page.id === curPage} value={page.id}>{page.value}</option>
           {/each}
@@ -158,6 +162,7 @@
         <!--      next button-->
         {#if nextStatus || showDisabledButton}
           <button
+            title={T('COMMON.LABEL.NEXT')}
             disabled={!nextStatus}
             on:click={() => jumpToPage(curPage + 1)}
             class={smallSize ? 'btn-small-success' : 'btn-success'}>
@@ -167,6 +172,7 @@
         <!--     last button-->
         {#if showFirstLastButton && (lastStatus || showDisabledButton)}
           <button
+            title={T('COMMON.LABEL.LAST')}
             disabled={!lastStatus}
             on:click={() => jumpToPage(totalPages)}
             class={smallSize ? 'btn-small-info' : 'btn-info'}>
@@ -176,15 +182,15 @@
       </span>
     {/if}
     <select
+      title={T('SYS.LABEL.PAGE_SIZE')}
       on:change={onPageSizeChange}
       bind:value={pageSize}
       class={smallSize ? 'small-control-dropdown' : 'control-dropdown'}>
-      <option disabled>{T('SYS.LABEL.SIZE')}</option>
       {#each sizes as size}
         <option value={size}>{size !== -1 ? size : T('SYS.LABEL.ALL')}</option>
       {/each}
     </select>
-    {'#' + totalRecords}
+    <span title={T('COMMON.LABEL.TOTAL_RECORD')}>{'#' + totalRecords}</span>
     <!--     Default slot-->
     <slot />
   </span>

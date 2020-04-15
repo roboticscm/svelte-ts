@@ -1,4 +1,5 @@
 export enum ButtonType {
+  Reset,
   AddNew,
   Save,
   Delete,
@@ -14,6 +15,9 @@ export enum ButtonType {
   CancelModal,
   Apply,
   Custom,
+  SelectAll,
+  UnSelectAll,
+  ToggleSelection,
 }
 
 export enum ButtonPressed {

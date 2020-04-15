@@ -17,7 +17,7 @@ import { Language } from '@/modules/sys/language/model';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import Form from '@/assets/js/form/form';
 import { Menu } from '@/modules/sys/menu/model';
-import { humanOrOrgStore } from '@/modules/sys/human-or-org/store';
+import { HumanOrOrgStore, humanOrOrgStore } from '@/modules/sys/human-or-org/store';
 
 export class ViewStore {
   tableName: string;
@@ -503,7 +503,7 @@ export class ViewStore {
   };
 
   getEditedUserDetail = async (userId: string) => {
-    const user = await humanOrOrgStore.sysGetUserInfoById(userId);
+    const user = await HumanOrOrgStore.sysGetUserInfoById(userId);
     return `${user[0].lastName} ${user[0].firstName} - <b>${user[0].username} </b>`;
   };
 

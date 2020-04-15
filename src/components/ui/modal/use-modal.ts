@@ -76,6 +76,11 @@ export const createModal = (menuPath: string, widthInPixel: number = null, heigh
   };
 
   const saveModalState = (modalRef: any) => {
+    const isSmartPhone = (window as any).isSmartPhone;
+    if (isSmartPhone) {
+      return;
+    }
+
     if (!modalRef.style.left || modalRef.style.left.includes('-')) {
       state.left = '0';
     } else {
@@ -95,6 +100,24 @@ export const createModal = (menuPath: string, widthInPixel: number = null, heigh
   };
 
   const loadSettings = (modalRef: any) => {
+    const isSmartPhone = (window as any).isSmartPhone;
+
+    if (isSmartPhone) {
+      const sw = screen.width;
+      const sh = screen.height;
+      const width = sw * 0.8;
+      const height = sh * 0.6;
+
+      const left = (sw * 0.2) / 2;
+      const top = sh * 0.1;
+
+      modalRef.style.width = `${width}px`;
+      modalRef.style.height = `${height}px`;
+      modalRef.style.left = `${left}px`;
+      modalRef.style.top = `${top}px`;
+      return;
+    }
+
     settingsStore
       .getUserSettings(modalRef.id, menuPath)
       .then((res: any) => {

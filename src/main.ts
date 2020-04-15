@@ -19,6 +19,8 @@ import { sysGetLocaleResourceListByCompanyIdAndLocale } from './assets/js/locale
 import { appStore } from '@/store/app';
 import { take } from 'rxjs/operators';
 
+import MobileDetect from 'mobile-detect';
+
 const applyAlphaColor = (alpha: number) => {
   Color.applyApha(getThemeColors(), alpha);
 };
@@ -133,6 +135,6 @@ interface Window {
 // @ts-ignore
 declare var ResizeObserver: ResizeObserver;
 
-type BigInt = number;
-// @ts-ignore
-declare const BigInt: typeof Number;
+// mobile detect
+const md = new MobileDetect(window.navigator.userAgent);
+(window as any).isSmartPhone = md.mobile() !== null && md.phone() !== null;

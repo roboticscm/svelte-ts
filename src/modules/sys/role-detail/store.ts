@@ -4,15 +4,19 @@ import { BehaviorSubject, forkJoin, of, zip } from 'rxjs';
 import { ViewStore } from '@/store/view';
 import { RoleStore } from '@/store/role';
 import { Role } from './model';
-import {RxHttp} from "@/assets/js/rx-http";
-import {getMethodNameInSnackCase} from "@/assets/js/util";
+import { RxHttp } from '@/assets/js/rx-http';
+import { getMethodNameInSnackCase } from '@/assets/js/util';
+import { OwnerOrg } from '@/modules/sys/owner-org/model';
 
 const BASE_URL = 'sys/role-detail/';
 export class Store {
-  roles$ = new BehaviorSubject<any[]>([]);
+  roles$ = new BehaviorSubject<Role[]>([]);
+  filterOrg$ = new BehaviorSubject<OwnerOrg[]>([]);
   selectedData$ = new BehaviorSubject<Role>(null);
   roleDetails$ = new BehaviorSubject<any[]>([]);
   dragEndSplitter$ = new BehaviorSubject<any>(null);
+  needSelectRole$ = new BehaviorSubject<string>(null);
+
   constructor(public viewStore: ViewStore) {}
 
   completeLoading$ = forkJoin([
@@ -35,13 +39,18 @@ export class Store {
     });
   };
 
+  loadFilterOrgTree = (roleId: string) => {
+    orgStore.sysGetHumanOrgTree(null).subscribe((res: any) => {
+      this.filterOrg$.next(res.data);
+    });
+  };
   saveOrUpdateOrDelete(roleId: any, roleDetailWithControls: any[]) {
     return RxHttp.post(
-        `${BASE_URL}${getMethodNameInSnackCase()}`,
-        JSON.stringify({
-          roleId,
-          roleDetailWithControls
-        })
+      `${BASE_URL}${getMethodNameInSnackCase()}`,
+      JSON.stringify({
+        roleId,
+        roleDetailWithControls,
+      }),
     );
   }
 }

@@ -2,7 +2,7 @@ import { RxHttp } from '@/assets/js/rx-http';
 import { BehaviorSubject } from 'rxjs';
 import { User } from '@/model/user';
 import { settingsStore } from '@/store/settings';
-import { humanOrOrgStore } from '@/modules/sys/human-or-org/store';
+import { HumanOrOrgStore, humanOrOrgStore } from '@/modules/sys/human-or-org/store';
 import { getMethodNameInSnackCase } from '@/assets/js/util';
 import { NavBarConfig } from '@/model/nav-bar-config';
 import { Menu, RoleMenu } from '@/modules/sys/menu/model';
@@ -21,8 +21,7 @@ class AppStore {
   navBarConfig$ = new BehaviorSubject<NavBarConfig>(new NavBarConfig());
 
   getCurrentUserInfo() {
-    humanOrOrgStore
-      .sysGetUserInfoById(null)
+    HumanOrOrgStore.sysGetUserInfoById(null)
       .then((res: any) => {
         if (res.length > 0) {
           this.user = res[0];

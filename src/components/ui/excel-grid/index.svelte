@@ -5,7 +5,7 @@
   import { UrlUtil } from '@/assets/js/url-util';
   import { Debug } from '@/assets/js/debug';
   import { settingsStore } from '@/store/settings';
-
+  import { T } from '@/assets/js/locale/locale';
   const dispatch = createEventDispatcher();
 
   export let id: string;
@@ -104,7 +104,7 @@
       recalculateColumnWidth();
       jExcelObj = jexcel(el, {
         data: data,
-        // editable: !disabled,
+        // editable: false,
         columns: columns,
         updateTable: onUpdateTable,
         onchange: onChanged,
@@ -277,7 +277,31 @@
 
   export const getGridInstance = () => {
     return jExcelObj;
-  }
+  };
+
+  export const createCheckboxHeader = (col: number) => {
+    const checkboxTag = document.createElement('input');
+    checkboxTag.type = 'checkbox';
+    checkboxTag.onchange = (event: any) => {
+      const checked = event.target.checked;
+      const checkColumn = new Array(data.length).fill(checked);
+      jExcelObj.setColumnData(col, checkColumn);
+    };
+    document.querySelector(`td[data-x="${col}"]`).prepend(checkboxTag);
+  };
+
+  export const createToggleCheckHeader = (col: number) => {
+    const buttonTag: any = document.createElement('button');
+    buttonTag.title = T('COMMON.LABEL.TOGGLE_SELECTION');
+    buttonTag.className = 'btn-small-primary';
+    buttonTag.innerHTML = '<i class="fa fa-toggle-on"></i>';
+    buttonTag.style = 'padding: 0; font-size: 0.8rem;';
+    buttonTag.onclick = (event: any) => {
+      const checkColumn = jExcelObj.getColumnData(col).map((it) => !it);
+      jExcelObj.setColumnData(col, checkColumn);
+    };
+    document.querySelector(`td[data-x="${col}"]`).prepend(buttonTag);
+  };
 </script>
 
 <style lang="scss">

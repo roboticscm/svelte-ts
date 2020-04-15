@@ -8,18 +8,20 @@
     makeMergeCells,
     calcTableHeight,
     preprocessData,
-    getTableData, fillNullColor
+    getTableData,
+    fillNullColor,
   } from './helper';
   import { Store } from '../store';
   import SC from '@/components/set-common';
 
   import { ButtonType, ButtonId } from '@/components/ui/button/types';
   import Button from '@/components/ui/button';
-  import {catchError, concatMap, switchMap, filter} from "rxjs/operators";
-  import {fromEvent, of, Observable} from "rxjs";
-  import {fromPromise} from "rxjs/internal-compatibility";
-  import {SObject} from "@/assets/js/sobject";
-  import {Debug} from "../../../../assets/js/debug";
+  import { catchError, concatMap, switchMap, filter } from 'rxjs/operators';
+  import { fromEvent, of, Observable } from 'rxjs';
+  import { fromPromise } from 'rxjs/internal-compatibility';
+  import { SObject } from '@/assets/js/sobject';
+  import { Debug } from '../../../../assets/js/debug';
+  import { ButtonPressed } from '../../../../components/ui/button/types';
 
   export let view: ViewStore;
   export let store: Store;
@@ -28,7 +30,7 @@
   // @ts-ignore
   const { hasAnyDeletedRecord$, deleteRunning$, saveRunning$, isReadOnlyMode$, isUpdateMode$ } = view;
   // @ts-ignore
-  const { roleDetails$, dragEndSplitter$, selectedData$ } = store;
+  const { roleDetails$, dragEndSplitter$, selectedData$, needSelectRole$ } = store;
 
   const tableContainerId = view.getViewName() + 'TableContainerId';
   let scRef: any;
@@ -47,14 +49,13 @@
   let editedData: any[];
 
   // @ts-ignore
-  $: if ($roleDetails$) {
+  $: if ($roleDetails$ && $roleDetails$.length > 0) {
     // @ts-ignore
     tick().then(() => {
       if (excelGridRef) {
         // @ts-ignore
         fillNullColor($roleDetails$, excelGridRef);
         beforeData = SObject.clone(getTableData(excelGridRef));
-
       }
     });
 
@@ -92,6 +93,49 @@
     });
   };
 
+  const onReset = () => {
+    // check for data change
+    editedData = getTableData(excelGridRef);
+
+    dataChanged = view.checkObjectArrayChange(beforeData, SObject.clone(editedData));
+
+    if (dataChanged !== true) {
+      scRef
+        .confirmModalRef()
+        .show(T('SYS.MSG.THE_DATA_HAS_BEEN_CHANGED') + '. ' + T('SYS.MSG.ARE_YOU_SURE_TO_RESET' + '?'))
+        .then((buttonPressed: ButtonPressed) => {
+          if (buttonPressed === ButtonPressed.OK) {
+            doReset();
+          }
+        });
+    } else {
+      scRef.snackbarRef().showNoDataChange();
+    }
+  };
+
+  const doReset = () => {
+    // @ts-ignore
+    needSelectRole$.next($selectedData$.id);
+  };
+
+  /**
+   * Event handle for Config button.
+   * @param {event} Mouse click event.
+   * @return {void}.
+   */
+  const onConfig = (event) => {
+    view.showViewConfigModal(event.currentTarget.id, scRef);
+  };
+
+  /**
+   * Event handle for Trash Restore button.
+   * @param {event} Mouse click event.
+   * @return {void}.
+   */
+  const onTrashRestore = (event) => {
+    view.showTrashRestoreModal(event.currentTarget.id, false, scRef);
+  };
+
   // ============================== CLIENT VALIDATION ==========================
   /**
    * Client validation and check for no data change.
@@ -105,9 +149,9 @@
       scRef.snackbarRef.show(T('SYS.MSG.PLEASE_SELECT_THE_ROLE_ON_THE_LEFT_TREE'));
       return false;
     }
-    // getDiffRowObjectArray
     // check for data change
     editedData = getTableData(excelGridRef);
+
     dataChanged = view.checkObjectArrayChange(beforeData, SObject.clone(editedData), scRef.snackbarRef());
 
     if (dataChanged === true) {
@@ -169,9 +213,10 @@
             scRef.snackbarRef().showUpdateSuccess();
           }
           saveRunning$.next(false);
+          store.loadRoleTree();
         },
         error: (error) => {
-          Debug.errorSection('Menu - doSaveOrUpdate', error);
+          Debug.errorSection('Role Detail - doSaveOrUpdate', error);
           saveRunning$.next(false);
         },
       });
@@ -189,7 +234,29 @@
         excelGridRef && excelGridRef.refresh();
       }, 250);
     });
+
+    createCheckboxesHeader();
   });
+
+  const createCheckboxesHeader = () => {
+    setTimeout(() => {
+      // checked
+      excelGridRef.createCheckboxHeader(4);
+      // private
+      excelGridRef.createCheckboxHeader(7);
+      // approve
+      excelGridRef.createCheckboxHeader(9);
+
+      // Render
+      excelGridRef.createCheckboxHeader(12);
+      // Disabled
+      excelGridRef.createCheckboxHeader(13);
+      // Confirm
+      excelGridRef.createCheckboxHeader(14);
+      // Require password
+      excelGridRef.createCheckboxHeader(15);
+    }, 1000);
+  };
 
   onDestroy(() => {
     if (saveOrUpdateSub) {
@@ -200,6 +267,7 @@
   // @ts-ignore
   $: if ($dragEndSplitter$) {
     excelGridRef && excelGridRef.refresh();
+    createCheckboxesHeader();
   }
 
   // @ts-ignore
@@ -209,7 +277,6 @@
     // @ts-ignore
     isUpdateMode$.next($selectedData$ !== null);
   }
-
 
   /**
    * Use save or update action directive. Register click event for Save / Update button
@@ -231,6 +298,7 @@
 
   <svelte:component
     this={ExcelGrid}
+    {menuPath}
     bind:this={excelGridRef}
     id={'roleControlGrid' + view.getViewTitle() + 'Id'}
     gridNestedHeaders={nestedHeaders}
@@ -246,6 +314,10 @@
 
 <!--Form controller-->
 <section class="view-content-bottom">
+  {#if $selectedData$ !== null}
+    <Button btnType={ButtonType.Reset} on:click={onReset} />
+  {/if}
+
   {#if view.isRendered(ButtonId.Edit, $isReadOnlyMode$ && $isUpdateMode$)}
     <Button btnType={ButtonType.Edit} on:click={onEdit} disabled={view.isDisabled(ButtonId.Edit)} />
   {/if}
@@ -259,22 +331,14 @@
       running={$saveRunning$} />
   {/if}
 
-  <!--  {#if view.isRendered(ButtonId.Delete, $isUpdateMode$)}-->
-  <!--    <Button-->
-  <!--            btnType={ButtonType.Delete}-->
-  <!--            on:click={onDelete}-->
-  <!--            disabled={view.isDisabled(ButtonId.Delete)}-->
-  <!--            running={$deleteRunning$} />-->
-  <!--  {/if}-->
+  {#if view.isRendered(ButtonId.Config)}
+    <Button btnType={ButtonType.Config} on:click={onConfig} disabled={view.isDisabled(ButtonId.Config)} />
+  {/if}
 
-  <!--  {#if view.isRendered(ButtonId.Config)}-->
-  <!--    <Button btnType={ButtonType.Config} on:click={onConfig} disabled={view.isDisabled(ButtonId.Config)} />-->
-  <!--  {/if}-->
-
-  <!--  {#if view.isRendered(ButtonId.TrashRestore, $hasAnyDeletedRecord$)}-->
-  <!--    <Button-->
-  <!--            btnType={ButtonType.TrashRestore}-->
-  <!--            on:click={onTrashRestore}-->
-  <!--            disabled={view.isDisabled(ButtonId.TrashRestore)} />-->
-  <!--  {/if}-->
+  {#if view.isRendered(ButtonId.TrashRestore, $hasAnyDeletedRecord$)}
+    <Button
+      btnType={ButtonType.TrashRestore}
+      on:click={onTrashRestore}
+      disabled={view.isDisabled(ButtonId.TrashRestore)} />
+  {/if}
 </section>

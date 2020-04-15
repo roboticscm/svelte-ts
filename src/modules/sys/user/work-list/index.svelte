@@ -32,7 +32,6 @@
         ),
       )
       .subscribe((res: any[]) => {
-        console.log(res);
         view.selectedData$.next(SObject.convertFieldsToCamelCase(res[0].data[0]));
         store.availableDep$.next(res[1].data);
         // store.assignedDep$.next(res[2].data);

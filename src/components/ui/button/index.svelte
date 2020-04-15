@@ -38,6 +38,9 @@
   // @ts-ignore
   $: {
     switch (+btnType) {
+      case ButtonType.Reset:
+        preset(undefined, 'Reset', '<i class="fa fa-redo-alt"></i>', 'btn-info');
+        break;
       case ButtonType.AddNew:
         preset(ButtonId.AddNew, 'ADD_NEW', '<i class="fa fa-plus"></i>', 'btn-info');
         break;
@@ -70,6 +73,15 @@
         break;
       case ButtonType.Apply:
         preset(undefined, 'APPLY', '<i class="fa fa-check"></i>', 'btn-success');
+        break;
+      case ButtonType.SelectAll:
+        preset(undefined, undefined, '<i class="fa fa-check-double"></i>', 'btn-small-info');
+        break;
+      case ButtonType.UnSelectAll:
+        preset(undefined, undefined, '<i class="fa fa-minus-square"></i>', 'btn-small-success');
+        break;
+      case ButtonType.ToggleSelection:
+        preset(undefined, undefined, '<i class="fa fa-toggle-on"></i>', 'btn-small-primary');
         break;
       default:
     }
