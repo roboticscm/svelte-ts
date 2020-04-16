@@ -22,8 +22,6 @@
   export let menuPath: string;
   export let searchFunc: Function;
 
-  console.log(saveState, menuPath, height, columns);
-
   let inputRef: any;
   let tableRef: any;
 
@@ -242,6 +240,7 @@
       bind:this={tableRef}
       id={'table' + id}
       data={markData}
+      showRowNumber={false}
       {columns}
       {menuPath}
       showHeader={false} />

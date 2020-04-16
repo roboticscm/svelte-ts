@@ -1,55 +1,55 @@
 <script lang="ts">
   import { tick, onMount, onDestroy } from 'svelte';
-  import { catchError, concatMap, switchMap, filter, take, finalize } from 'rxjs/operators';
+  import { catchError, concatMap, switchMap, filter } from 'rxjs/operators';
   import { fromEvent, of, Observable, EMPTY } from 'rxjs';
   import { fromPromise } from 'rxjs/internal-compatibility';
 
   import { T } from '@/assets/js/locale/locale';
   import Form from '@/assets/js/form/form';
   import { ViewStore } from '@/store/view';
-  import { Menu } from '../model';
-  import { User } from '@/model/user';
+  import { Role } from '../model';
   import { SObject } from '@/assets/js/sobject';
   import { apolloClient } from '@/assets/js/hasura-client';
   import { ButtonPressed } from '@/components/ui/button/types';
   import { SDate } from '@/assets/js/sdate';
   import { humanOrOrgStore } from '@/modules/sys/human-or-org/store';
-  import { ButtonType, ButtonId } from '@/components/ui/button/types';
-  import { validation } from './validation';
   import { ModalType } from '@/components/ui/modal/types';
+  import { ButtonType, ButtonId } from '@/components/ui/button/types';
+  import TreeView from '@/components/ui/tree-view';
+  import { validation } from './validation';
+
   import { StringUtil } from '@/assets/js/string-util';
 
   import Button from '@/components/ui/button';
   import NumberInput from '@/components/ui/input/number-input';
   import TextInput from '@/components/ui/input/text-input';
-  import PasswordInput from '@/components/ui/input/password-input';
-  import Checkbox from '@/components/ui/input/checkbox';
   import SC from '@/components/set-common';
-  import SimpleImageSelector from '@/components/ui/simple-image-selector';
-  import TreeView from '@/components/ui/tree-view';
-  import { Store } from '../store';
+  import Snackbar from '@/components/ui/snackbar';
   import { Debug } from '@/assets/js/debug';
+  import {Store} from "../store";
 
   // Props
   export let view: ViewStore;
-  export let store: Store;
   export let menuPath: string;
+  export let store: Store;
 
   // Observable
   // @ts-ignore
   const { selectedData$, hasAnyDeletedRecord$, deleteRunning$, saveRunning$, isReadOnlyMode$, isUpdateMode$ } = view;
-  const { availableDep$, assignedDep$, completeSelecting$ } = store;
+
+  // @ts-ignore
+  const {orgData$} = store;
 
   // Refs
-  let nameRef: any;
+  let codeRef: any;
   let scRef: any;
+
   let btnSaveRef: any;
   let btnUpdateRef: any;
-  let availableDepTreeRef: any;
-  let defaultDepTreeRef: any;
+  let orgTreeRef: any;
 
   // Other vars
-  let selectedData: User;
+  let selectedData: Role;
   let saveOrUpdateSub;
   /**
    * Reset form (reset input and errors)
@@ -58,12 +58,14 @@
    */
   const resetForm = () => {
     return new Form({
-      ...new User(),
+      ...new Role(),
     });
   };
   let form: any = resetForm();
   let beforeForm: Form;
-  const saveUpdateUri = 'sys/human-or-org/save-or-update';
+
+  const saveUpdateUri = 'sys/role/save-or-update';
+
   // ============================== EVENT HANDLE ==========================
   /**
    * Event handle for Add New button.
@@ -90,7 +92,7 @@
       isReadOnlyMode$.next(false);
       tick().then(() => {
         // the moving focus to the first element
-        nameRef.focus();
+        codeRef.focus();
       });
     });
   };
@@ -126,69 +128,12 @@
     view.showTrashRestoreModal(event.currentTarget.id, false, scRef);
   };
 
-  /**
-   * Event handle for Select Image button.
-   * @param {event} data of image.
-   * @return {void}.
-   */
-  const onImageChange = (event: any) => {
-    (form as any).iconData = event.detail;
-  };
-
-  const onCheckAvailTree = (event) => {
-    checkDefaultDepartment();
-    onCheckAssignedDepTree (undefined);
-  };
-
-  const onCheckAssignedDepTree = (event) => {
-    form.errors.clear('defaultOwnerOrgId');
+  const onCheckOrgTree = (event) => {
+    form.errors.clear('ownerOrgId');
     form.errors.errors = {...form.errors.errors};
   }
   // ============================== //EVENT HANDLE ==========================
 
-  // ============================== HELPER ==========================
-  const checkDefaultDepartment = (defaultDepId: string = undefined) => {
-    let checkedData = SObject.clone(availableDepTreeRef.getCheckedDataParent());
-    const checkedLeafIds: any[] = availableDepTreeRef.getCheckedLeafIds(true);
-    const defaultChecked = defaultDepTreeRef.getCheckedLeafIds(true);
-
-    // check first department
-    if (checkedLeafIds && checkedLeafIds.length > 0) {
-      let firstCheck = false;
-      checkedData = checkedData.map((it) => {
-        if (
-          !firstCheck &&
-          ((defaultChecked.length === 1 && it.id.toString() === defaultChecked[0].toString()) ||
-            (defaultChecked.length === 0 &&
-              it.id.toString() === (defaultDepId ? defaultDepId.toString() : checkedLeafIds[0].toString())))
-        ) {
-          it.checked = true;
-          firstCheck = true;
-        } else {
-          it.checked = false;
-        }
-        return it;
-      });
-      assignedDep$.next(checkedData);
-    } else {
-      assignedDep$.next([]);
-    }
-  };
-
-  const preprocessData = () => {
-    [form.lastName, form.firstName] = StringUtil.splitHumanName(form.name);
-    // update data from tree
-    form.insertDepartmentIds = availableDepTreeRef.getCheckedLeafIds(true);
-    form.removeDepartmentIds = availableDepTreeRef.getCheckedLeafIds(false);
-    const defaultIds: any[] = defaultDepTreeRef.getCheckedLeafIds(true);
-    if (defaultIds && defaultIds.length > 0) {
-      form.defaultOwnerOrgId = defaultIds[0];
-    } else {
-      form.defaultOwnerOrgId = undefined;
-    }
-  };
-
-  // ============================== //HELPER ==========================
   // ============================== CLIENT VALIDATION ==========================
   /**
    * Client validation and check for no data change.
@@ -200,12 +145,6 @@
 
     // client validation
     form.errors.errors = form.recordErrors(validation(form));
-
-    // @ts-ignore
-    if ($isUpdateMode$ && StringUtil.isEmpty(form.password)) {
-      delete form.errors.errors.password;
-    }
-
     if (form.errors.any()) {
       return false;
     }
@@ -238,18 +177,9 @@
     // reset form
     form = resetForm();
 
-    store
-      .loadAvailableDep(null)
-      .pipe(take(1))
-      .subscribe((res) => {
-        availableDep$.next(res.data);
-      });
-    if (defaultDepTreeRef) {
-      assignedDep$.next([]);
-    }
     // moving focus to the first element after DOM updated
     tick().then(() => {
-      nameRef.focus();
+      codeRef.focus();
     });
   };
 
@@ -313,7 +243,7 @@
           saveRunning$.next(false);
         },
         error: (error) => {
-          Debug.errorSection('User - doSaveOrUpdate', error);
+          Debug.errorSection('Role - doSaveOrUpdate', error);
           saveRunning$.next(false);
         },
       });
@@ -322,21 +252,14 @@
   const doSelect = (data: any) => {
     selectedData = data;
     if (selectedData) {
-      // check default department
-      tick().then(() => {
-        checkDefaultDepartment(selectedData.defaultOwnerOrgId);
-        isReadOnlyMode$.next(true);
-        isUpdateMode$.next(true);
-        form = new Form({
-          ...selectedData,
-          insertDepartmentIds: availableDepTreeRef.getCheckedLeafIds(true),
-          removeDepartmentIds: availableDepTreeRef.getCheckedLeafIds(false),
-          password: '',
-        });
-        form.name = `${form.lastName} ${form.firstName}`;
-        // save init value for checking data change
-        beforeForm = SObject.clone(form);
+      isReadOnlyMode$.next(true);
+      isUpdateMode$.next(true);
+      form = new Form({
+        ...selectedData,
       });
+      orgTreeRef.checkNodeById(selectedData.ownerOrgId);
+      // save init value for checking data change
+      beforeForm = SObject.clone(form);
     }
   };
   // ============================== //FUNCTIONAL ==========================
@@ -373,6 +296,16 @@
   });
   // ============================== //REACTIVE ==========================
 
+  // ============================== HELPER ==========================
+  const preprocessData = () => {
+    const checkedIds: any[] = orgTreeRef.getCheckedIds(true);
+    if (checkedIds && checkedIds.length > 0) {
+      form.ownerOrgId = checkedIds[0];
+    } else {
+      form.ownerOrgId = undefined;
+    }
+  }
+    // ============================== // HELPER ==========================
   // ============================== HOOK ==========================
   /**
    * onMount Hook.
@@ -421,19 +354,10 @@
   const useSaveOrUpdateAction = {
     register(component: HTMLElement, param: any) {
       doSaveOrUpdate(fromEvent(component, 'click'));
-    },
-  };
+    }
+  }
   // ============================== //HOOK ==========================
 </script>
-
-<style lang="scss">
-  .image-container {
-    height: 100px;
-  }
-  .menu-font-icon {
-    font-size: 1.6rem !important;
-  }
-</style>
 
 <!--Invisible Element-->
 <SC bind:this={scRef} {view} {menuPath} />
@@ -442,148 +366,63 @@
 <!--Main content-->
 <section class="view-content-main">
   <form class="form" on:keydown={(event) => form.errors.clear(event.target.name)}>
-    <div class="row ">
-      <div class="col-xs-24 col-lg-21">
-        <div class="row">
-          <!-- Full name -->
-          <div class="col-xs-24 col-sm-12">
-            <div class="row">
-              <div class="label text-sm-left text-xx-right col-sm-24 col-lg-8">{T('COMMON.LABEL.FULL_NAME')}:</div>
-              <div class="col-sm-24 col-lg-16">
-                <TextInput name="name" disabled={$isReadOnlyMode$} bind:value={form.name} bind:this={nameRef} />
-                {#if form.errors.has('name')}
-                  <span class="error">{form.errors.get('name')}</span>
-                {/if}
-              </div>
-            </div>
-          </div>
-          <!-- //Full name -->
-
-          <!-- Username -->
-          <div class="col-xs-24 col-sm-12 pl-xs-0 pl-sm-2 pl-md-0">
-            <div class="row">
-              <div class="label text-sm-left text-xx-right col-sm-24 col-lg-8">{T('COMMON.LABEL.USERNAME')}:</div>
-              <div class="col-sm-24 col-lg-16">
-                <TextInput name="username" disabled={$isReadOnlyMode$} bind:value={form.username} />
-                {#if form.errors.has('username')}
-                  <span class="error">{form.errors.get('username')}</span>
-                {/if}
-              </div>
-            </div>
-          </div>
-          <!-- //Username -->
-        </div>
-
-        <div class="row">
-          <!-- Email -->
-          <div class="col-xs-24 col-sm-12">
-            <div class="row">
-              <div class="label text-sm-left text-xx-right col-sm-24 col-lg-8">{T('COMMON.LABEL.EMAIL')}:</div>
-              <div class="col-sm-24 col-lg-16">
-                <TextInput name="email" disabled={$isReadOnlyMode$} bind:value={form.email} />
-                {#if form.errors.has('email')}
-                  <span class="error">{form.errors.get('email')}</span>
-                {/if}
-              </div>
-            </div>
-          </div>
-          <!-- //Email -->
-
-          <!-- Password -->
-          <div class="col-xs-24 col-sm-12 pl-xs-0 pl-sm-2 pl-md-0">
-            <div class="row">
-              <div class="label text-sm-left text-xx-right col-sm-24 col-lg-8">{T('COMMON.LABEL.PASSWORD')}:</div>
-              <div class="col-sm-24 col-lg-16">
-                <div class="col-sm-24 col-lg-16">
-                  <PasswordInput name="password" disabled={$isReadOnlyMode$} bind:value={form.password} />
-                </div>
-                {#if form.errors.has('password')}
-                  <span class="error">{form.errors.get('password')}</span>
-                {/if}
-              </div>
-            </div>
-          </div>
-          <!--  //Password -->
-        </div>
-
-        <div class="row">
-          <!--  Font Icon -->
-          <div class="col-xs-24 col-sm-12 pl-xs-0 pl-sm-2 pl-md-0">
-            <div class="row">
-              <div class="label text-sm-left text-xx-right col-sm-24 col-lg-8">
-                <Checkbox name="useFontIcon" disabled={$isReadOnlyMode$} bind:checked={form.useFontIcon} />
-                {T('COMMON.LABEL.FONT_ICON')}:
-              </div>
-              <div class="col-sm-24 col-lg-14">
-                <div class="col-sm-24 col-lg-16">
-                  <TextInput name="fontIcon" disabled={$isReadOnlyMode$} bind:value={form.fontIcon} />
-                </div>
-              </div>
-
-              <div class="col-sm-24 col-lg-2 pl-md-0 pl-lg-1">
-                {#if form.fontIcon && form.fontIcon.includes('<')}
-                  <span class="menu-font-icon">
-                    {@html form.fontIcon}
-                  </span>
-                {/if}
-              </div>
-            </div>
-          </div>
-          <!--  //Font Icon -->
-
-          <!--  Activated -->
-          <div class="col-xs-24 col-sm-12 pl-xs-0 pl-sm-2 pl-md-0">
-            <div class="row">
-              <div class="col-sm-24 col-lg-8" />
-              <div class="label col-sm-24 col-lg-16">
-                <Checkbox disabled={$isReadOnlyMode$} name="activated" bind:checked={form.activated} />
-                {T('COMMON.LABEL.ACTIVATED')}
-              </div>
-            </div>
-          </div>
-          <!-- //Activated -->
-        </div>
-      </div>
-
-      <!-- Image Selector -->
-      <div class="image-container col-xs-24 col-lg-3 mt-xs-0 mt-sm-6 mt-md-0">
-        <SimpleImageSelector
-          id={view.getViewName() + 'ViewerId'}
-          src={form.iconData}
-          disabled={$isReadOnlyMode$}
-          on:imageChange={onImageChange} />
-      </div>
-      <!--  //Image Selector -->
-    </div>
-
-    <!--  Department Tree -->
     <div class="row">
-      <div class="default-border col-sm-24 col-md-12">
-        <TreeView
-          on:check={onCheckAvailTree}
-          bind:this={availableDepTreeRef}
-          id={'availableDepTree' + view.getViewName() + 'Id'}
-          data={$availableDep$}
-          disabled={$isReadOnlyMode$}
-          isCheckableNode={true}>
-          <div slot="label" class="label">{T('SYS.LABEL.AVAILABLE_DEPARTMENT')}:</div>
-        </TreeView>
+      <div class="col-xs-24 col-sm-12">
+        <div class="row ">
+          <!-- Code -->
+          <div class="label col-24">
+            {T('COMMON.LABEL.CODE')}:
+          </div>
+          <div class="col-24">
+            <TextInput name="code" disabled={$isReadOnlyMode$} bind:value={form.code} bind:this={codeRef} />
+            {#if form.errors.has('code')}
+              <span class="error">{form.errors.get('code')}</span>
+            {/if}
+          </div>
+          <!-- // Code -->
+
+          <!-- Name -->
+          <div class="label col-24">
+            {T('COMMON.LABEL.NAME')}:
+          </div>
+          <div class="col-24">
+            <TextInput name="name" disabled={$isReadOnlyMode$} bind:value={form.name} />
+            {#if form.errors.has('name')}
+              <span class="error">{form.errors.get('name')}</span>
+            {/if}
+          </div>
+          <!-- // Name -->
+
+          <!-- Sort -->
+          <div class="label col-24">
+            {T('COMMON.LABEL.SORT')}:
+          </div>
+          <div class="col-24">
+            <NumberInput name="sort" disabled={$isReadOnlyMode$} bind:value={form.sort} />
+            {#if form.errors.has('sort')}
+              <span class="error">{form.errors.get('sort')}</span>
+            {/if}
+          </div>
+          <!-- // Sort -->
+        </div>
       </div>
-      <div class="default-border col-sm-24 col-md-12 pl-md-0 pl-lg-1 pt-md-1 pt-lg-0">
+      <div class="default-border col-xs-24 col-sm-12">
         <TreeView
-                on:check={onCheckAssignedDepTree}
-          bind:this={defaultDepTreeRef}
-          id={'assignedDepTree' + view.getViewName() + 'Id'}
-          data={$assignedDep$}
-          disabled={$isReadOnlyMode$}
-          radioType="all">
-          <div slot="label" class="label">{T('SYS.LABEL.DEFAULT_DEPARTMENT')}:</div>
+                on:check={onCheckOrgTree}
+                bind:this={orgTreeRef}
+                id={'orgTree' + view.getViewName() + 'Id'}
+                data={$orgData$}
+                disabled={$isReadOnlyMode$}
+                radioType="all">
+          <div slot="label" class="label">{T('SYS.LABEL.ORG')}:</div>
         </TreeView>
-        {#if form.errors.has('defaultOwnerOrgId')}
-          <span class="error">{form.errors.get('defaultOwnerOrgId')}</span>
+        {#if form.errors.has('ownerOrgId')}
+          <span class="error">{form.errors.get('ownerOrgId')}</span>
         {/if}
       </div>
     </div>
+
+
   </form>
 </section>
 <!--//Main content-->

@@ -235,9 +235,9 @@ export const calcTableHeight = (id: string) => {
 export const preprocessData = (changeData: any, originData: any) => {
   let prevMenuId: any = null;
   for (let i = 0; i < changeData.length; i++) {
-    if (prevMenuId === null || prevMenuId !== changeData[i].menuId) {
+    if (prevMenuId === null || prevMenuId.toString() !== changeData[i].menuId.toString()) {
       let filter = originData.filter((item: any) => {
-        return item.menuId === changeData[i].menuId && item.menuName.length > 0;
+        return item.menuId.toString() === changeData[i].menuId.toString() && item.menuName.length > 0;
       });
       if (filter && filter.length > 0) {
         changeData[i].menuName = filter[0].menuName;
@@ -270,7 +270,7 @@ export const getTableData = (excelGridRef: any) => {
   const data = excelGridRef.getData();
 
   for (let i = 0; i < data.length; i++) {
-    if (i > 0 && data[i].menuId === data[i - 1].menuId) {
+    if (i > 0 && data[i].menuId.toString() === data[i - 1].menuId.toString()) {
       data[i].checked = data[i - 1].checked;
     }
   }

@@ -34,7 +34,6 @@
 
   const tableContainerId = view.getViewName() + 'TableContainerId';
   let scRef: any;
-  let btnUpdateRef: any;
   let excelGridRef: any;
   let ExcelGrid: any;
 
@@ -65,19 +64,6 @@
     }
     view.loading$.next(false);
   }
-
-  /**
-   * Event handle for Add New button.
-   * @param {event} Mouse click event.
-   * @return {void}.
-   */
-  const onAddNew = (event) => {
-    // verify permission
-    view.verifyAddNewAction(event.currentTarget.id, scRef).then((_) => {
-      // if everything is OK, call the action
-      // doAddNew();
-    });
-  };
 
   /**
    * Event handle for Edit button.
@@ -125,15 +111,6 @@
    */
   const onConfig = (event) => {
     view.showViewConfigModal(event.currentTarget.id, scRef);
-  };
-
-  /**
-   * Event handle for Trash Restore button.
-   * @param {event} Mouse click event.
-   * @return {void}.
-   */
-  const onTrashRestore = (event) => {
-    view.showTrashRestoreModal(event.currentTarget.id, false, scRef);
   };
 
   // ============================== CLIENT VALIDATION ==========================
@@ -325,7 +302,6 @@
   {#if view.isRendered(ButtonId.Update, !$isReadOnlyMode$ && $isUpdateMode$)}
     <Button
       action={useSaveOrUpdateAction}
-      bind:this={btnUpdateRef}
       btnType={ButtonType.Update}
       disabled={view.isDisabled(ButtonId.Update, $selectedData$ == null)}
       running={$saveRunning$} />
@@ -335,10 +311,4 @@
     <Button btnType={ButtonType.Config} on:click={onConfig} disabled={view.isDisabled(ButtonId.Config)} />
   {/if}
 
-  {#if view.isRendered(ButtonId.TrashRestore, $hasAnyDeletedRecord$)}
-    <Button
-      btnType={ButtonType.TrashRestore}
-      on:click={onTrashRestore}
-      disabled={view.isDisabled(ButtonId.TrashRestore)} />
-  {/if}
 </section>

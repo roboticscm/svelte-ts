@@ -2,18 +2,18 @@
 const JSONbig = require('json-bigint');
 
 export class SJSON {
-  public static stringify = (obj: any) => {
-    return JSON.stringify(obj, (key, value) => {
-      if (typeof value === 'bigint') {
-        return value ? value.toString() : value;
-      } else {
-        return value;
-      }
-    });
-  };
   // public static stringify = (obj: any) => {
-  //     return JSONbig.stringify(obj);
-  // }
+  //   return JSON.stringify(obj, (key, value) => {
+  //     if (typeof value === 'bigint') {
+  //       return value ? value.toString() : value;
+  //     } else {
+  //       return value;
+  //     }
+  //   });
+  // };
+  public static stringify = (obj: any) => {
+      return JSONbig.stringify(obj);
+  }
 
   // public static parse = (json: string) => {
   //     return JSON.parse(json, (key, value) => {

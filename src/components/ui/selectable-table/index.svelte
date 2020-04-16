@@ -115,7 +115,7 @@
     }
   };
 
-  const getSelectedData = () => {
+  export const getSelectedData = () => {
     const result = selectedRows.map((index) => data[index]);
     return result;
   };
@@ -139,7 +139,6 @@
       let idx = startRow.cellIndex;
 
       let nextrow = startRow.parentElement && startRow.parentElement.previousElementSibling;
-      console.log(startRow);
       if (nextrow != null) {
         let sibling = nextrow.cells[idx];
         let row = Number(sibling.id.split('_')[1]);
@@ -247,7 +246,7 @@
 </style>
 
 <div style="height: 100%; overflow: auto;">
-  <slot name="label" />
+  <slot />
   <span title={T('COMMON.LABEL.SELECT_ALL')}>
     <slot name="selectAll" {selectAll} />
   </span>

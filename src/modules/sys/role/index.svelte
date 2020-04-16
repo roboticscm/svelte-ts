@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { scale } from 'svelte/transition';
   import { onMount } from 'svelte';
   import { take } from 'rxjs/operators';
 
@@ -10,33 +11,48 @@
   import MainContent from './content/index.svelte';
   import ViewTitle from '@/components/layout/view-title';
   import ProgressBar from '@/components/ui/progress-bar';
-  import { Store } from './store';
+  import {Store} from "./store";
 
+  // Props
   export let showTitle = true;
   export let menuPath: string;
   export let fullControl: boolean;
   export let roleControls: [];
+  export let callFrom = 'Self';
+  export let showWorkList = true;
 
+  // Init view
   const view = new ViewStore(menuPath);
   const store = new Store(view);
-
-  view.tableName = 'assignment_role';
-  view.columns = ['id'];
+  view.tableName = 'role';
+  view.columns = ['id', 'code', 'name', 'sort'];
   view.fullControl = fullControl;
   view.roleControls = roleControls;
   view.loading$.next(true);
-  // view.loadTableMetaData();
+  view.loadTableMetaData();
+  store.loadOrgTree();
 
+  // ================= SUBSCRIPTION ========================
   const subscription = () => {
-    store.completeLoading$.subscribe((_) => {
+    store.completeLoading$.pipe(take(1)).subscribe((_) => {
       view.loading$.next(false);
     });
   };
+  // ================= //SUBSCRIPTION ========================
 
+  // ================= KOOK ========================
   onMount(() => {
-    store.loadOrgTree();
     subscription();
   });
+
+  export const getViewTitle = () => {
+    return view.getViewTitle();
+  };
+
+  export const getMenuInfo$ = () => {
+    return view.menuInfo$;
+  };
+  // ================= //KOOK ========================
 </script>
 
 <style lang="scss">
@@ -48,11 +64,12 @@
 {#if showTitle}
   <ViewTitle {view} />
 {/if}
-<TwoColumnView id={'mainLayout' + view.getViewName()} {showTitle} {menuPath}>
-  <div style="height: 100%;" slot="viewLeft">
-    <WorkList {view} {store} {menuPath} />
+<TwoColumnView minLeftPane={!showWorkList} id={'mainLayout' + view.getViewName()} {showTitle} {menuPath}>
+  <div style="height: 100%" slot="viewLeft">
+    <WorkList {view} {menuPath} {callFrom} on:callback />
   </div>
-  <div style="height: 100%;" slot="default">
-    <MainContent {view} {store} {menuPath} />
+
+  <div style="height: 100%" slot="default">
+    <MainContent {view} {menuPath} {store} />
   </div>
 </TwoColumnView>

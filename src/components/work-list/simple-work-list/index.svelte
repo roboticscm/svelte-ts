@@ -126,7 +126,7 @@
     on:selection
     {columns}
     {menuPath}
-    showRowNumber={false}
+    showRowNumber={true}
     data={$dataList$}
     id={tableId} />
 </div>

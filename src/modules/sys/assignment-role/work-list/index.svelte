@@ -13,7 +13,6 @@
   export let view: ViewStore;
   export let store: Store;
   export let menuPath: string;
-  export let tableId: string;
 
   const columns: TableColumn[] = [
     {
@@ -99,6 +98,12 @@
 
   // =========================EVENT HANDLE===========================
 
+  const onSelection = (event) => {
+    if (event.detail.length > 0) {
+      store.selectedUserRole$.next(event.detail[0]);
+    }
+  };
+
   const onLoadPage = (event) => {
     view.pageSize = event.detail.pageSize;
     view.page = event.detail.page;
@@ -134,12 +139,12 @@
     <SelectableTable
       startRowCount={(view.page - 1) * view.pageSize + 1}
       bind:this={tableRef}
-      on:selection
+      on:selection={onSelection}
       {columns}
       {menuPath}
       showRowNumber={false}
       data={$dataList$}
-      id={tableId} />
+      id={'userTableWorkList' + view.getViewName() + 'Id'} />
   </div>
   <div style="margin-top: 1px;">
     <Pagination

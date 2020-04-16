@@ -2,6 +2,8 @@ import { StringUtil } from '@/assets/js/string-util';
 
 export class CommonValidation {
   public static REQUIRED_VALUE = 'COMMON.MSG.REQUIRED_VALUE';
+  public static SELECT_AT_LEAST_ONE_LEAF_NODE = 'COMMON.MSG.LEASE_SELECT_AT_LEAST_ONE_LEAF_NODE';
+  public static SELECT_AT_LEAST_ONE_NODE = 'COMMON.MSG.LEASE_SELECT_AT_LEAST_ONE_NODE';
   public static isEmptyString(source: string) {
     if (!source) {
       return true;

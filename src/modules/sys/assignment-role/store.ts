@@ -5,7 +5,7 @@ import { BehaviorSubject, forkJoin, of } from 'rxjs';
 import { catchError, first, skip, zip } from 'rxjs/operators';
 import { User } from '@/model/user';
 import { OwnerOrg } from '@/modules/sys/owner-org/model';
-import { orgStore } from '@/store/org';
+import { OrgStore } from '@/store/org';
 import { HumanOrOrgStore } from '@/modules/sys/human-or-org/store';
 import { RoleStore } from '@/store/role';
 import { Role } from '@/modules/sys/role-detail/model';
@@ -16,6 +16,7 @@ export class Store {
   orgData$ = new BehaviorSubject<OwnerOrg[]>([]);
   userData$ = new BehaviorSubject<User[]>([]);
   roleData$ = new BehaviorSubject<Role[]>([]);
+  selectedUserRole$ = new BehaviorSubject<Role>(null);
 
   completeLoading$ = forkJoin([
     this.dataList$.pipe(
@@ -43,7 +44,7 @@ export class Store {
   }
 
   loadOrgTree() {
-    orgStore.sysGetOwnerOrgTree().subscribe((res) => {
+    OrgStore.sysGetOwnerOrgTree().subscribe((res) => {
       this.orgData$.next(res.data);
     });
   }

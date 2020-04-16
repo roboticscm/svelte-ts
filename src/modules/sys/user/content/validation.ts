@@ -16,5 +16,9 @@ export const validation = (form: any) => {
     error.password = CommonValidation.MIN_LENGTH.replace('%min%', App.MIN_PASSWORD_LENGTH + '');
   }
 
+  if (CommonValidation.isEmptyString(form.defaultOwnerOrgId)) {
+    error.defaultOwnerOrgId = CommonValidation.SELECT_AT_LEAST_ONE_LEAF_NODE;
+  }
+
   return error;
 };
