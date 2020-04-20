@@ -1,5 +1,5 @@
 import { ViewStore } from '@/store/view';
-import Form from '@/assets/js/form/form';
+import Form from '@/lib/js/form/form';
 import { tick } from 'svelte';
 import { fromEvent } from 'rxjs';
 import { concatMap, filter, map, tap } from 'rxjs/operators';

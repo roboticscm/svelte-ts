@@ -1,9 +1,9 @@
-import { RxHttp } from '@/assets/js/rx-http';
-import { getMethodNameInSnackCase } from '@/assets/js/util';
-import { Http } from '@/assets/js/http';
+import { RxHttp } from '@/lib/js/rx-http';
+import { getMethodNameInSnackCase } from '@/lib/js/util';
+import { Http } from '@/lib/js/http';
 import { Settings } from '@/model/settings';
 import { appStore } from '@/store/app';
-import { SJSON } from '@/assets/js/sjson';
+import { SJSON } from '@/lib/js/sjson';
 
 const BASE_URL = 'sys/user-settings/';
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   import Modal from '@/components/ui/modal/base/index.svelte';
-  import { T } from '@/assets/js/locale/locale';
+  import { T } from '@/lib/js/locale/locale';
 
   export let id: string;
   export let subTitle: string;

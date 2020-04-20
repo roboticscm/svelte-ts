@@ -1,7 +1,7 @@
 <script lang="ts">
   import Modal from '@/components/ui/modal/base/index.svelte';
-  import { T } from '@/assets/js/locale/locale';
-  import { SDate } from '@/assets/js/sdate';
+  import { T } from '@/lib/js/locale/locale';
+  import { SDate } from '@/lib/js/sdate';
 
   export let id: string;
   export let menuPath: string;

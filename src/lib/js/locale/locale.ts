@@ -1,5 +1,5 @@
 // @ts-ignore
-import { Http } from '@/assets/js/http';
+import { Http } from '@/lib/js/http';
 
 let I18N: any[] = [];
 
@@ -50,6 +50,11 @@ TYPE_GROUPS.map((item: any) => {
   SYS[item] = {};
 });
 
+export const QTT: any = {};
+TYPE_GROUPS.map((item: any) => {
+  QTT[item] = {};
+});
+
 const CATEGORIES_MAP = new Map([
   ['IMG', IMG],
   ['EMR', EMR],
@@ -57,6 +62,7 @@ const CATEGORIES_MAP = new Map([
   ['ACC', ACC],
   ['SYS', SYS],
   ['COMMON', COMMON],
+  ['QTT', QTT],
 ]);
 
 export const convertLocaleResource = function() {

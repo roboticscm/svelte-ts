@@ -4,27 +4,27 @@
   import { fromEvent, of, Observable, EMPTY } from 'rxjs';
   import { fromPromise } from 'rxjs/internal-compatibility';
 
-  import { T } from '@/assets/js/locale/locale';
-  import Form from '@/assets/js/form/form';
+  import { T } from '@/lib/js/locale/locale';
+  import Form from '@/lib/js/form/form';
   import { ViewStore } from '@/store/view';
   import { Language } from '../model';
-  import { SObject } from '@/assets/js/sobject';
-  import { apolloClient } from '@/assets/js/hasura-client';
+  import { SObject } from '@/lib/js/sobject';
+  import { apolloClient } from '@/lib/js/hasura-client';
   import { ButtonPressed } from '@/components/ui/button/types';
-  import { SDate } from '@/assets/js/sdate';
+  import { SDate } from '@/lib/js/sdate';
   import { humanOrOrgStore } from '@/modules/sys/human-or-org/store';
   import { ModalType } from '@/components/ui/modal/types';
   import { ButtonType, ButtonId } from '@/components/ui/button/types';
   import { validation } from './validation';
 
-  import { StringUtil } from '@/assets/js/string-util';
+  import { StringUtil } from '@/lib/js/string-util';
 
   import Button from '@/components/ui/button';
   import NumberInput from '@/components/ui/input/number-input';
   import TextInput from '@/components/ui/input/text-input';
   import SC from '@/components/set-common';
   import Snackbar from '@/components/ui/snackbar';
-  import { Debug } from '@/assets/js/debug';
+  import { Debug } from '@/lib/js/debug';
 
   // Props
   export let view: ViewStore;

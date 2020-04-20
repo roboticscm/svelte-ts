@@ -1,5 +1,5 @@
 // @ts-ignore
-import { Token } from '@/assets/js/constants';
+import { Token } from '@/lib/js/constants';
 import axios from 'axios';
 
 export const getBrowserID = (): string => {

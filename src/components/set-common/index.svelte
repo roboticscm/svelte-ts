@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { T } from '@/assets/js/locale/locale';
+  import { T } from '@/lib/js/locale/locale';
   import { ModalType } from '@/components/ui/modal/types';
 
   import ConfirmModal from '@/components/ui/modal/base';

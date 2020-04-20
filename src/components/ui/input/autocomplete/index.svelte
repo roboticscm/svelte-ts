@@ -1,17 +1,16 @@
 <script lang="ts">
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
-  import { SObject } from '@/assets/js/sobject';
-  import { markStringSearch } from '@/assets/js/util';
-  import { StringUtil } from '@/assets/js/string-util';
-  import { Debug } from '@/assets/js/debug';
+  import { SObject } from '@/lib/js/sobject';
+  import { markStringSearch } from '@/lib/js/util';
+  import { StringUtil } from '@/lib/js/string-util';
+  import { Debug } from '@/lib/js/debug';
   import { TableColumn } from '@/model/base';
   import ProgressBar from '@/components/ui/progress-bar';
   import { BehaviorSubject, Observable } from 'rxjs';
   import { map, switchMap, tap, mergeAll, filter, distinctUntilChanged } from 'rxjs/operators';
   import { Store } from '@/modules/sys/locale-resource/store';
-  import { fromEvents } from '@/assets/js/rx';
+  import { fromEvents } from '@/lib/js/rx';
   import SelectableTable from '@/components/ui/selectable-table';
-  import HandsonTable from '@/components/ui/handson-table';
   import { settingsStore } from '@/store/settings';
 
   export let columns: TableColumn[];
@@ -72,10 +71,6 @@
     } else if (event.code === 'ArrowDown') {
       return false;
     }
-
-    // if (event.code && !event.code.startsWith('Key') && event.code !== 'Backspace') {
-    //   return false;
-    // }
 
     if (event.code === 'Enter') {
       return false;

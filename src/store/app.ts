@@ -1,14 +1,14 @@
-import { RxHttp } from '@/assets/js/rx-http';
+import { RxHttp } from '@/lib/js/rx-http';
 import { BehaviorSubject } from 'rxjs';
 import { User } from '@/model/user';
 import { settingsStore } from '@/store/settings';
 import { HumanOrOrgStore, humanOrOrgStore } from '@/modules/sys/human-or-org/store';
-import { getMethodNameInSnackCase } from '@/assets/js/util';
+import { getMethodNameInSnackCase } from '@/lib/js/util';
 import { NavBarConfig } from '@/model/nav-bar-config';
 import { Menu, RoleMenu } from '@/modules/sys/menu/model';
 import { take } from 'rxjs/operators';
-import { T } from '@/assets/js/locale/locale';
-import { StringUtil } from '@/assets/js/string-util';
+import { T } from '@/lib/js/locale/locale';
+import { StringUtil } from '@/lib/js/string-util';
 
 class AppStore {
   user$ = new BehaviorSubject<User>(null);

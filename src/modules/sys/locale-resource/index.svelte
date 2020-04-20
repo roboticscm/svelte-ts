@@ -3,7 +3,7 @@
   import { onMount } from 'svelte';
   import { take } from 'rxjs/operators';
 
-  import { App } from '@/assets/js/constants';
+  import { App } from '@/lib/js/constants';
   import { ViewStore } from '@/store/view';
   import MainContent from './content/index.svelte';
   import ViewTitle from '@/components/layout/view-title';

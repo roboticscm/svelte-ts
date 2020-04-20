@@ -76,6 +76,7 @@
     "sirv-cli": "^0.4.5",
     "split-grid": "^1.0.9",
     "subscriptions-transport-ws": "^0.9.16",
-    "svelte-guard-history-router": "^1.1.16"
+    "svelte-guard-history-router": "^1.1.16",
+    "uuid": "^7.0.3"
   }
 }

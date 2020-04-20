@@ -1,6 +1,6 @@
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte';
-  import { fromEvents } from '@/assets/js/rx';
+  import { fromEvents } from '@/lib/js/rx';
   import { distinctUntilChanged, switchMap } from 'rxjs/operators';
   export let placeholder = '';
   export let action: any = undefined;

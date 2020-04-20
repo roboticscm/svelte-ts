@@ -136,9 +136,11 @@ module.exports = {
   devServer: {
     contentBase: 'public',
     host: '0.0.0.0',
+    port: 80,
     hot: true,
     overlay: true,
     historyApiFallback: true,
+    disableHostCheck: true,
     headers: {
       'Access-Control-Allow-Origin': '*',
     },

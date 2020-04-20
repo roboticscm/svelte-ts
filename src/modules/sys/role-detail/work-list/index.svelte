@@ -3,7 +3,7 @@
   import TreeView from '@/components/ui/tree-view';
   import { ViewStore } from '@/store/view';
   import { Store } from '../store';
-  import { T } from '@/assets/js/locale/locale';
+  import { T } from '@/lib/js/locale/locale';
 
   export let view: ViewStore;
   export let store: Store;
@@ -11,6 +11,7 @@
   let roleTreeRef: any;
 
   const { isReadOnlyMode$ } = view;
+  // @ts-ignore
   const { roles$, needSelectRole$ } = store;
 
   const reload = () => {
@@ -53,11 +54,12 @@
       name: treeNode.name,
     });
     store.loadRoleDetail(orgId, roleId);
-    store.loadFilterOrgTree(roleId);
+    store.loadFilterOrgTree(orgId);
   };
 
   // @ts-ignore
   $: if ($needSelectRole$) {
+    // @ts-ignore
     roleTreeRef.selectNodeById($needSelectRole$, true);
   }
 </script>

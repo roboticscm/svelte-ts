@@ -3,7 +3,7 @@
   import TreeView from '@/components/ui/tree-view';
   import { ViewStore } from '@/store/view';
   import { Store } from '../store';
-  import { T } from '@/assets/js/locale/locale';
+  import { T } from '@/lib/js/locale/locale';
 
   export let view: ViewStore;
   export let store: Store;

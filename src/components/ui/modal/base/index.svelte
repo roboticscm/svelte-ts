@@ -4,16 +4,16 @@
   import { ModalType, ModalId } from '@/components/ui/modal/types';
   import { createModal } from '../use-modal';
   import { onMount, createEventDispatcher, onDestroy } from 'svelte';
-  import { StringUtil } from '@/assets/js/string-util';
-  import { T } from '@/assets/js/locale/locale';
+  import { StringUtil } from '@/lib/js/string-util';
+  import { T } from '@/lib/js/locale/locale';
   import PasswordInput from '@/components/ui/input/password-input/index.svelte';
   import TextInput from '@/components/ui/input/text-input/index.svelte';
   import { appStore } from '@/store/app';
-  import Form from '@/assets/js/form/form';
-  import { getMethodNameInSnackCase } from '@/assets/js/util';
+  import Form from '@/lib/js/form/form';
+  import { getMethodNameInSnackCase } from '@/lib/js/util';
   import { catchError } from 'rxjs/operators';
   import { of } from 'rxjs';
-  import { App } from '@/assets/js/constants';
+  import { App } from '@/lib/js/constants';
 
   const dispatch = createEventDispatcher();
   export let id: string;

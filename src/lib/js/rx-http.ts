@@ -1,7 +1,7 @@
 // @ts-ignore
 import Axios from 'axios-observable';
 import { API } from './constants';
-import { SJSON } from '@/assets/js/sjson';
+import { SJSON } from '@/lib/js/sjson';
 
 // @ts-ignore
 import { Method } from 'axios';

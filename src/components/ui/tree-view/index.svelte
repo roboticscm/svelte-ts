@@ -38,8 +38,8 @@
   };
 
   export const checkNodeById = (id: any, fireClickEvent = false) => {
-    for(let row of data) {
-      if(row.id && id && row.id.toString() === id.toString()) {
+    for (let row of data) {
+      if (row.id && id && row.id.toString() === id.toString()) {
         row.checked = true;
       } else {
         row.checked = false;

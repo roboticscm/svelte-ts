@@ -1,6 +1,6 @@
 <script lang="ts">
   import { menuStore } from '@/store/menu';
-  import { App } from '@/assets/js/constants';
+  import { App } from '@/lib/js/constants';
   import { appStore } from '@/store/app';
   import { RoleMenu } from '@/modules/sys/menu/model';
   import { ViewStore } from '@/store/view';

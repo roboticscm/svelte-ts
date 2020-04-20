@@ -1,6 +1,7 @@
 import { UrlUtil } from './url-util';
 import { StringUtil } from './string-util';
 import { Browser } from './browser';
+import { v4 as uuidv4 } from 'uuid';
 
 export const getMethodNameInSnackCase = () => {
   let err: any = new Error();
@@ -65,5 +66,5 @@ export const markStringSearch = (source: string, search: string, removeAccent: b
 };
 
 export const genUUID = () => {
-  return `${Date.now()}`;
+  return uuidv4();
 };

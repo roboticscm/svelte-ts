@@ -1,5 +1,5 @@
-import { RxHttp } from '@/assets/js/rx-http';
-import { getMethodNameInSnackCase } from '@/assets/js/util';
+import { RxHttp } from '@/lib/js/rx-http';
+import { getMethodNameInSnackCase } from '@/lib/js/util';
 
 const BASE_URL = 'sys/role/';
 export class RoleStore {

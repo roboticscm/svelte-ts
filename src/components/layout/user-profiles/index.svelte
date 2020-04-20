@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { logout } from '@/assets/js/security';
-  import { API } from '@/assets/js/constants';
-  import { T } from '@/assets/js/locale/locale';
+  import { logout } from '@/lib/js/security';
+  import { API } from '@/lib/js/constants';
+  import { T } from '@/lib/js/locale/locale';
   import { appStore } from '@/store/app';
 
   // import ThemeConfigModal from '@/components/modal/theme-config-modal/index.vue';
@@ -12,7 +12,7 @@
   $: user = $user$;
 
   const onLogout = (event) => {
-    logout(API.HOST_URL);
+    logout(API.API_SERVER);
   };
 
   const showUserProfiles = () => {

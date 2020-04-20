@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { App } from '@/assets/js/constants';
-  import { T } from '@/assets/js/locale/locale';
+  import { App } from '@/lib/js/constants';
+  import { T } from '@/lib/js/locale/locale';
   import { settingsStore } from '@/store/settings';
   import { menuStore } from '@/store/menu';
   import { appStore } from '@/store/app';

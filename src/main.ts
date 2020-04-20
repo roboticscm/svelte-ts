@@ -3,19 +3,18 @@ import jQuery from 'jquery';
 import 'jquery-ui';
 (window as any).$ = jQuery;
 (window as any).jQuery = jQuery;
-import '@/assets/js/vendor/jquery.easyui.min';
 import '../../sass/sass/index.scss';
-import '@/assets/js/vendor/jquery.ztree.all';
+import '@/lib/js/vendor/jquery.ztree.all';
 
 import App from '@/App.svelte';
 
-import Color, { getThemeColors } from '@/assets/js/color';
-import { Debug } from '@/assets/js/debug';
-import { UrlUtil } from '@/assets/js/url-util';
-import { setHeader, getBrowserID, loginSuccess, logout } from './assets/js/security';
-import { Token, API } from '@/assets/js/constants';
+import Color, { getThemeColors } from '@/lib/js/color';
+import { Debug } from '@/lib/js/debug';
+import { UrlUtil } from '@/lib/js/url-util';
+import { setHeader, getBrowserID, loginSuccess, logout } from '@/lib/js/security';
+import { Token, API } from '@/lib/js/constants';
 import { menuStore } from '@/store/menu';
-import { sysGetLocaleResourceListByCompanyIdAndLocale } from './assets/js/locale/locale';
+import { sysGetLocaleResourceListByCompanyIdAndLocale } from '@/lib/js/locale/locale';
 import { appStore } from '@/store/app';
 import { take } from 'rxjs/operators';
 
@@ -61,7 +60,7 @@ const startApp = () => {
   const companyId = UrlUtil.getCompanyId();
   const locale = UrlUtil.getLanguage();
   if (!companyId) {
-    logout(API.HOST_URL);
+    logout(API.API_SERVER);
   }
   sysGetLocaleResourceListByCompanyIdAndLocale(companyId, locale)
     .then((_: any) => {
@@ -92,7 +91,7 @@ const startApp = () => {
           loginSuccess(localStorage.getItem(Token.TOKEN_KEY)!);
           loadMenuAndUserSettings(companyId);
         } else {
-          logout(API.HOST_URL);
+          logout(API.API_SERVER);
         }
       }
     })

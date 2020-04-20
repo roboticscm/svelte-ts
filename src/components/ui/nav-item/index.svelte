@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { T } from '@/assets/js/locale/locale';
+  import { T } from '@/lib/js/locale/locale';
   import { settingsStore } from '@/store/settings';
 
   export let router: any;

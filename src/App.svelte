@@ -9,7 +9,7 @@
   import UserProfiles from '@/components/layout/user-profiles';
   import HistoryNavBar from '@/components/layout/history-nav-bar';
   import SearchBar from '@/components/ui/input/search-bar';
-  import { T } from '@/assets/js/locale/locale';
+  import { T } from '@/lib/js/locale/locale';
   import RouterView from '@/components/ui/router-view';
   import { skip, take } from 'rxjs/operators';
   let routerView: any;

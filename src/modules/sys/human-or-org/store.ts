@@ -1,6 +1,6 @@
-import { Http } from '@/assets/js/http';
-import { getMethodNameInSnackCase } from '@/assets/js/util';
-import { RxHttp } from '@/assets/js/rx-http';
+import { Http } from '@/lib/js/http';
+import { getMethodNameInSnackCase } from '@/lib/js/util';
+import { RxHttp } from '@/lib/js/rx-http';
 
 const BASE_URL = 'sys/human-or-org/';
 

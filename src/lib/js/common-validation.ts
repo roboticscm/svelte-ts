@@ -1,4 +1,4 @@
-import { StringUtil } from '@/assets/js/string-util';
+import { StringUtil } from '@/lib/js/string-util';
 
 export class CommonValidation {
   public static REQUIRED_VALUE = 'COMMON.MSG.REQUIRED_VALUE';

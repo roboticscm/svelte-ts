@@ -1,5 +1,5 @@
-import { Window } from '@/assets/js/window';
-import { UrlUtil } from '@/assets/js/url-util';
+import { Window } from '@/lib/js/window';
+import { UrlUtil } from '@/lib/js/url-util';
 import { Settings } from '@/model/settings';
 import { settingsStore } from '@/store/settings';
 import { ModalType } from '@/components/ui/modal/types';

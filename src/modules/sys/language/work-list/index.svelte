@@ -4,7 +4,7 @@
   import { fromEvent, forkJoin, Observable, Subscription } from 'rxjs';
   import { switchMap, tap, filter } from 'rxjs/operators';
   import SimpleWorkList from '@/components/work-list/simple-work-list';
-  import { SObject } from '@/assets/js/sobject';
+  import { SObject } from '@/lib/js/sobject';
 
   // Props
   export let view: ViewStore;

@@ -12,8 +12,8 @@ export class SJSON {
   //   });
   // };
   public static stringify = (obj: any) => {
-      return JSONbig.stringify(obj);
-  }
+    return JSONbig.stringify(obj);
+  };
 
   // public static parse = (json: string) => {
   //     return JSON.parse(json, (key, value) => {

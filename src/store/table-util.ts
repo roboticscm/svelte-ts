@@ -1,6 +1,6 @@
-import { RxHttp } from '@/assets/js/rx-http';
-import { Http } from '@/assets/js/http';
-import { getMethodNameInSnackCase } from '@/assets/js/util';
+import { RxHttp } from '@/lib/js/rx-http';
+import { Http } from '@/lib/js/http';
+import { getMethodNameInSnackCase } from '@/lib/js/util';
 import { SimpleListParam } from '@/model/base';
 
 const BASE_URL = 'sys/table-util/';

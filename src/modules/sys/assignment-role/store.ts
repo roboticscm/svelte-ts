@@ -1,6 +1,6 @@
 import { ViewStore } from '@/store/view';
-import { RxHttp } from '@/assets/js/rx-http';
-import { getMethodNameInSnackCase } from '@/assets/js/util';
+import { RxHttp } from '@/lib/js/rx-http';
+import { getMethodNameInSnackCase } from '@/lib/js/util';
 import { BehaviorSubject, forkJoin, of } from 'rxjs';
 import { catchError, first, skip, zip } from 'rxjs/operators';
 import { User } from '@/model/user';

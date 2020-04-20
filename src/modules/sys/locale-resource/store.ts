@@ -1,12 +1,12 @@
 import { ViewStore } from '@/store/view';
-import { getMethodNameInSnackCase } from '@/assets/js/util';
-import { RxHttp } from '@/assets/js/rx-http';
+import { getMethodNameInSnackCase } from '@/lib/js/util';
+import { RxHttp } from '@/lib/js/rx-http';
 import { take } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
 import { Language } from '@/modules/sys/language/model';
 import OwnerOrgStore from '@/modules/sys/owner-org/store';
 import { OwnerOrg } from '@/modules/sys/owner-org/model';
-import { Http } from '@/assets/js/http';
+import { Http } from '@/lib/js/http';
 
 const BASE_URL = 'sys/locale-resource/';
 

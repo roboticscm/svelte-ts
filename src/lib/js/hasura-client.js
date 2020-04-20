@@ -4,7 +4,7 @@ import { WebSocketLink } from 'apollo-link-ws';
 import { getMainDefinition } from 'apollo-utilities';
 import ApolloClient from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
-import { Hasura } from '@/assets/js/constants';
+import { Hasura } from '@/lib/js/constants';
 
 // Create an http link:
 const httpLink = new HttpLink({

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { menuStore, historyMenuStore } from '@/store/menu';
   import { appStore } from '@/store/app';
-  import { Debug } from '@/assets/js/debug';
+  import { Debug } from '@/lib/js/debug';
   import RouterLink from '@/components/ui/router-link/index.svelte';
   import { settingsStore } from '@/store/settings';
   import Page from 'page';

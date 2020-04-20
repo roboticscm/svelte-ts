@@ -1,4 +1,4 @@
-import { SJSON } from '@/assets/js/sjson';
+import { SJSON } from '@/lib/js/sjson';
 // @ts-ignore
 const axios = require('axios');
 import { API } from './constants';

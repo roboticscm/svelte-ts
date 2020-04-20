@@ -5,14 +5,16 @@
   import { tick, createEventDispatcher } from 'svelte';
   import { onMount } from 'svelte';
   import { settingsStore } from '@/store/settings';
-  import { T } from '@/assets/js/locale/locale';
+  import { T } from '@/lib/js/locale/locale';
+  import {genUUID} from '@/lib/js/util';
+
 
   const dispatch = createEventDispatcher();
-  // import { SObject } from '@/assets/js/sobject';
+  // import { SObject } from '@/lib/js/sobject';
   // require('jquery-ui');
   // require('jquery-ui/ui/widgets/sortable');
 
-  export let id: string;
+  export let id: string = genUUID();
   export let showHeader = true;
   export let columns: TableColumn[];
   export let data: any[];
@@ -22,6 +24,7 @@
 
   let startRow: any = null;
   let selectedRows: number[] = [];
+  let tableRef: any;
 
   onMount(() => {
     loadSettings();
@@ -35,13 +38,14 @@
   };
 
   const getTableId = () => {
-    const jId: any = window['$']('#' + id);
+    // const jId: any = window['$']('#' + id);
+    const jId: any = window['$'](tableRef);
     return jId;
   };
 
   const getFirstRowEle = () => {
     return document.querySelector(`#${id} tbody tr :first-child`);
-  };
+  }
   const applyTable = () => {
     // selectedRows = [];
 
@@ -259,7 +263,7 @@
     <slot name="toggleSelection" {toggleSelection} />
   </span>
 
-  <table on:click|stopPropagation={onClick} {id} class="table">
+  <table bind:this={tableRef} on:click|stopPropagation={onClick} {id} class="table">
     {#if showHeader}
       <thead>
         <tr on:mouseup={onMouseUpHeader}>

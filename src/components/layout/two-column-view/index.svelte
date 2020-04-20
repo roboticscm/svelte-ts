@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import Split from 'split-grid';
-  import { GUTTER_WIDTH } from '@/assets/js/constants';
+  import { GUTTER_WIDTH } from '@/lib/js/constants';
   import { settingsStore } from '@/store/settings';
   import { Settings } from '@/model/settings';
 

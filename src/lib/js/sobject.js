@@ -1,6 +1,6 @@
-import { StringUtil } from '@/assets/js/string-util';
+import { StringUtil } from '@/lib/js/string-util';
 
-import { SJSON } from '@/assets/js/sjson';
+import { SJSON } from '@/lib/js/sjson';
 
 export class SObject {
   static clone(obj) {

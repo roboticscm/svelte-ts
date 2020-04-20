@@ -1,6 +1,6 @@
-import { Http } from '@/assets/js/http';
-import { getMethodNameInSnackCase } from '@/assets/js/util';
-import { SJSON } from '@/assets/js/sjson';
+import { Http } from '@/lib/js/http';
+import { getMethodNameInSnackCase } from '@/lib/js/util';
+import { SJSON } from '@/lib/js/sjson';
 
 const BASE_URL = 'sys/menu-control/';
 

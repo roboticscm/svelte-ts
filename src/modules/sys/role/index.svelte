@@ -3,7 +3,7 @@
   import { onMount } from 'svelte';
   import { take } from 'rxjs/operators';
 
-  import { App } from '@/assets/js/constants';
+  import { App } from '@/lib/js/constants';
   import { ViewStore } from '@/store/view';
 
   import TwoColumnView from '@/components/layout/two-column-view';
@@ -11,7 +11,7 @@
   import MainContent from './content/index.svelte';
   import ViewTitle from '@/components/layout/view-title';
   import ProgressBar from '@/components/ui/progress-bar';
-  import {Store} from "./store";
+  import { Store } from './store';
 
   // Props
   export let showTitle = true;

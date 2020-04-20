@@ -2,7 +2,7 @@
   import { onMount, tick } from 'svelte';
   import Button from '@/components/ui/button';
   import ViewWrapperModal from '@/components/modal/view-wrapper';
-  import { T } from '@/assets/js/locale/locale';
+  import { T } from '@/lib/js/locale/locale';
   import { ViewStore } from '@/store/view';
   import { roleControlStore } from '@/store/role-control';
   import { appStore } from '@/store/app';
@@ -13,14 +13,14 @@
   import Autocomplete from '@/components/ui/input/autocomplete';
   import { Store } from '../store';
   import { settingsStore } from '@/store/settings';
-  import { Debug } from '@/assets/js/debug';
+  import { Debug } from '@/lib/js/debug';
   import QuickSearch from '@/components/ui/input/quick-search';
   import { TableColumn } from '@/model/base';
   import ProgressBar from '@/components/ui/progress-bar';
-  import { StringUtil } from '@/assets/js/string-util';
-  import { SObject } from '@/assets/js/sobject';
-  import { fromEvents } from '@/assets/js/rx';
-  import { markStringSearch } from '@/assets/js/util';
+  import { StringUtil } from '@/lib/js/string-util';
+  import { SObject } from '@/lib/js/sobject';
+  import { fromEvents } from '@/lib/js/rx';
+  import { markStringSearch } from '@/lib/js/util';
   import Pagination from '@/components/ui/pagination';
 
   import { ModalType } from '@/components/ui/modal/types';

@@ -1,5 +1,5 @@
-import { CommonValidation } from '@/assets/js/common-validation';
-import { App } from '@/assets/js/constants';
+import { CommonValidation } from '@/lib/js/common-validation';
+import { App } from '@/lib/js/constants';
 
 export const validation = (form: any) => {
   const error: any = {};

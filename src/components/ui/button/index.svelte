@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { T } from '@/assets/js/locale/locale';
-  import { StringUtil } from '@/assets/js/string-util';
+  import { T } from '@/lib/js/locale/locale';
+  import { StringUtil } from '@/lib/js/string-util';
   import { ButtonType, ButtonId } from './types';
-  import { genUUID } from '@/assets/js/util';
+  import { genUUID } from '@/lib/js/util';
 
   export let id: string = undefined;
   export let type = 'button';

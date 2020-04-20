@@ -1,11 +1,11 @@
-import { orgStore } from '@/store/org';
+import { OrgStore, orgStore } from '@/store/org';
 import { catchError, first, skip, take, withLatestFrom, zipAll } from 'rxjs/operators';
 import { BehaviorSubject, forkJoin, of, zip } from 'rxjs';
 import { ViewStore } from '@/store/view';
 import { RoleStore } from '@/store/role';
 import { Role } from './model';
-import { RxHttp } from '@/assets/js/rx-http';
-import { getMethodNameInSnackCase } from '@/assets/js/util';
+import { RxHttp } from '@/lib/js/rx-http';
+import { getMethodNameInSnackCase } from '@/lib/js/util';
 import { OwnerOrg } from '@/modules/sys/owner-org/model';
 
 const BASE_URL = 'sys/role-detail/';
@@ -39,8 +39,8 @@ export class Store {
     });
   };
 
-  loadFilterOrgTree = (roleId: string) => {
-    orgStore.sysGetHumanOrgTree(null).subscribe((res: any) => {
+  loadFilterOrgTree = (parentId: string = undefined) => {
+    OrgStore.sysGetOwnerOrgTree(parentId).subscribe((res: any) => {
       this.filterOrg$.next(res.data);
     });
   };

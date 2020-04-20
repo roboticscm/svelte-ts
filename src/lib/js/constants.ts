@@ -3,29 +3,30 @@ export class Token {
   static BLOWFISH_ENCRYPTION_KEY = '12345678910';
 }
 
-export class API {
-  static HOST_URL = 'http://localhost:8182';
-  // static HOST_URL = 'http://172.16.30.12:8182';
-  // static HOST_URL = 'http://192.168.10.3:8182';
-
-  static BASE_URL = `${API.HOST_URL}/api/`;
+export class Protocol {
+  static HTTP = 'http';
+  static WS = 'ws';
 }
 
 export class Proxy {
   // static HOST_URL = '172.26.22.61:8200';
-
-  static HOST_URL = 'localhost:8081';
+  // static HOST_URL = 'localhost:8081';
 }
 
-export class Net {
-  static PROTOCOL = 'http';
+export class API {
+  static API_SERVER = `${Protocol.HTTP}://www.frontend.com.vn:7581`;
+
+  static BASE_URL = `${API.API_SERVER}/api/`;
 }
 
 export const GUTTER_WIDTH = 10; //pixel
 
 export class Hasura {
-  static HTTP_URL = 'http://localhost:9999/v1/graphql';
-  static WS_URL = 'ws://localhost:9999/v1/graphql';
+  static HTTP_URL = `${Protocol.HTTP}://www.frontend.com.vn:7580/v1/graphql`;
+  static WS_URL = `${Protocol.WS}://www.frontend.com.vn:7580/v1/graphql`;
+
+  // static HTTP_URL = 'http://localhost:9999/v1/graphql';
+  // static WS_URL = 'ws://localhost:9999/v1/graphql';
 }
 
 export class App {
@@ -37,4 +38,6 @@ export class App {
   static SNACKBAR_TIMEOUT = 3000;
   static PROGRESS_BAR = '<i class="fa fa-spinner fa-spin" />';
   static MIN_PASSWORD_LENGTH = 6;
+  static  MAX_HEADER_HEIGHT = 100;
+  static  MIN_HEADER_HEIGHT = 30;
 }

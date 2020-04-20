@@ -6,15 +6,15 @@
   import { ViewStore } from '@/store/view';
   import { Store } from '../store';
   import { userColumns, roleColumns, applyAssignedRole } from './helper';
-  import { T } from '@/assets/js/locale/locale';
+  import { T } from '@/lib/js/locale/locale';
   import Button from '@/components/ui/button';
   import { ButtonType, ButtonId, ButtonPressed } from '@/components/ui/button/types';
-  import { catchError, concatMap, switchMap, take, filter} from 'rxjs/operators';
+  import { catchError, concatMap, switchMap, take, filter } from 'rxjs/operators';
   import SC from '@/components/set-common';
-  import {fromEvent, zip, of, Observable} from 'rxjs';
-  import { SObject } from '@/assets/js/sobject';
+  import { fromEvent, zip, of, Observable } from 'rxjs';
+  import { SObject } from '@/lib/js/sobject';
   import { fromPromise } from 'rxjs/internal-compatibility';
-  import { Debug } from '@/assets/js/debug';
+  import { Debug } from '@/lib/js/debug';
 
   export let view: ViewStore;
   export let store: Store;

@@ -2,10 +2,10 @@
   import { routerLinkStore } from './store';
   import { createEventDispatcher } from 'svelte';
   import { take, skip } from 'rxjs/operators';
-  import { T } from '@/assets/js/locale/locale';
+  import { T } from '@/lib/js/locale/locale';
   import Page from 'page';
   import { menuStore } from '@/store/menu';
-  import { StringUtil } from '../../../assets/js/string-util';
+  import { StringUtil } from '@/lib/js/string-util';
 
   // @ts-ignore
   const { currentComponentUri$ } = routerLinkStore;

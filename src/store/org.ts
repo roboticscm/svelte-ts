@@ -1,5 +1,5 @@
-import { RxHttp } from '@/assets/js/rx-http';
-import { getMethodNameInSnackCase } from '@/assets/js/util';
+import { RxHttp } from '@/lib/js/rx-http';
+import { getMethodNameInSnackCase } from '@/lib/js/util';
 
 const BASE_URL = 'sys/owner-org/';
 export class OrgStore {
@@ -38,8 +38,10 @@ export class OrgStore {
     });
   }
 
-  static sysGetOwnerOrgTree() {
-    return RxHttp.get(`${BASE_URL}${getMethodNameInSnackCase()}`);
+  static sysGetOwnerOrgTree(parentId: string = undefined) {
+    return RxHttp.get(`${BASE_URL}${getMethodNameInSnackCase()}`, {
+      parentId,
+    });
   }
 }
 

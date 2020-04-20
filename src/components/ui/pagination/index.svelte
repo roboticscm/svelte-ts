@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { T } from '@/assets/js/locale/locale';
+  import { T } from '@/lib/js/locale/locale';
   import { settingsStore } from '@/store/settings';
   import { createEventDispatcher } from 'svelte';
-  import { App } from '@/assets/js/constants';
+  import { App } from '@/lib/js/constants';
 
   const dispatch = createEventDispatcher();
 

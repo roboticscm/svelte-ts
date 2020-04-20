@@ -1,11 +1,11 @@
-import { RxHttp } from '@/assets/js/rx-http';
-import { Http } from '@/assets/js/http';
+import { RxHttp } from '@/lib/js/rx-http';
+import { Http } from '@/lib/js/http';
 import { BehaviorSubject } from 'rxjs';
 import { skip, take } from 'rxjs/operators';
 import { HistoryMenu, RoleMenu } from '@/modules/sys/menu/model';
-import { getMethodNameInSnackCase } from '@/assets/js/util';
-import { Debug } from '@/assets/js/debug';
-import { SJSON } from '@/assets/js/sjson';
+import { getMethodNameInSnackCase } from '@/lib/js/util';
+import { Debug } from '@/lib/js/debug';
+import { SJSON } from '@/lib/js/sjson';
 
 const BASE_URL = 'sys/menu/';
 class MenuStore {

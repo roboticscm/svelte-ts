@@ -2,10 +2,10 @@
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
   import jexcel from 'jexcel';
   import { Settings } from '@/model/settings';
-  import { UrlUtil } from '@/assets/js/url-util';
-  import { Debug } from '@/assets/js/debug';
+  import { UrlUtil } from '@/lib/js/url-util';
+  import { Debug } from '@/lib/js/debug';
   import { settingsStore } from '@/store/settings';
-  import { T } from '@/assets/js/locale/locale';
+  import { T } from '@/lib/js/locale/locale';
   const dispatch = createEventDispatcher();
 
   export let id: string;

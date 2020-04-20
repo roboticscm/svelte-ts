@@ -2,8 +2,8 @@
   import { onMount, onDestroy, SvelteComponent, createEventDispatcher } from 'svelte';
   import { fromEvent, Subscription } from 'rxjs';
   import { take } from 'rxjs/operators';
-  import { apolloClient } from '@/assets/js/hasura-client';
-  import { App } from '@/assets/js/constants';
+  import { apolloClient } from '@/lib/js/hasura-client';
+  import { App } from '@/lib/js/constants';
   import { ViewStore } from '@/store/view';
 
   import Pagination from '@/components/ui/pagination/index.svelte';

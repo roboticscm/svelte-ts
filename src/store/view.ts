@@ -1,21 +1,21 @@
 import { menuStore } from '@/store/menu';
-import { T } from '@/assets/js/locale/locale';
-import { StringUtil } from '@/assets/js/string-util';
+import { T } from '@/lib/js/locale/locale';
+import { StringUtil } from '@/lib/js/string-util';
 import { BehaviorSubject, forkJoin, fromEvent, Observable, of, Subscription } from 'rxjs';
 import { tableUtilStore } from '@/store/table-util';
 import { catchError, concatMap, filter, first, skip, switchMap, take } from 'rxjs/operators';
-import { App } from '@/assets/js/constants';
+import { App } from '@/lib/js/constants';
 import { AxiosResponse } from 'axios';
 import { PayloadRes, RoleControl } from '@/model/base';
 import gql from 'graphql-tag';
-import { Debug } from '@/assets/js/debug';
+import { Debug } from '@/lib/js/debug';
 import { ButtonId, ButtonPressed } from '@/components/ui/button/types';
 import { menuControlStore } from '@/store/menu-control';
-import { getDiffFieldsObject, SObject } from '@/assets/js/sobject';
-import { SDate } from '@/assets/js/sdate';
+import { getDiffFieldsObject, SObject } from '@/lib/js/sobject';
+import { SDate } from '@/lib/js/sdate';
 import { Language } from '@/modules/sys/language/model';
 import { fromPromise } from 'rxjs/internal-compatibility';
-import Form from '@/assets/js/form/form';
+import Form from '@/lib/js/form/form';
 import { Menu } from '@/modules/sys/menu/model';
 import { HumanOrOrgStore, humanOrOrgStore } from '@/modules/sys/human-or-org/store';
 
@@ -79,11 +79,11 @@ export class ViewStore {
   };
 
   getViewTitle = () => {
-    return T(`COMMON.MENU.${this.getMenuNameFromPath().toUpperCase()}`);
+    return T(`COMMON.MENU.${StringUtil.replaceAll(this.getMenuNameFromPath().toUpperCase(), '-', '_')}`);
   };
 
   getViewName = () => {
-    return StringUtil.toTitleCase(this.getMenuNameFromPath());
+    return StringUtil.replaceAll(StringUtil.toTitleCase(StringUtil.replaceAll(this.getMenuNameFromPath(), '-', '')), ' ', '');
   };
 
   getSimpleList = (textSearch = '') => {

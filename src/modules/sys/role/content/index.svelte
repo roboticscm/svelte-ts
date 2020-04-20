@@ -4,29 +4,29 @@
   import { fromEvent, of, Observable, EMPTY } from 'rxjs';
   import { fromPromise } from 'rxjs/internal-compatibility';
 
-  import { T } from '@/assets/js/locale/locale';
-  import Form from '@/assets/js/form/form';
+  import { T } from '@/lib/js/locale/locale';
+  import Form from '@/lib/js/form/form';
   import { ViewStore } from '@/store/view';
   import { Role } from '../model';
-  import { SObject } from '@/assets/js/sobject';
-  import { apolloClient } from '@/assets/js/hasura-client';
+  import { SObject } from '@/lib/js/sobject';
+  import { apolloClient } from '@/lib/js/hasura-client';
   import { ButtonPressed } from '@/components/ui/button/types';
-  import { SDate } from '@/assets/js/sdate';
+  import { SDate } from '@/lib/js/sdate';
   import { humanOrOrgStore } from '@/modules/sys/human-or-org/store';
   import { ModalType } from '@/components/ui/modal/types';
   import { ButtonType, ButtonId } from '@/components/ui/button/types';
   import TreeView from '@/components/ui/tree-view';
   import { validation } from './validation';
 
-  import { StringUtil } from '@/assets/js/string-util';
+  import { StringUtil } from '@/lib/js/string-util';
 
   import Button from '@/components/ui/button';
   import NumberInput from '@/components/ui/input/number-input';
   import TextInput from '@/components/ui/input/text-input';
   import SC from '@/components/set-common';
   import Snackbar from '@/components/ui/snackbar';
-  import { Debug } from '@/assets/js/debug';
-  import {Store} from "../store";
+  import { Debug } from '@/lib/js/debug';
+  import { Store } from '../store';
 
   // Props
   export let view: ViewStore;
@@ -38,7 +38,7 @@
   const { selectedData$, hasAnyDeletedRecord$, deleteRunning$, saveRunning$, isReadOnlyMode$, isUpdateMode$ } = view;
 
   // @ts-ignore
-  const {orgData$} = store;
+  const { orgData$ } = store;
 
   // Refs
   let codeRef: any;
@@ -130,8 +130,8 @@
 
   const onCheckOrgTree = (event) => {
     form.errors.clear('ownerOrgId');
-    form.errors.errors = {...form.errors.errors};
-  }
+    form.errors.errors = { ...form.errors.errors };
+  };
   // ============================== //EVENT HANDLE ==========================
 
   // ============================== CLIENT VALIDATION ==========================
@@ -304,8 +304,8 @@
     } else {
       form.ownerOrgId = undefined;
     }
-  }
-    // ============================== // HELPER ==========================
+  };
+  // ============================== // HELPER ==========================
   // ============================== HOOK ==========================
   /**
    * onMount Hook.
@@ -354,8 +354,8 @@
   const useSaveOrUpdateAction = {
     register(component: HTMLElement, param: any) {
       doSaveOrUpdate(fromEvent(component, 'click'));
-    }
-  }
+    },
+  };
   // ============================== //HOOK ==========================
 </script>
 
@@ -370,9 +370,7 @@
       <div class="col-xs-24 col-sm-12">
         <div class="row ">
           <!-- Code -->
-          <div class="label col-24">
-            {T('COMMON.LABEL.CODE')}:
-          </div>
+          <div class="label col-24">{T('COMMON.LABEL.CODE')}:</div>
           <div class="col-24">
             <TextInput name="code" disabled={$isReadOnlyMode$} bind:value={form.code} bind:this={codeRef} />
             {#if form.errors.has('code')}
@@ -382,9 +380,7 @@
           <!-- // Code -->
 
           <!-- Name -->
-          <div class="label col-24">
-            {T('COMMON.LABEL.NAME')}:
-          </div>
+          <div class="label col-24">{T('COMMON.LABEL.NAME')}:</div>
           <div class="col-24">
             <TextInput name="name" disabled={$isReadOnlyMode$} bind:value={form.name} />
             {#if form.errors.has('name')}
@@ -394,9 +390,7 @@
           <!-- // Name -->
 
           <!-- Sort -->
-          <div class="label col-24">
-            {T('COMMON.LABEL.SORT')}:
-          </div>
+          <div class="label col-24">{T('COMMON.LABEL.SORT')}:</div>
           <div class="col-24">
             <NumberInput name="sort" disabled={$isReadOnlyMode$} bind:value={form.sort} />
             {#if form.errors.has('sort')}
@@ -408,12 +402,12 @@
       </div>
       <div class="default-border col-xs-24 col-sm-12">
         <TreeView
-                on:check={onCheckOrgTree}
-                bind:this={orgTreeRef}
-                id={'orgTree' + view.getViewName() + 'Id'}
-                data={$orgData$}
-                disabled={$isReadOnlyMode$}
-                radioType="all">
+          on:check={onCheckOrgTree}
+          bind:this={orgTreeRef}
+          id={'orgTree' + view.getViewName() + 'Id'}
+          data={$orgData$}
+          disabled={$isReadOnlyMode$}
+          radioType="all">
           <div slot="label" class="label">{T('SYS.LABEL.ORG')}:</div>
         </TreeView>
         {#if form.errors.has('ownerOrgId')}
@@ -421,7 +415,6 @@
         {/if}
       </div>
     </div>
-
 
   </form>
 </section>

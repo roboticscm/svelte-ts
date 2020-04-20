@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy, tick } from 'svelte';
-  import { T } from '@/assets/js/locale/locale';
+  import { T } from '@/lib/js/locale/locale';
   import { ViewStore } from '@/store/view';
   import {
     columns,
@@ -19,9 +19,9 @@
   import { catchError, concatMap, switchMap, filter } from 'rxjs/operators';
   import { fromEvent, of, Observable } from 'rxjs';
   import { fromPromise } from 'rxjs/internal-compatibility';
-  import { SObject } from '@/assets/js/sobject';
-  import { Debug } from '../../../../assets/js/debug';
-  import { ButtonPressed } from '../../../../components/ui/button/types';
+  import { SObject } from '@/lib/js/sobject';
+  import { Debug } from '@/lib/js/debug';
+  import { ButtonPressed } from '@/components/ui/button/types';
 
   export let view: ViewStore;
   export let store: Store;
@@ -37,9 +37,9 @@
   let excelGridRef: any;
   let ExcelGrid: any;
 
-  let mergeCells: any;
+  let mergeCells: any = {};
+  let useMergeCell = false;
 
-  let useMergeCell = true;
   let tableHeight: string;
   let saveOrUpdateSub;
 
@@ -58,13 +58,18 @@
       }
     });
 
-    if (useMergeCell) {
-      // @ts-ignore
-      mergeCells = makeMergeCells($roleDetails$);
-    }
+    view.loading$.next(false);
+  } else {
     view.loading$.next(false);
   }
 
+  // @ts-ignore
+  $: if (useMergeCell) {
+    // @ts-ignore
+    mergeCells = makeMergeCells($roleDetails$);
+  } else {
+    mergeCells = {};
+  }
   /**
    * Event handle for Edit button.
    * @param {event} Mouse click event.
@@ -282,7 +287,7 @@
     {columns}
     data={$roleDetails$}
     height={tableHeight}
-    gridMergeCells={useMergeCell ? mergeCells : undefined}>
+    gridMergeCells={useMergeCell ? mergeCells : {}}>
     <div slot="label">
       <span class="label">{T('SYS.LABEL.MENU')} - {T('SYS.LABEL.ROLE_CONTROL')}:</span>
     </div>
@@ -291,6 +296,8 @@
 
 <!--Form controller-->
 <section class="view-content-bottom">
+  <input type="checkbox" bind:checked={useMergeCell} />
+  <span style="color:var(--primary)">{T('SYS.LABEL.USE_MERGE_CELL')}</span>
   {#if $selectedData$ !== null}
     <Button btnType={ButtonType.Reset} on:click={onReset} />
   {/if}
