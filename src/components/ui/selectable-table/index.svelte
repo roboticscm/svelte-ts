@@ -6,8 +6,7 @@
   import { onMount } from 'svelte';
   import { settingsStore } from '@/store/settings';
   import { T } from '@/lib/js/locale/locale';
-  import {genUUID} from '@/lib/js/util';
-
+  import { genUUID } from '@/lib/js/util';
 
   const dispatch = createEventDispatcher();
   // import { SObject } from '@/lib/js/sobject';
@@ -45,7 +44,7 @@
 
   const getFirstRowEle = () => {
     return document.querySelector(`#${id} tbody tr :first-child`);
-  }
+  };
   const applyTable = () => {
     // selectedRows = [];
 

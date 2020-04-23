@@ -7,8 +7,5 @@ export const validation = (form: any) => {
     error.name = CommonValidation.REQUIRED_VALUE;
   }
 
-  if (!CommonValidation.isIntegerNumber((form as any).sort)) {
-    error.sort = CommonValidation.INTEGER_NUMBER;
-  }
   return error;
 };

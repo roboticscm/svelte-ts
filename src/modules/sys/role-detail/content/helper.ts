@@ -1,6 +1,7 @@
 import { T } from '@/lib/js/locale/locale';
 import { tick } from 'svelte';
 import { Observable } from 'rxjs';
+import { SObject } from '@/lib/js/sobject';
 
 export const nestedHeaders = [
   [
@@ -8,6 +9,36 @@ export const nestedHeaders = [
       title: T('SYS.LABEL.COMPANY_BRANCH'),
       colspan: 2,
     },
+    {
+      title: T('SYS.LABEL.MENU_SCREEN'),
+      colspan: 5,
+    },
+    {
+      title: T('SYS.LABEL.ROLE_CONTROL'),
+      colspan: 5,
+    },
+  ],
+];
+
+export const nestedHeadersHideBranch = [
+  [
+    {
+      title: T('SYS.LABEL.COMPANY_DEPARTMENT'),
+      colspan: 1,
+    },
+    {
+      title: T('SYS.LABEL.MENU_SCREEN'),
+      colspan: 5,
+    },
+    {
+      title: T('SYS.LABEL.ROLE_CONTROL'),
+      colspan: 5,
+    },
+  ],
+];
+
+export const nestedHeadersHideBranchAndDep = [
+  [
     {
       title: T('SYS.LABEL.MENU_SCREEN'),
       colspan: 5,
@@ -251,10 +282,10 @@ export const preprocessData = (changeData: any, originData: any) => {
 
 export const fillNullColor = (data: any[], excelGridRef: any) => {
   let nullRows = [];
-
-  for (let i = 0; i < data.length; i++) {
-    if (data[i].renderControl === null) {
-      data[i].renderControl = true;
+  const dt = SObject.clone(data);
+  for (let i = 0; i < dt.length; i++) {
+    if (dt[i].renderControl === null) {
+      dt[i].renderControl = true;
       nullRows.push('M' + (i + 1));
     }
   }

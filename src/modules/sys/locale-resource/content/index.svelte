@@ -495,6 +495,7 @@
             id={view.getViewName() + 'UsedLanguageSelectId'}
             {menuPath}
             saveState={true}
+            autoLoad={true}
             data={$usedLanguages$}
             bind:this={languageDropdownRef} />
         </div>

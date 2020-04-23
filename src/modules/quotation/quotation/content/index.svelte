@@ -1,11 +1,8 @@
 <script lang="ts">
-    import { ViewStore } from '@/store/view';
+  import { ViewStore } from '@/store/view';
 
-    export let view: ViewStore;
-
+  export let view: ViewStore;
 </script>
 
-<section class="view-content-main">
-    Content
-</section>
+<section class="view-content-main">Content</section>
 <div class="view-content-bottom" />

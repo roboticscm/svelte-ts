@@ -66,5 +66,5 @@ export const markStringSearch = (source: string, search: string, removeAccent: b
 };
 
 export const genUUID = () => {
-  return uuidv4();
+  return 'id' + uuidv4();
 };

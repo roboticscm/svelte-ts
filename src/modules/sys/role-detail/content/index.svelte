@@ -5,6 +5,8 @@
   import {
     columns,
     nestedHeaders,
+    nestedHeadersHideBranch,
+    nestedHeadersHideBranchAndDep,
     makeMergeCells,
     calcTableHeight,
     preprocessData,
@@ -30,13 +32,24 @@
   // @ts-ignore
   const { hasAnyDeletedRecord$, deleteRunning$, saveRunning$, isReadOnlyMode$, isUpdateMode$ } = view;
   // @ts-ignore
-  const { roleDetails$, dragEndSplitter$, selectedData$, needSelectRole$ } = store;
-
+  const {
+    roleDetails$,
+    dragEndSplitter$,
+    selectedData$,
+    needSelectRole$,
+    selectedOrg$,
+    hideBranchColumn$,
+    hideDepartmentColumn$,
+    resetColumn$,
+    filterMenu$,
+  } = store;
+  let roleDetails: any[] = [];
   const tableContainerId = view.getViewName() + 'TableContainerId';
   let scRef: any;
   let excelGridRef: any;
   let ExcelGrid: any;
 
+  let _nestedHeaders = nestedHeaders;
   let mergeCells: any = {};
   let useMergeCell = false;
 
@@ -48,25 +61,35 @@
   let editedData: any[];
 
   // @ts-ignore
+  $: if ($roleDetails$) {
+    view.loading$.next(false);
+  }
+
+  // @ts-ignore
   $: if ($roleDetails$ && $roleDetails$.length > 0) {
     // @ts-ignore
+    const filterMenu = $filterMenu$;
+    if (!filterMenu) {
+      // @ts-ignore
+      roleDetails = $roleDetails$;
+    } else {
+      // @ts-ignore
+      roleDetails = $roleDetails$.filter((item: any) => {
+        return filterMenu.indexOf(item.menuId.toString()) >= 0;
+      });
+    }
     tick().then(() => {
       if (excelGridRef) {
-        // @ts-ignore
-        fillNullColor($roleDetails$, excelGridRef);
+        fillNullColor(roleDetails, excelGridRef);
         beforeData = SObject.clone(getTableData(excelGridRef));
       }
     });
-
-    view.loading$.next(false);
-  } else {
-    view.loading$.next(false);
   }
 
   // @ts-ignore
   $: if (useMergeCell) {
     // @ts-ignore
-    mergeCells = makeMergeCells($roleDetails$);
+    mergeCells = makeMergeCells(roleDetails);
   } else {
     mergeCells = {};
   }
@@ -106,7 +129,14 @@
 
   const doReset = () => {
     // @ts-ignore
-    needSelectRole$.next($selectedData$.id);
+    if ($selectedOrg$ && $selectedData$) {
+      // @ts-ignore
+      store.loadRoleDetail($selectedOrg$.id, $selectedData$.id);
+      // @ts-ignore
+    } else if ($selectedData$) {
+      // @ts-ignore
+      store.loadRoleDetail($selectedData$.pId, $selectedData$.id);
+    }
   };
 
   /**
@@ -118,6 +148,20 @@
     view.showViewConfigModal(event.currentTarget.id, scRef);
   };
 
+  const onChangeUseMerge = (event: any) => {
+    setTimeout(() => {
+      excelGridRef.refresh();
+      tick().then(() => {
+        if (excelGridRef) {
+          // @ts-ignore
+
+          fillNullColor(roleDetails, excelGridRef);
+
+          beforeData = SObject.clone(getTableData(excelGridRef));
+        }
+      });
+    });
+  };
   // ============================== CLIENT VALIDATION ==========================
   /**
    * Client validation and check for no data change.
@@ -173,7 +217,7 @@
           /* submit data to API server*/
           saveRunning$.next(true);
           // @ts-ignore
-          return store.saveOrUpdateOrDelete($selectedData$.id.replace('role', ''), processedData).pipe(
+          return store.saveOrUpdateOrDelete($selectedData$.id, processedData).pipe(
             catchError((error) => {
               return of(error);
             }),
@@ -193,9 +237,17 @@
             // @ts-ignore
             beforeData = SObject.clone(editedData);
             scRef.snackbarRef().showUpdateSuccess();
+            // @ts-ignore
+            if ($isUpdateMode$) {
+              // @ts-ignore
+              view.needSelectId$.next('role' + $selectedData$.id);
+            }
+
+            doReset();
+
+            store.loadRoleTree();
           }
           saveRunning$.next(false);
-          store.loadRoleTree();
         },
         error: (error) => {
           Debug.errorSection('Role Detail - doSaveOrUpdate', error);
@@ -220,24 +272,24 @@
     createCheckboxesHeader();
   });
 
-  const createCheckboxesHeader = () => {
+  const createCheckboxesHeader = (delay = 1000) => {
     setTimeout(() => {
       // checked
-      excelGridRef.createCheckboxHeader(4);
+      excelGridRef.createCheckboxHeader(4, true);
       // private
-      excelGridRef.createCheckboxHeader(7);
+      excelGridRef.createCheckboxHeader(7, true);
       // approve
-      excelGridRef.createCheckboxHeader(9);
+      excelGridRef.createCheckboxHeader(9, true);
 
       // Render
-      excelGridRef.createCheckboxHeader(12);
+      excelGridRef.createCheckboxHeader(12, true);
       // Disabled
-      excelGridRef.createCheckboxHeader(13);
+      excelGridRef.createCheckboxHeader(13, true);
       // Confirm
-      excelGridRef.createCheckboxHeader(14);
+      excelGridRef.createCheckboxHeader(14, true);
       // Require password
-      excelGridRef.createCheckboxHeader(15);
-    }, 1000);
+      excelGridRef.createCheckboxHeader(15, true);
+    }, delay);
   };
 
   onDestroy(() => {
@@ -270,6 +322,48 @@
       doSaveOrUpdate(fromEvent(component, 'click'));
     },
   };
+
+  // @ts-ignore
+  $: {
+    // @ts-ignore
+    if ($hideDepartmentColumn$) {
+      columns[1].type = 'hidden';
+      columns[3].type = 'hidden';
+      _nestedHeaders = nestedHeadersHideBranchAndDep;
+      tick().then(() => {
+        excelGridRef && excelGridRef.refresh();
+        createCheckboxesHeader(0);
+      });
+    }
+  }
+
+  // @ts-ignore
+  $: {
+    // @ts-ignore
+    if ($hideBranchColumn$) {
+      columns[1].type = 'hidden';
+      columns[3].type = 'text';
+      _nestedHeaders = nestedHeadersHideBranch;
+      tick().then(() => {
+        excelGridRef && excelGridRef.refresh();
+        createCheckboxesHeader(0);
+      });
+    }
+  }
+
+  // @ts-ignore
+  $: {
+    // @ts-ignore
+    if ($resetColumn$) {
+      columns[1].type = 'text';
+      columns[3].type = 'text';
+      _nestedHeaders = nestedHeaders;
+      tick().then(() => {
+        excelGridRef && excelGridRef.refresh();
+        createCheckboxesHeader(0);
+      });
+    }
+  }
 </script>
 
 <!--Main content-->
@@ -283,9 +377,9 @@
     {menuPath}
     bind:this={excelGridRef}
     id={'roleControlGrid' + view.getViewTitle() + 'Id'}
-    gridNestedHeaders={nestedHeaders}
+    gridNestedHeaders={_nestedHeaders}
     {columns}
-    data={$roleDetails$}
+    data={roleDetails}
     height={tableHeight}
     gridMergeCells={useMergeCell ? mergeCells : {}}>
     <div slot="label">
@@ -296,7 +390,7 @@
 
 <!--Form controller-->
 <section class="view-content-bottom">
-  <input type="checkbox" bind:checked={useMergeCell} />
+  <input on:change={onChangeUseMerge} type="checkbox" bind:checked={useMergeCell} />
   <span style="color:var(--primary)">{T('SYS.LABEL.USE_MERGE_CELL')}</span>
   {#if $selectedData$ !== null}
     <Button btnType={ButtonType.Reset} on:click={onReset} />

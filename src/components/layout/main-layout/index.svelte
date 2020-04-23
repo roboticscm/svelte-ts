@@ -4,7 +4,7 @@
   import { applyLayout } from './helper';
   import { appStore } from '@/store/app';
   import { settingsStore } from '@/store/settings';
-  import {App} from '@/lib/js/constants';
+  import { App } from '@/lib/js/constants';
 
   onMount(async () => {
     Split({
@@ -22,12 +22,11 @@
         const gridEle: any = document.querySelector('.layout-container');
         let [headerHeight] = gridEle.style['grid-template-rows'].split(' ');
 
-        if (headerHeight && (+headerHeight.replace('px', '')) > App.MAX_HEADER_HEIGHT) {
+        if (headerHeight && +headerHeight.replace('px', '') > App.MAX_HEADER_HEIGHT) {
           headerHeight = '100px';
           const gridEle: any = document.querySelector('.layout-container');
           gridEle.style['grid-template-rows'] = `${headerHeight} 2px auto`;
           applyLayout();
-
         }
         settingsStore.saveUserSettings({
           menuPath: 'sys/main-layout',

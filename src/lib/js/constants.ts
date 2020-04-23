@@ -38,6 +38,6 @@ export class App {
   static SNACKBAR_TIMEOUT = 3000;
   static PROGRESS_BAR = '<i class="fa fa-spinner fa-spin" />';
   static MIN_PASSWORD_LENGTH = 6;
-  static  MAX_HEADER_HEIGHT = 100;
-  static  MIN_HEADER_HEIGHT = 30;
+  static MAX_HEADER_HEIGHT = 100;
+  static MIN_HEADER_HEIGHT = 30;
 }

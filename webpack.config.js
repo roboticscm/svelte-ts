@@ -15,6 +15,7 @@ const onwarn = (warning, onwarn) => warning.code === 'css-unused-selector' || on
 const alias = {
       svelte: path.resolve('node_modules', 'svelte'),
       '@': path.resolve(__dirname, 'src'),
+      'd': path.resolve(__dirname, 'src/lib/js/debug')
     };
 
 module.exports = {
@@ -125,6 +126,7 @@ module.exports = {
     new webpack.ProvidePlugin({
       j: 'jquery',
       jQuery: 'jquery',
+      'd': 'd'
     }),
 
     new CopyPlugin([

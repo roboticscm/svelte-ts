@@ -1,11 +1,12 @@
 export class OwnerOrg {
+  parentId = '';
   id = '';
   code = '';
   name = '';
   fontIcon = '';
   useFontIcon = false;
   iconData = '';
-  type = 100;
+  type = -2;
   slogan = '';
   houseNumber = '';
   country = -1;
@@ -18,4 +19,12 @@ export class OwnerOrg {
   twitter = '';
   skype = '';
   disabled = false;
+  sort = 0;
+}
+
+export enum OrgType {
+  Campany = 10000,
+  Branch = 1000,
+  Department = 100,
+  Group = 10,
 }

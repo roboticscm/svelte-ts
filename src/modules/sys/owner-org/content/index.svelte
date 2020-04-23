@@ -7,7 +7,7 @@
   import { T } from '@/lib/js/locale/locale';
   import Form from '@/lib/js/form/form';
   import { ViewStore } from '@/store/view';
-  import { OwnerOrg } from '../model';
+  import { OwnerOrg, OrgType } from '../model';
   import { SObject } from '@/lib/js/sobject';
   import { apolloClient } from '@/lib/js/hasura-client';
   import { ButtonPressed } from '@/components/ui/button/types';
@@ -20,7 +20,9 @@
 
   import Button from '@/components/ui/button';
   import FloatTextInput from '@/components/ui/float-input/text-input';
+  import FloatNumberInput from '@/components/ui/float-input/number-input';
   import FloatSelect from '@/components/ui/float-input/float-select';
+  import Select from '@/components/ui/input/select';
   import FloatCheckbox from '@/components/ui/float-input/checkbox';
   import Error from '@/components/ui/error';
   import SC from '@/components/set-common';
@@ -38,7 +40,6 @@
   // Observable
   // @ts-ignore
   const { selectedData$, hasAnyDeletedRecord$, deleteRunning$, saveRunning$, isReadOnlyMode$, isUpdateMode$ } = view;
-
   // Refs
   let codeRef: any;
   let scRef: any;
@@ -50,6 +51,7 @@
   // Other vars
   let selectedData: OwnerOrg;
   let saveOrUpdateSub;
+  let newCompany = false;
   /**
    * Reset form (reset input and errors)
    * @param {none}
@@ -60,10 +62,19 @@
       ...new OwnerOrg(),
     });
   };
-  let form = resetForm();
+  let form: any = resetForm();
   let beforeForm: Form;
   const saveUpdateUri = 'sys/owner-org/save-or-update';
   // ============================== EVENT HANDLE ==========================
+  const onChangeOrgType = (event: any) => {
+    if (event.detail === OrgType.Campany) {
+      form.parentId = '';
+    } else {
+      // @ts-ignore
+      form.parentId = $selectedData$ && $selectedData$.pId;
+    }
+  };
+
   /**
    * Event handle for Add New button.
    * @param {event} Mouse click event.
@@ -149,9 +160,6 @@
     }
 
     // check for data change
-
-    (form as any).insertDepIds = availableDepTreeRef.getCheckedLeafIds(true);
-    (form as any).deleteDepIds = assignedDepTreeRef.getCheckedLeafIds(false);
     // @ts-ignore
     if ($isUpdateMode$) {
       const dataChanged = view.checkObjectChange(beforeForm, SObject.clone(form), scRef.snackbarRef());
@@ -178,6 +186,13 @@
 
     // reset form
     form = resetForm();
+    newCompany = false;
+
+    // @ts-ignore
+    if ($selectedData$) {
+      // @ts-ignore
+      form.parentId = $selectedData$.id;
+    }
 
     // moving focus to the first element after DOM updated
     tick().then(() => {
@@ -210,6 +225,8 @@
         ),
         filter((value) => value !== 'fail') /* filter if pass verify permission*/,
         switchMap((_) => {
+          preprocessData();
+          console.log(form.data());
           /* submit data to API server*/
           saveRunning$.next(true);
           return form.post(saveUpdateUri).pipe(
@@ -221,7 +238,7 @@
       )
       .subscribe({
         /* do something after form submit*/
-        next: (res) => {
+        next: (res: any) => {
           if (res.response && res.response.data) {
             // if error
             if (res.response.data.message) {
@@ -258,9 +275,8 @@
       isUpdateMode$.next(true);
       form = new Form({
         ...selectedData,
-        insertDepIds: [],
-        deleteDepIds: [],
       });
+
       // save init value for checking data change
       beforeForm = SObject.clone(form);
     }
@@ -276,7 +292,6 @@
       view.selectedData$
         .pipe(
           switchMap((it) => {
-            console.log('??', it && it.id);
             if (!it) return EMPTY;
             return apolloClient.subscribe({
               query,
@@ -299,6 +314,33 @@
     doSelect(data);
   });
   // ============================== //REACTIVE ==========================
+
+  // ============================== HELPER ==========================
+  const getOrgType = (type: number) => {
+    switch (type) {
+      case OrgType.Campany:
+        return OrgType.Branch;
+      case OrgType.Branch:
+        return OrgType.Department;
+      case OrgType.Department:
+        return OrgType.Group;
+      default:
+        return OrgType.Group;
+    }
+  };
+
+  const preprocessData = () => {
+    // @ts-ignore
+    if (!$isUpdateMode$) {
+      if (newCompany) {
+        form.parentId = '';
+        form.type = OrgType.Campany;
+      }
+      // @ts-ignore
+      form.type = getOrgType($selectedData$.type);
+    }
+  };
+  // ============================== //HELPER ==========================
 
   // ============================== HOOK ==========================
   /**
@@ -355,7 +397,7 @@
 
 <style lang="scss">
   .image-container {
-    height: 100px;
+    height: 130px;
   }
   .menu-font-icon {
     font-size: 1.6rem !important;
@@ -372,6 +414,27 @@
     <div class="row ">
       <div class="col-xs-24 col-lg-21">
         <div class="row">
+          <!-- Type -->
+          <div class="col-xs-24 col-lg-12 col-xl-6">
+            <FloatSelect
+              bind:value={form.type}
+              on:change={onChangeOrgType}
+              data={Store.orgType}
+              placeholder={T('COMMON.LABEL.TYPE')}
+              disabled={true}
+              name="type" />
+          </div>
+          <!-- //Type -->
+
+          <!-- New company -->
+          <div class="col-xs-24 col-lg-12 col-xl-6">
+            <FloatCheckbox text={T('COMMON.LABEL.NEW_COMPANY')} disabled={$isUpdateMode$} bind:checked={newCompany} />
+          </div>
+          <!-- // New company -->
+
+        </div>
+
+        <div class="row">
           <!-- Code -->
           <div class="col-xs-24 col-lg-12 col-xl-6">
             <FloatTextInput
@@ -380,6 +443,7 @@
               disabled={$isReadOnlyMode$}
               bind:value={form.code}
               bind:this={codeRef} />
+            <Error {form} field="code" />
           </div>
           <!-- //Code -->
           <!-- Name -->
@@ -389,17 +453,12 @@
               name="name"
               disabled={$isReadOnlyMode$}
               bind:value={form.name} />
-            <Error {form} field="name" />
+
           </div>
           <!-- //Name -->
 
-          <!-- Type -->
-          <div class="col-xs-24 col-lg-12 col-xl-6">
-            <FloatSelect placeholder={T('COMMON.LABEL.TYPE')} disabled={$isReadOnlyMode$} name="type" />
-          </div>
-          <!-- //Type -->
           <!-- Slogan -->
-          <div class="col-xs-24 col-lg-12 col-xl-6">
+          <div class="col-lg-24 col-xl-12">
             <FloatTextInput
               placeholder={T('COMMON.LABEL.SLOGAN')}
               name="slogan"
@@ -420,7 +479,7 @@
               disabled={$isReadOnlyMode$}
               bind:value={form.fontIcon} />
             <span style="display: flex; flex-direction: column; justify-content: flex-end;">
-              {@html form.fontIcon.includes('<') ? form.fontIcon : ''}
+              {@html form.fontIcon && form.fontIcon.includes('<') ? form.fontIcon : ''}
             </span>
           </div>
 
@@ -488,7 +547,7 @@
       <div class="col-xs-24 col-lg-21">
         <div class="row">
           <!-- Facebook -->
-          <div class="col-xs-24 col-xl-12">
+          <div class="col-xs-24 col-lg-12 col-xl-6">
             <FloatTextInput
               placeholder={T('COMMON.LABEL.FACEBOOK')}
               name="facebook"
@@ -516,12 +575,27 @@
           </div>
           <!-- //Skype -->
 
+          <!-- Sort -->
+          <div class="col-xs-24 col-lg-12 col-xl-6">
+            <FloatNumberInput
+              placeholder={T('COMMON.LABEL.SORT')}
+              disabled={$isReadOnlyMode$}
+              name="sort"
+              bind:value={form.sort} />
+            <Error {form} field="sort" />
+          </div>
+          <!-- //Sort -->
+
         </div>
       </div>
       <div class="image-container col-xs-24 col-lg-3">
         <!-- Disabled -->
 
-        <FloatCheckbox text={T('COMMON.LABEL.DISABLED')} name="disabled" bind:checked={form.disabled} />
+        <FloatCheckbox
+          text={T('COMMON.LABEL.DISABLED')}
+          name="disabled"
+          disabled={$isReadOnlyMode$}
+          bind:checked={form.disabled} />
 
         <!-- //Disabled -->
       </div>

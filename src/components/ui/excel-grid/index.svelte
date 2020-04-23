@@ -279,7 +279,7 @@
     return jExcelObj;
   };
 
-  export const createCheckboxHeader = (col: number) => {
+  export const createCheckboxHeader = (col: number, onlyOneCheckbox = false) => {
     const checkboxTag = document.createElement('input');
     checkboxTag.type = 'checkbox';
     checkboxTag.onchange = (event: any) => {
@@ -287,7 +287,15 @@
       const checkColumn = new Array(data.length).fill(checked);
       jExcelObj.setColumnData(col, checkColumn);
     };
-    document.querySelector(`td[data-x="${col}"]`).prepend(checkboxTag);
+    const td: any = document.querySelector(`td[data-x="${col}"]`);
+
+    if (onlyOneCheckbox) {
+      if (!td.querySelector('input[type="checkbox"]')) {
+        td.prepend(checkboxTag);
+      }
+    } else {
+      td.prepend(checkboxTag);
+    }
   };
 
   export const createToggleCheckHeader = (col: number) => {
@@ -301,6 +309,18 @@
       jExcelObj.setColumnData(col, checkColumn);
     };
     document.querySelector(`td[data-x="${col}"]`).prepend(buttonTag);
+  };
+
+  export const hideColumn = (col: number) => {
+    if (jExcelObj) {
+      jExcelObj.hideColumn(col);
+    }
+  };
+
+  export const showColumn = (col: number) => {
+    if (jExcelObj) {
+      jExcelObj.showColumn(col);
+    }
   };
 </script>
 

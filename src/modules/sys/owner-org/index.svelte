@@ -24,25 +24,19 @@
   const store = new Store(view);
 
   view.tableName = 'owner_org';
-  view.columns = ['id', 'code', 'name', 'sort'];
+  view.columns = ['id', 'code', 'name'];
   view.fullControl = fullControl;
   view.roleControls = roleControls;
-  // view.loading$.next(true);
-  // view.loadTableMetaData();
+  view.loading$.next(true);
+  view.loadTableMetaData();
 
   const subscription = () => {
-    // store.completeLoading$.pipe(take(1)).subscribe((_) => {
-    //   view.loading$.next(false);
-    // });
+    store.completeLoading$.pipe(take(1)).subscribe((_) => {
+      view.loading$.next(false);
+    });
   };
 
   onMount(() => {
-    // store
-    //   .loadAvailableDep(null)
-    //   .pipe(take(1))
-    //   .subscribe((res) => {
-    //     store.availableDep$.next(res.data);
-    //   });
     subscription();
   });
 </script>

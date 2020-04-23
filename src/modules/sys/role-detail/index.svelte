@@ -5,10 +5,9 @@
   import { App } from '@/lib/js/constants';
   import { ViewStore } from '@/store/view';
 
-  import ThreeColumnView from '@/components/layout/three-column-view';
+  import TwoColumnView from '@/components/layout/two-column-view';
   import WorkList from './work-list/index.svelte';
   import MainContent from './content/index.svelte';
-  import Right from './right/index.svelte';
   import ViewTitle from '@/components/layout/view-title';
   import ProgressBar from '@/components/ui/progress-bar';
   import { Store } from './store';
@@ -50,14 +49,11 @@
 {#if showTitle}
   <ViewTitle {view} />
 {/if}
-<ThreeColumnView on:dragEnd={onDragEndSplitter} id={'mainLayout' + view.getViewName()} {showTitle} {menuPath}>
+<TwoColumnView on:dragEnd={onDragEndSplitter} id={'mainLayout' + view.getViewName()} {showTitle} {menuPath}>
   <div style="height: 100%;" slot="viewLeft">
     <WorkList {view} {store} />
   </div>
   <div style="height: 100%;" slot="default">
     <MainContent {view} {store} {menuPath} />
   </div>
-  <div style="height: 100%;" slot="viewRight">
-    <Right {view} {store} />
-  </div>
-</ThreeColumnView>
+</TwoColumnView>

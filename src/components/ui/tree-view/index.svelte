@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onDestroy, tick, createEventDispatcher } from 'svelte';
+  import { genUUID } from '@/lib/js/util';
 
-  export let id: string;
+  export let id = genUUID();
   export let data: any[];
   export let disabled = false;
   export let isCheckableNode = false;
@@ -27,7 +28,7 @@
   export const selectNodeById = (id: any, fireClickEvent = false) => {
     const treeObj = getTreeInstance();
     if (treeObj && id) {
-      const nodes = treeObj.getNodesByParam('id', id, null);
+      const nodes = treeObj.getNodesByParam('id', id.toString(), null);
       if (nodes && nodes.length > 0) {
         treeObj.selectNode(nodes[0]);
         if (fireClickEvent) {
@@ -146,6 +147,13 @@
         treeObj.setChkDisabled(nodes[i], disable);
       }
       // treeObj.refresh();
+    }
+  };
+
+  export const clearSelection = () => {
+    const treeObj = getTreeInstance();
+    if (treeObj) {
+      treeObj.cancelSelectedNode();
     }
   };
 

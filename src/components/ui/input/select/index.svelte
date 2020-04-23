@@ -3,9 +3,10 @@
   import { T } from '@/lib/js/locale/locale';
   import { settingsStore } from '@/store/settings';
   import { Observable } from 'rxjs';
+  import { take } from 'rxjs/operators';
 
   export let id: string;
-  export let data: any[];
+  export let data: any[] = [];
   export let disabled = false;
   export let saveState = false;
   export let autoLoad = false;
@@ -20,12 +21,15 @@
 
   const onChange = (event) => {
     _selectedId = event.target.value;
-    settingsStore.saveUserSettings({
-      menuPath,
-      controlId: id,
-      keys: ['lastSelected'],
-      values: [_selectedId],
-    });
+    if (saveState) {
+      console.log('save', menuPath, id, _selectedId);
+      settingsStore.saveUserSettings({
+        menuPath,
+        controlId: id,
+        keys: ['lastSelected'],
+        values: [_selectedId],
+      });
+    }
     dispatch('change', _selectedId);
   };
 
@@ -76,7 +80,9 @@
 
   onMount(() => {
     if (autoLoad) {
-      loadSettings();
+      loadSettings()
+        .pipe(take(1))
+        .subscribe();
     }
   });
 </script>

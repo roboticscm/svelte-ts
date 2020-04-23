@@ -83,7 +83,11 @@ export class ViewStore {
   };
 
   getViewName = () => {
-    return StringUtil.replaceAll(StringUtil.toTitleCase(StringUtil.replaceAll(this.getMenuNameFromPath(), '-', '')), ' ', '');
+    return StringUtil.replaceAll(
+      StringUtil.toTitleCase(StringUtil.replaceAll(this.getMenuNameFromPath(), '-', '')),
+      ' ',
+      '',
+    );
   };
 
   getSimpleList = (textSearch = '') => {
