@@ -11,7 +11,7 @@
   import MainContent from './content/index.svelte';
   import ViewTitle from '@/components/layout/view-title';
   import ProgressBar from '@/components/ui/progress-bar';
-  import { Store } from './store';
+  import Store from './store';
 
   export let showTitle = true;
   export let menuPath: string;

@@ -17,7 +17,7 @@ import { Language } from '@/modules/sys/language/model';
 import { fromPromise } from 'rxjs/internal-compatibility';
 import Form from '@/lib/js/form/form';
 import { Menu } from '@/modules/sys/menu/model';
-import { HumanOrOrgStore, humanOrOrgStore } from '@/modules/sys/human-or-org/store';
+import HumanOrOrgStore from '@/modules/sys/user/store';
 
 export class ViewStore {
   tableName: string;
@@ -519,6 +519,7 @@ export class ViewStore {
     const hasuraObj = SObject.convertFieldsToCamelCase(data[this.tableName][0]);
     delete hasuraObj._Typename;
     delete hasuraObj.id;
+    delete hasuraObj.password;
     const obj = SObject.clone(form);
     const formObj = {};
     for (const field in hasuraObj) {

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { ViewStore } from '@/store/view';
-  import { Store } from '../store';
+  import Store from '../store';
   import { fromEvent, forkJoin, Observable, Subscription } from 'rxjs';
   import { switchMap, tap, filter } from 'rxjs/operators';
   import SimpleWorkList from '@/components/work-list/simple-work-list';

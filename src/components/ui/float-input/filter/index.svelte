@@ -11,7 +11,6 @@
   export let value;
   export let list: any[] = [];
   export let fullWidth = true;
-  export let showAllItem = true;
 
   let inputRef: any;
   let dropdownContentRef: any;

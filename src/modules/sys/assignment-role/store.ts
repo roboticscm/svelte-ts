@@ -6,7 +6,7 @@ import { catchError, first, skip, zip } from 'rxjs/operators';
 import { User } from '@/model/user';
 import { OwnerOrg } from '@/modules/sys/owner-org/model';
 import { OrgStore } from '@/store/org';
-import { HumanOrOrgStore } from '@/modules/sys/human-or-org/store';
+import HumanOrOrgStore from '@/modules/sys/user/store';
 import { RoleStore } from '@/store/role';
 import { Role } from '@/modules/sys/role-detail/model';
 

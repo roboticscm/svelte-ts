@@ -29,7 +29,6 @@ export const errorSection = (section: string, ...message: any) => {
   }
 };
 
-
 // @Deprecated
 export class Debug {
   public static isDebugMode(): boolean {

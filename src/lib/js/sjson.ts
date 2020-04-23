@@ -41,4 +41,13 @@ export class SJSON {
 
     return JSONbig.parse(json);
   };
+
+  public static isJson = (str: string) => {
+    try {
+      JSON.parse(str);
+    } catch (e) {
+      return false;
+    }
+    return true;
+  };
 }

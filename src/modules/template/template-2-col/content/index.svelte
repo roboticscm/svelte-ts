@@ -12,7 +12,6 @@
   import { apolloClient } from '@/lib/js/hasura-client';
   import { ButtonPressed } from '@/components/ui/button/types';
   import { SDate } from '@/lib/js/sdate';
-  import { humanOrOrgStore } from '@/modules/sys/human-or-org/store';
   import { ModalType } from '@/components/ui/modal/types';
   import { ButtonType, ButtonId } from '@/components/ui/button/types';
   import { validation } from './validation';

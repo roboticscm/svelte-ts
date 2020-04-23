@@ -11,7 +11,6 @@
   // Props
   export let view: ViewStore;
   export let store: Store;
-  export let menuPath: string;
   export let callFrom: string;
 
   // Other vars

@@ -12,7 +12,6 @@
   import { apolloClient } from '@/lib/js/hasura-client';
   import { ButtonPressed } from '@/components/ui/button/types';
   import { SDate } from '@/lib/js/sdate';
-  import { humanOrOrgStore } from '@/modules/sys/human-or-org/store';
   import { ButtonType, ButtonId } from '@/components/ui/button/types';
   import { validation } from './validation';
   import { ModalType } from '@/components/ui/modal/types';
@@ -30,11 +29,9 @@
   import TreeView from '@/components/ui/tree-view';
   import Store from '../store';
   import { Debug } from '@/lib/js/debug';
-  import App from '../../../../App.svelte';
 
   // Props
   export let view: ViewStore;
-  export let store: Store;
   export let menuPath: string;
 
   // Observable

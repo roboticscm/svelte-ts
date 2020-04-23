@@ -13,7 +13,6 @@
   export let value;
   export let list: any[] = [];
   export let fullWidth = true;
-  export let showAllItem = true;
   export let menuPath: string;
 
   let inputRef: any;

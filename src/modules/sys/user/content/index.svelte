@@ -13,7 +13,6 @@
   import { apolloClient } from '@/lib/js/hasura-client';
   import { ButtonPressed } from '@/components/ui/button/types';
   import { SDate } from '@/lib/js/sdate';
-  import { humanOrOrgStore } from '@/modules/sys/human-or-org/store';
   import { ButtonType, ButtonId } from '@/components/ui/button/types';
   import { validation } from './validation';
   import { ModalType } from '@/components/ui/modal/types';
@@ -27,9 +26,9 @@
   import SC from '@/components/set-common';
   import SimpleImageSelector from '@/components/ui/simple-image-selector';
   import TreeView from '@/components/ui/tree-view';
-  import { Store } from '../store';
+  import Store from '../store';
   import { Debug } from '@/lib/js/debug';
-
+  import { SJSON } from '@/lib/js/sjson';
   // Props
   export let view: ViewStore;
   export let store: Store;
@@ -292,8 +291,8 @@
         next: (res: any) => {
           if (res.response && res.response.data) {
             // if error
-            if (res.response.data.message) {
-              scRef.snackbarRef().showUnknownError(res.response.data.message);
+            if (!SJSON.isJson(res.response.data) || res.response.data.message) {
+              scRef.snackbarRef().showUnknownError(res.response.data.message || res.response.data);
             } else {
               form.errors.errors = form.recordErrors(res.response.data);
             }

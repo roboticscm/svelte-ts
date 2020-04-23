@@ -1,25 +1,15 @@
 <script lang="ts">
   import { onMount, createEventDispatcher } from 'svelte';
-  import { T } from '@/lib/js/locale/locale';
-  import { settingsStore } from '@/store/settings';
-  import { Observable } from 'rxjs';
-  import { take } from 'rxjs/operators';
   import Button from '@/components/ui/button';
   import { ButtonType } from '@/components/ui/button/types';
 
-  export let id: string;
   export let data: any[] = [];
   export let disabled = false;
-  export let saveState = false;
-  export let autoLoad = false;
-  export let selectedId: string = undefined;
-  export let menuPath: string;
   export let showButtons = true;
 
   const dispatch = createEventDispatcher();
 
-  let selectRef: any;
-  let _selectedId = selectedId;
+  let ulRef: any;
 
   const onChange = (event) => {
     dispatch('change', getCheckedIds());
@@ -45,7 +35,7 @@
 
   export const getCheckedItems = () => {
     const results: any[] = [];
-    const checkList: any[] = selectRef.getElementsByTagName('input');
+    const checkList: any[] = ulRef.getElementsByTagName('input');
     for (const [index, item] of Array.from(checkList).entries()) {
       if (item.checked) {
         results.push(data[index]);
@@ -58,7 +48,7 @@
   onMount(() => {});
 
   const checkAll = (checked: boolean) => {
-    const checkList: any[] = selectRef.getElementsByTagName('input');
+    const checkList: any[] = ulRef.getElementsByTagName('input');
     for (const [index, item] of Array.from(checkList).entries()) {
       if (checked === undefined) {
         item.checked = !item.checked;
@@ -85,10 +75,10 @@
     <Button on:click={() => checkAll(undefined)} btnType={ButtonType.ToggleSelection} />
   </div>
 {/if}
-<ul style="padding: 0; list-style: none;" bind:this={selectRef} class="full-width" {id} on:change={onChange} {disabled}>
+<ul style="padding: 0; list-style: none;" bind:this={ulRef} class="full-width" on:change={onChange}>
   {#each data as item}
     <li>
-      <input type="checkbox" bind:checked={item.checked} />
+      <input type="checkbox" bind:checked={item.checked} {disabled} />
       {item.name}
     </li>
   {/each}
